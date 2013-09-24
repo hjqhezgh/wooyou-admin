@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>配置化工程</title>
+    <script src="/lessgo/static/js/sea.js" id="seajsnode" data-config="config"></script>
+    <link href="/lessgo/static/js/lib/jq-ui/1.10.3/css/redmond/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+    <link href="/lessgo/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/lessgo/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/lessgo/static/css/admin.css" rel="stylesheet">
+</head>
+<body>
+<div class="leftcon">
+    <div class="logo"><h1>内控管理系统</h1></div>
+    <!--E logo-->
+    <div class="datewidget">今天是：2013.9.13 16:15:20</div>
+    <!--E datewidget-->
+    <div class="leftmenu">
+        <ul>
+        </ul>
+    </div>
+    <!--E leftmenu-->
+</div>
+<!--E leftcon-->
+
+<div class="content">
+<div class="head">
+    <div class="headerright">
+        <div class="right-text"><span class="user">你好，sara！</span></div>
+        <!--E right-text-->
+        <div class="right-text">
+            <a href="javascript:viod(0);">我的桌面</a>
+        </div>
+        <!--E right-text-->
+        <div class="right-text">
+            <a href="javascript:viod(0);">修改密码</a>
+        </div>
+        <!--E right-text-->
+        <div class="right-text">
+            <a href="javascript:viod(0);">其他后台管理<i class="icon"></i></a>
+
+            <div class="down-menu" style="display:none;">
+                <ul>
+                    <li><a href="">Wooyou后台管理</a></li>
+                </ul>
+            </div>
+            <!--E down-menu-->
+        </div>
+        <!--E right-text-->
+        <div class="right-text">
+            <a href="javascript:viod(0);">退出</a>
+        </div>
+        <!--E right-text-->
+    </div>
+    <!--E headerright-->
+</div>
+<!--E head-->
+
+<div class="break">
+    <ul>
+        <li><a href="javascript:viod(0);">基础设置</a> <span class="divider">/</span></li>
+        <li><a href="javascript:viod(0);">课程管理</a> <span class="divider">/</span></li>
+        <li class="active">门店管理</li>
+    </ul>
+</div>
+<!--E break-->
+
+<div class="wrap">
+<div class="history">
+    <i class="icon-tags"></i> 你查看过：<a href="javascript:viod(0);">百度</a> ， <a href="javascript:viod(0);">谷歌</a>
+</div>
+<!--E history-->
+{{.Content}}
+</div>
+<!--E wrap-->
+</div>
+<!--E content-->
+<script id="menuItem" type="text/template">
+    <li {@if url != ''}class="admin1"{@/if}>
+        <a {@if url != ''}href="${url}" {@else} href="javascript:viod(0);" {@/if}  >${text}</a>
+        {@if url === ''}
+        <dl>
+            {@each children as item}
+            <dd><a href="${item.url}">${item.text}</a></dd>
+            {@/each}
+        </dl>
+        {@/if}
+    </li>
+</script>
+<script type="text/javascript">
+    seajs.use(['jquery','juicer'],function(){
+        var menus = [
+            {
+                id : 1,
+                text : '基础设置',
+                icon : '',
+                url : '',
+                children : [
+                    {
+                        id : 101,
+                        text : '门店管理',
+                        icon : '',
+                        url : '/web/center'
+                    },
+                    {
+                        id : 102,
+                        text : '教室管理',
+                        icon : '',
+                        url : '/web/room'
+                    }
+                ]
+            },
+            {
+                id : 2,
+                text : '视频管理',
+                icon : '',
+                url : '/web/video',
+                children : [
+                ]
+            }
+        ];
+
+
+        for (var i=0;i<menus.length;i++){
+            $('.leftmenu').find('ul').append(juicer($('#menuItem').html(),menus[i]));
+        }
+
+        var now = new Date();
+        $('.datewidget').html('当前时间：'+now.getFullYear()+'.'+(now.getMonth()+1)+'.'+now.getDate()+' '+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds());
+    });
+
+</script>
+</body>
+</html>

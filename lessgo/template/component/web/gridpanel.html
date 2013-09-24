@@ -1,0 +1,90 @@
+{{$entity := .Entity}}
+{{$id := getComponentId "gridpanel" }}
+{{$tableId := getComponentId "table" }}
+{{$pageId := getComponentId "page" }}
+{{$terminal := .Terminal }}
+<div class="block gridpanel" id="{{$id}}" style="width: {{.Gridpanel.Width}}px;">
+    <h4 class="title">
+        <i class="icon-table"></i>{{.Gridpanel.Title}}
+	 			<span class="iconright">
+	 				<!--点击收起的时候用这个<i class="icon-plus-sign"></i>-->
+	 				<i class="icon-minus-sign"></i>
+	 			</span>
+    </h4>
+
+    <div class="cont">
+        <div class="input-box text-center">
+            <form class="form-inline">
+                {{range $searchIndex,$search := .Gridpanel.Searchs}}
+                <div class="inline form-field"
+                     field-desc="{{$search.Desc}}"
+                     field-name="{{$search.Field}}"
+                     field-searchType="{{$search.SearchType}}"
+                     field-inputType="{{$search.InputType}}"
+                     field-localData="{{$search.LocalData}}"
+                     field-url="{{$search.Url}}"
+                     field-valueField="{{$search.ValueField}}"
+                     field-descField="{{$search.DescField}}"
+                        >
+                </div>
+                {{end}}
+                <div class="inline">
+                    <a href="javascript:void(0)" data-action="search" class="btn btn-primary">搜索</a>
+                    <a href="javascript:void(0)" data-action="reset"  class="btn">重置</a>
+                </div>
+            </form>
+
+            <div class="table-box">
+                <table id="{{$tableId}}"></table>
+                <div class="page" id="{{$pageId}}"></div>
+            </div><!--E table-box-->
+        </div>
+    </div><!--E cont-->
+</div><!--E block-->
+
+<script type="text/javascript">
+    seajs.use('lessgo-grid',function(){
+        var {{$id}}ColumnModels = [];
+        var {{$id}}ColumnNames = [];
+        var {{$id}}Actions = [];
+
+        var {{$id}}Width = {{.Gridpanel.Width}}-50;
+
+        {{range $columnIndex,$column := .Gridpanel.Columns}}
+        {{$id}}ColumnModels.push({
+            "name" : '{{$column.Field}}',
+            "index" : '{{$column.Field}}',
+            "width":70,
+            "sortable":false
+        });
+        {{$id}}ColumnNames.push('{{$column.Desc}}');
+        {{end}}
+
+        {{if .Gridpanel.Actions}}
+        {{range .Gridpanel.Actions}}
+        {{$id}}Actions.push({
+            action : '{{.Action}}',
+            desc : '{{.Desc}}',
+            url : '{{.Url}}'
+        });
+        {{end}}
+        {{end}}
+
+        $('#{{$id}}').grid({
+            tableId : '{{$tableId}}',
+            pageId : '{{$pageId}}',
+            dataurl:'/{{.Terminal}}/{{.Entity.Id}}/page?componentId={{.Gridpanel.Id}}',
+            addurl:'/{{$terminal}}/{{$entity.Id}}/add',
+            modifyurl:'/{{$terminal}}/{{$entity.Id}}/modify/',
+            deleteurl:'/{{$terminal}}/{{$entity.Id}}/delete/',
+            colNames:{{$id}}ColumnNames,
+            width:{{$id}}Width,
+            height:{{.Gridpanel.Height}},
+            colModel:{{$id}}ColumnModels,
+            rowNum:{{.Gridpanel.PageSize}},
+            actions:{{$id}}Actions
+        });
+    });
+
+
+</script>

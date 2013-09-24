@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <mutiformpanel id="form1">
+
+        <publicelement>
+            <element field="cid" type="remoteSelect" url="/web/center/alldata" valueField="cid" validate="notNull" descField="name" desc="所属门店"/>
+            <element field="week" type="dateweek" validate="notNull" desc="时间"/>
+        </publicelement>
+
+        <formtab entity="marketing_data" desc="市场数据">
+            <element field="plan_amount" type="text" validate="notNull,float" desc="目标销售金额"/>
+            <element field="total_class_num" type="text" validate="notNull,num" desc="开班总数"/>
+            <element field="new_class_num" type="text" validate="notNull,num" desc="新开班数"/>
+            <element field="attendance" type="text" validate="notNull,num" desc="出席人数"/>
+            <element field="sell_amount" type="text" validate="notNull,float" desc="签单金额"/>
+            <element field="new_member_num" type="text" validate="notNull,num" desc="新会员增长人数"/>
+            <element field="continue_amount" type="text" validate="notNull,float" desc="续单金额"/>
+            <element field="continue_member_num" type="text" validate="notNull,num" desc="续单人数"/>
+            <element field="continue_rate" type="text" validate="notNull,float" desc="续单率"/>
+            <element field="lost_member_num" type="text" validate="notNull,num" desc="流失人数"/>
+            <element field="market_list_num" type="text" validate="notNull,num" desc="市场名单数"/>
+            <element field="phone_num" type="text" validate="notNull,num" desc="顾问电话数"/>
+            <element field="attempt_num" type="text" validate="notNull,num" desc="体验人数"/>
+            <element field="sell_rate" type="text" validate="notNull,float" desc="签单率"/>
+        </formtab>
+
+        <formtab entity="inside_cost_data" desc="内部费用">
+            <element field="budget" type="text" validate="notNull" desc="内部费用预算"/>
+            <element field="toy_amount" type="text" validate="notNull" desc="玩具进货金额"/>
+            <element field="toy_num" type="text" validate="notNull" desc="销售金额"/>
+            <element field="toy_sell_amount" type="text" validate="notNull" desc="销售件数"/>
+            <element field="toy_sell_num" type="text" validate="notNull" desc="材料采购金额"/>
+            <element field="teaching_aid_amount" type="text" validate="notNull" desc="教具采购金额"/>
+            <element field="material_sell_amount" type="text" validate="notNull" desc="教材收费金额"/>
+            <element field="teaching_aid_sell_amount" type="text" validate="notNull" desc="教具收费金额"/>
+            <element field="consumables_amount" type="text" validate="notNull" desc="低值易耗品消耗金额"/>
+            <element field="phone_cost" type="text" validate="notNull" desc="电话费"/>
+            <element field="water_elec_cost" type="text" validate="notNull" desc="水电费"/>
+        </formtab>
+
+        <formtab entity="hr_data" desc="人事数据">
+            <element field="plan_num" type="text" validate="notNull" desc="人事目标"/>
+            <element field="teacher" type="text" validate="notNull" desc="老师"/>
+            <element field="sa" type="text" validate="notNull" desc="SA"/>
+            <element field="other" type="text" validate="notNull" desc="其他各岗位"/>
+            <element field="new_staff" type="text" validate="notNull" desc="新增员工数"/>
+            <element field="leave_num" type="text" validate="notNull" desc="离职数"/>
+            <element field="best_continue_teacher" type="text" validate="notNull" desc="续单最优老师"/>
+            <element field="best_seller" type="text" validate="notNull" desc="签单最优顾问"/>
+            <element field="best_exper_teacher" type="text" validate="notNull" desc="体验签单最优老师"/>
+        </formtab>
+
+        <formtab entity="outside_cost_data" desc="外部费用">
+            <element field="plan_amount" type="text" validate="notNull" desc="外部费用预算"/>
+            <element field="ad_amount" type="text" validate="notNull" desc="广告投入费用"/>
+            <element field="activity_charge" type="text" validate="notNull" desc="中心举办活动收费"/>
+            <element field="activity_per_num" type="text" validate="notNull" desc="参加人次"/>
+            <element field="activity_cost" type="text" validate="notNull" desc="活动成本"/>
+            <element field="activity_list_num" type="text" validate="notNull" desc="活动名单数"/>
+            <element field="bee_salary" type="text" validate="notNull" desc="小蜜蜂工资"/>
+        </formtab>
+
+        <formtab entity="satisfaction_data" desc="满意度">
+            <element field="en_satisfaction" type="text" validate="notNull" desc="英语家长满意度"/>
+            <element field="art_satisfaction" type="text" validate="notNull" desc="美术家长满意度"/>
+            <element field="complaint_num" type="text" validate="notNull" desc="家长投诉次数"/>
+            <element field="reason" type="textarea" validate="notNull" desc="家长不续单原因前三"/>
+        </formtab>
+
+    </mutiformpanel>
+</viewport>

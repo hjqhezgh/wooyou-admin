@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--该文件用来配置数据库实体-->
+<entitys>
+    <!--id既可以用来获取该实体，同时表示实体在数据库中的表名-->
+    <entity id="demo1">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="name"/>
+        <field name="age"/>
+        <field name="birthday"/>
+        <field name="create_time"/>
+        <field name="state"/>
+        <field name="sex"/>
+        <field name="address"/>
+        <field name="week"/>
+        <field name="htmltext"/>
+        <field name="sid"/>
+        <!--在已经配置field的情况下，需要再配置ref来实现多表的数据获取-->
+        <ref entity="school" field="sid" refEntityField="sid">
+            <field name="sid"/>
+            <field name="name"/>
+        </ref>
+        <field name="region_code"/>
+        <ref entity="region" field="region_code" refEntityField="code">
+            <field name="code"/>
+            <field name="name"/>
+        </ref>
+    </entity>
+
+    <entity id="demo2">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="name"/>
+        <field name="age"/>
+        <field name="birthday"/>
+        <field name="create_time"/>
+        <field name="state"/>
+        <field name="sex"/>
+        <field name="address"/>
+        <field name="week"/>
+        <field name="sid"/>
+        <!--在已经配置field的情况下，需要再配置ref来实现多表的数据获取-->
+        <ref entity="school" field="sid" refEntityField="sid">
+            <field name="sid"/>
+            <field name="name"/>
+        </ref>
+        <field name="region_code"/>
+        <ref entity="region" field="region_code" refEntityField="code">
+            <field name="code"/>
+            <field name="name"/>
+        </ref>
+    </entity>
+
+    <entity id="school">
+        <pk>sid</pk>
+        <field name="name"/>
+    </entity>
+
+    <entity id="center">
+        <pk>cid</pk>
+        <field name="name"/>
+    </entity>
+
+    <entity id="pic">
+        <pk>pid</pk>
+    </entity>
+
+    <entity id="hr_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="plan_num"/>
+        <field name="teacher"/>
+        <field name="sa"/>
+        <field name="other"/>
+        <field name="new_staff"/>
+        <field name="leave_num"/>
+        <field name="best_continue_teacher"/>
+        <field name="best_seller"/>
+        <field name="best_exper_teacher"/>
+    </entity>
+
+    <entity id="inside_cost_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="budget"/>
+        <field name="toy_amount"/>
+        <field name="toy_num"/>
+        <field name="toy_sell_amount"/>
+        <field name="toy_sell_num"/>
+        <field name="teaching_aid_amount"/>
+        <field name="material_sell_amount"/>
+        <field name="teaching_aid_sell_amount"/>
+        <field name="water_elec_cost"/>
+        <field name="consumables_amount"/>
+        <field name="phone_cost"/>
+    </entity>
+
+    <entity id="marketing_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="plan_amount"/>
+        <field name="total_class_num"/>
+        <field name="new_class_num"/>
+        <field name="attendance"/>
+        <field name="sell_amount"/>
+        <field name="new_member_num"/>
+        <field name="continue_amount"/>
+        <field name="continue_member_num"/>
+        <field name="continue_rate"/>
+        <field name="lost_member_num"/>
+        <field name="market_list_num"/>
+        <field name="phone_num"/>
+        <field name="attempt_num"/>
+        <field name="sell_rate"/>
+    </entity>
+
+    <entity id="outside_cost_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="plan_amount"/>
+        <field name="ad_amount"/>
+        <field name="activity_charge"/>
+        <field name="activity_per_num"/>
+        <field name="activity_cost"/>
+        <field name="activity_list_num"/>
+        <field name="bee_salary"/>
+    </entity>
+
+    <entity id="satisfaction_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="en_satisfaction"/>
+        <field name="art_satisfaction"/>
+        <field name="complaint_num"/>
+        <field name="reason"/>
+    </entity>
+</entitys>

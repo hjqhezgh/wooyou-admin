@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <gridpanel entity="demo1" pageSize="2" title="示例数据" id="grid" width="1200" height="250">
+        <search field="name" searchType="like" inputType="text" desc="名字的模糊查询"/>
+        <search field="sex" searchType="eq" inputType="localSelect" desc="性别的确定查询" localData="[{desc:'男',value:'男'},{desc:'女',value:'女'}]"/>
+        <search field="sid" searchType="eq" inputType="remoteSelect" desc="所属学校" url="/web/school/alldata" valueField="sid" descField="name" />
+        <search field="birthday" searchType="ge" inputType="date" desc="生日起始时间"/>
+        <search field="birthday" searchType="le" inputType="datetime" desc="生日结束时间"/>
+
+        <column field="name" desc="名字" linkType="currentPage" url="http://www.baidu.com" loadParamName="name" loadParamValue="this"/>
+        <column field="age" desc="年龄"/>
+        <column field="birthday" desc="生日"/>
+        <column field="create_time" desc="创建时间"/>
+        <column field="state" desc="状态"/>
+        <column field="sex" desc="性别"/>
+        <column field="address" desc="地址"/>
+        <column field="school.name" desc="所属学校"/>
+        <column field="region.name" desc="所属区域"/>
+
+        <action desc="添加" action="add" />
+        <action desc="修改" action="modify" />
+        <action desc="删除" action="delete" />
+        <action desc="自定义按钮" action="custom" url="http://www.baidu.com"/>
+    </gridpanel>
+</viewport>

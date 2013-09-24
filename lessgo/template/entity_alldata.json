@@ -1,0 +1,16 @@
+{{$dataLength := .DataLength}}
+{{$fieldLength := .FieldLength}}
+{
+    "success" : true,
+    "code" : 200,
+    "datas":[
+    {{ range $modelIndex,$model:= .Models}}
+         {
+             "{{.Entity.Pk}}":"{{$model.Id}}",
+         {{range $propIndex,$prop := $model.Props}}
+            "{{$prop.Name}}":"{{getPropValue $model $prop.Name}}"{{if compareInt $propIndex $fieldLength "lt"}},{{end}}
+         {{end}}
+         }{{if compareInt $modelIndex $dataLength "lt"}},{{end}}
+    {{end}}
+    ]
+}

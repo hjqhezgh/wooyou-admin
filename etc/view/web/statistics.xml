@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <gridpanel entity="marketing_data" pageSize="10" title="市场数据" id="grid1" width="1200" height="250">
+        <search field="week" searchType="like" inputType="text" desc="时间，格式【（2013年8月份就输入201308），（2013年8月份第2周就输入2013082）】"/>
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属门店" url="/web/center/alldata" valueField="cid" descField="name" />
+        <column field="center.name" desc="所属门店"/>
+        <column field="week" desc="时间"/>
+        <column field="plan_amount" desc="目标销售金额"/>
+        <column field="total_class_num" desc="开班总数"/>
+        <column field="new_class_num" desc="新开班数"/>
+        <column field="attendance" desc="出席人数"/>
+        <column field="sell_amount" desc="签单金额"/>
+        <column field="new_member_num" desc="新会员增长人数"/>
+        <column field="continue_amount" desc="续单金额"/>
+        <column field="continue_member_num" desc="续单人数"/>
+        <column field="continue_rate" desc="续单率"/>
+        <column field="lost_member_num" desc="流失人数"/>
+        <column field="market_list_num" desc="市场名单数"/>
+        <column field="phone_num" desc="顾问电话数"/>
+        <column field="attempt_num" desc="体验人数"/>
+        <column field="sell_rate" desc="签单率"/>
+    </gridpanel>
+
+    <gridpanel entity="inside_cost_data" pageSize="10" title="内部费用" id="grid2" width="1200" height="250">
+        <search field="week" searchType="like" inputType="text" desc="时间，格式【（2013年8月份就输入201308），（2013年8月份第2周就输入2013082）】"/>
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属门店" url="/web/center/alldata" valueField="cid" descField="name" />
+        <column field="center.name" desc="所属门店"/>
+        <column field="week" desc="时间"/>
+        <column field="budget" desc="内部费用预算"/>
+        <column field="toy_amount" desc="玩具进货金额"/>
+        <column field="toy_num" desc="销售金额"/>
+        <column field="toy_sell_amount" desc="销售件数"/>
+        <column field="toy_sell_num" desc="材料采购金额"/>
+        <column field="teaching_aid_amount" desc="教具采购金额"/>
+        <column field="material_sell_amount" desc="教材收费金额"/>
+        <column field="teaching_aid_sell_amount" desc="教具收费金额"/>
+        <column field="consumables_amount" desc="低值易耗品消耗金额"/>
+        <column field="phone_cost" desc="电话费"/>
+        <column field="water_elec_cost" desc="水电费"/>
+    </gridpanel>
+
+    <gridpanel entity="hr_data" pageSize="10" title="人事数据" id="grid3" width="1200" height="250">
+        <search field="week" searchType="like" inputType="text" desc="时间，格式【（2013年8月份就输入201308），（2013年8月份第2周就输入2013082）】"/>
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属门店" url="/web/center/alldata" valueField="cid" descField="name" />
+        <column field="center.name" desc="所属门店"/>
+        <column field="week" desc="时间"/>
+        <column field="plan_num" desc="人事目标"/>
+        <column field="teacher" desc="老师"/>
+        <column field="sa" desc="SA"/>
+        <column field="other" desc="其他各岗位"/>
+        <column field="new_staff" desc="新增员工数"/>
+        <column field="leave_num" desc="离职数"/>
+        <column field="best_continue_teacher" desc="续单最优老师"/>
+        <column field="best_seller" desc="签单最优顾问"/>
+        <column field="best_exper_teacher" desc="体验签单最优老师"/>
+    </gridpanel>
+
+    <gridpanel entity="outside_cost_data" pageSize="10" title="外部费用" id="grid4" width="1200" height="250">
+        <search field="week" searchType="like" inputType="text" desc="时间，格式【（2013年8月份就输入201308），（2013年8月份第2周就输入2013082）】"/>
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属门店" url="/web/center/alldata" valueField="cid" descField="name" />
+        <column field="center.name" desc="所属门店"/>
+        <column field="week" desc="时间"/>
+        <column field="plan_amount" desc="外部费用预算"/>
+        <column field="ad_amount" desc="广告投入费用"/>
+        <column field="activity_charge" desc="中心举办活动收费"/>
+        <column field="activity_per_num" desc="参加人次"/>
+        <column field="activity_cost" desc="活动成本"/>
+        <column field="activity_list_num" desc="活动名单数"/>
+        <column field="bee_salary" desc="小蜜蜂工资"/>
+    </gridpanel>
+
+    <gridpanel entity="satisfaction_data" pageSize="10" title="满意度" id="grid5" width="1200" height="250">
+        <search field="week" searchType="like" inputType="text" desc="时间，格式【（2013年8月份就输入201308），（2013年8月份第2周就输入2013082）】"/>
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属门店" url="/web/center/alldata" valueField="cid" descField="name" />
+        <column field="center.name" desc="所属门店"/>
+        <column field="week" desc="时间"/>
+        <column field="en_satisfaction" desc="英语家长满意度"/>
+        <column field="art_satisfaction" desc="美术家长满意度"/>
+        <column field="complaint_num" desc="家长投诉次数"/>
+        <column field="reason" desc="家长不续单原因前三"/>
+    </gridpanel>
+</viewport>

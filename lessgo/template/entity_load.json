@@ -1,0 +1,11 @@
+{{$model := .Model}}
+{{$fieldLength := .FieldLength}}
+{
+    "success" : true,
+    "code" : 200,
+    "data":{
+    {{range $fieldIndex,$field := .Entity.Fields}}
+    "{{$field.Name}}":"{{getPropValue $model $field.Name }}"{{if compareInt $fieldIndex $fieldLength "lt"}},{{end}}
+    {{end}}
+    }
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <formpanel entity="demo1" id="form">
+        <element field="name" type="text" validate="notNull,len(4-9)" desc="名字"/>
+        <element field="age" type="text" validate="notNull,num" desc="年龄"/>
+        <element field="birthday" type="date" validate="notNull" desc="生日"/>
+        <element field="create_time" type="datetime" validate="notNull" desc="创建时间"/>
+        <element field="state" type="hidden" defaultValue="1"/>
+        <!--里面请用'引号-->
+        <element field="sex"  type="localSelect" validate="notNull" localData="[{desc:'男',value:'男'},{desc:'女',value:'女'}]" desc="性别" />
+        <element field="address"  type="textarea" desc="地址" />
+        <element field="sid" type="remoteSelect" url="/web/school/alldata" valueField="sid" descField="name" desc="所属学校"/>
+        <element field="region_code" type="area" validate="notNull" desc="地域" />
+        <element field="pid" type="image" imageEntity="pic" imagePath="../demoimg" resolutions="[{width:50,height:50},{width:30,height:30},{width:20,height:20}]" desc="图片" />
+        <element field="htmltext" type="htmleditor" desc="网页正文" />
+    </formpanel>
+</viewport>

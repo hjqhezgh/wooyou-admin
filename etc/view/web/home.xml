@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <container>
+        <gridpanel entity="demo1" pageSize="2" title="示例数据" id="grid1" width="1200" height="250">
+            <search field="name" searchType="like" desc="名字的模糊查询"/>
+
+            <column field="name" desc="名字"/>
+            <column field="age" desc="年龄"/>
+            <column field="birthday" desc="生日"/>
+            <column field="create_time" desc="创建时间"/>
+            <column field="state" desc="状态"/>
+            <column field="sex" desc="性别"/>
+            <column field="address" desc="地址"/>
+            <column field="school.name" desc="所属学校"/>
+        </gridpanel>
+
+        <gridpanel entity="demo1" pageSize="2" title="示例数据" id="grid2" width="400" height="250">
+            <column field="name" desc="名字"/>
+            <column field="age" desc="年龄"/>
+        </gridpanel>
+    </container>
+</viewport>

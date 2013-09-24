@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--该文件用来配置url与视图的映射-->
+<!--
+    url配置严格遵守rest风格，这里的规约就是/终端类型/实体id/操作（或页面）/id[视操作而定，可选]
+
+    应用首页默认会加载对应终端下的home.xml
+
+    对于一个实体的一种终端而言，目前共有下面几种url可能性:
+    video实体首页        action=index    path=/web/video或者/web/video/index.html
+    video实体数据页      action=page     path=/web/video/data
+    video实体添加页      action=add      path=/web/video/add
+    video实体修改页      action=modify   path=/web/modify/id
+    video实体加载页      action=load     path=/web/load/id
+    video实体详情页      action=detail   path=/web/video/id
+    video实体保存页      action=index    path=/web/video/save
+    video实体删除页      action=delete   path=/web/video/delete/id
+    video实体所有数据页  action=alldate   path=/web/video/alldate
+
+    用户自己加入的非实体页面，可以通过该文件进行配置，配置的时候请注意不要和现有实体的url地址冲突，并且目前是不支持通配符的
+    同时也是有终端的概念，第一个文件夹应为终端名，并在相应的终端下放置页面
+-->
+<urls>
+    <!--至少保留一种终端，并在view文件夹下为该终端配置页面-->
+    <terminal>web</terminal>
+    <terminal>phone</terminal>
+    <url path="/web/mytest" view="web/mytest.xml" />
+    <url path="/web/mutiform" view="web/mutiform.xml" />
+    <url path="/web/statistics" view="web/statistics.xml" />
+    <url path="/web/statistics-add" view="web/statistics-add.xml" />
+</urls>

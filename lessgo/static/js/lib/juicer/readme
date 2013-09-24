@@ -1,0 +1,5 @@
+使用方法：
+在相关的页面模块中引入
+require('juicer');这时全局范围内会产生一个juicer方法
+可以利用该方法进行模板数据合并，console.log(juicer("${name}",{name:"hjq"}));
+详细的api和demo请见：http://juicer.name/docs/docs_zh_cn.html#!demo
