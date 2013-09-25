@@ -78,53 +78,24 @@
 <!--E content-->
 <script id="menuItem" type="text/template">
     <li {@if url != ''}class="admin1"{@/if}>
-        <a {@if url != ''}href="${url}" {@else} href="javascript:viod(0);" {@/if}  >${text}</a>
-        {@if url === ''}
-        <dl>
-            {@each children as item}
-            <dd><a href="${item.url}">${item.text}</a></dd>
-            {@/each}
-        </dl>
-        {@/if}
+    <a {@if url != ''}href="${url}" {@else} href="javascript:viod(0);" {@/if}  >${name}</a>
+    {@if url === ''}
+    <dl>
+        {@each children as item}
+        <dd><a href="${item.url}">${item.name}</a></dd>
+        {@/each}
+    </dl>
+    {@/if}
     </li>
 </script>
 <script type="text/javascript">
     seajs.use(['jquery','juicer'],function(){
-        var menus = [
-            {
-                id : 1,
-                text : '基础设置',
-                icon : '',
-                url : '',
-                children : [
-                    {
-                        id : 101,
-                        text : '门店管理',
-                        icon : '',
-                        url : '/web/center'
-                    },
-                    {
-                        id : 102,
-                        text : '教室管理',
-                        icon : '',
-                        url : '/web/room'
-                    }
-                ]
-            },
-            {
-                id : 2,
-                text : '视频管理',
-                icon : '',
-                url : '/web/video',
-                children : [
-                ]
+        $.get('/queryMenus',{username:'liuli'},function(data){
+            var menus = data.menus;
+            for (var i=0;i<menus.length;i++){
+                $('.leftmenu').find('ul').append(juicer($('#menuItem').html(),menus[i]));
             }
-        ];
-
-
-        for (var i=0;i<menus.length;i++){
-            $('.leftmenu').find('ul').append(juicer($('#menuItem').html(),menus[i]));
-        }
+        },'json');
 
         var now = new Date();
         $('.datewidget').html('当前时间：'+now.getFullYear()+'.'+(now.getMonth()+1)+'.'+now.getDate()+' '+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds());
