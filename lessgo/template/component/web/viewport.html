@@ -59,9 +59,13 @@
 
 <div class="break">
     <ul>
-        <li><a href="javascript:viod(0);">基础设置</a> <span class="divider">/</span></li>
-        <li><a href="javascript:viod(0);">课程管理</a> <span class="divider">/</span></li>
-        <li class="active">门店管理</li>
+        {{range $index,$crumb:= .Crumbs.Crumbs}}
+        {{if compareString $crumb.CurrentPage "true"}}
+        <li class="active">{{$crumb.Text}}</li>
+        {{else}}
+        <li><a href="{{$crumb.Url}}">{{$crumb.Text}}</a> <span class="divider">/</span></li>
+        {{end}}
+        {{end}}
     </ul>
 </div>
 <!--E break-->
@@ -90,7 +94,7 @@
 </script>
 <script type="text/javascript">
     seajs.use(['jquery','juicer'],function(){
-        $.get('/queryMenus',{username:'liuli'},function(data){
+        $.get('/queryMenus',{username:'{{.Employee.UserName}}'},function(data){
             var menus = data.menus;
             for (var i=0;i<menus.length;i++){
                 $('.leftmenu').find('ul').append(juicer($('#menuItem').html(),menus[i]));

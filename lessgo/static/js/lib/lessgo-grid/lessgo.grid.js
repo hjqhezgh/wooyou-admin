@@ -221,12 +221,29 @@ jQuery.fn.grid = function (opts) {
 
         });
 
+        this.removeConfigAttr();
+
         //美化按钮
         this.find('a[data-action=reset]').button();
 
         this.find('a[data-action=search]').button();
 
         this.bindFormEvent();
+    }
+
+    this.removeConfigAttr = function(){
+        this.find('div.form-field')
+            .removeAttr("field-type")
+            .removeAttr("field-name")
+            .removeAttr("field-value")
+            .removeAttr("field-desc")
+            .removeAttr("field-localData")
+            .removeAttr("field-url")
+            .removeAttr("field-valueField")
+            .removeAttr("field-descField")
+            .removeAttr("field-readonly")
+            .removeAttr("field-defaultValue")
+            .removeAttr("field-validate");
     }
 
     this.bindFormEvent = function(){
