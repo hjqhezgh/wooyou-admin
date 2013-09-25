@@ -35,8 +35,6 @@ func main() {
 
 	fmt.Println("服务器监听",portString,"端口")
 
-	lessgo.GetMySQL()
-
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
 }
