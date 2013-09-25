@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"strconv"
 	"github.com/hjqhezgh/lessgo"
+	"server"
 )
 
 func main() {
@@ -27,6 +28,8 @@ func main() {
 	portString,_ := lessgo.Config.GetValue("lessgo","port")
 
 	port,_ := strconv.Atoi(portString)
+
+	r.HandleFunc("/login", server.LoginAction)
 
 	http.Handle("/", r)
 

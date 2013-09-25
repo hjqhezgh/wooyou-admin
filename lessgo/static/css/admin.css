@@ -62,3 +62,16 @@ ul,li{ list-style:none;margin:0; padding:0;}
 .tab-box .nav-tabs > li > a{border-radius:0;background-image: linear-gradient(to bottom, #F7F7F7, #ebeceb);border-color:#ccc;}
 .tab-box .nav-tabs > .active > a,.tab-box .nav-tabs > .active > a:hover,.tab-box .nav-tabs > .active > a:focus{background:#f8f8f8;border-color:#ccc #ccc transparent;}
 .tab-box .nav-tabs > li > a,.tab-box .nav-pills > li > a{margin-right:-1px; padding:10px 20px;}
+
+/*login*/
+.loginbg{background:#ebebeb;}
+.loginbox{width:355px;height:auto;margin:10% auto 0;border:1px solid #dbdbdb;background:#fff;}
+.loginbox .logo{padding:10px 0 10px 10px;}
+.login-cont{padding:20px 40px 0;}
+.loginbtnbox{padding:10px 40px 10px;background:#f9f9f9;border-top:1px solid #dbdbdb;}
+.login-cont label{margin-bottom:10px;}
+.login-cont input{width:260px;height:25px;}
+.login-cont .form-horizontal .control-label{width:120px;}
+.login-cont .form-horizontal .controls{margin-left:140px;}
+.loginbtnbox .checkbox{margin-bottom:10px;}
+.loginbtnbox button{margin-left:120px;}
