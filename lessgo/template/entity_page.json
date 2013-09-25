@@ -1,6 +1,5 @@
 {{$dataLength := .DataLength}}
 {{$fieldLength := .FieldLength}}
-{{$gridpanel := .Gridpanel}}
 {
     "page": "{{.PageData.CurrPageNo}}",
     "total": "{{.PageData.TotalPage}}",
@@ -12,16 +11,7 @@
             "cell": [
                 {{range $propIndex,$prop := $model.Props}}
                 {{$propValue := getPropValue $model $prop.Name}}
-                {{$column := getColumn $gridpanel $prop.Name}}
-
-                {{if compareString $column.LinkType "currentPage"}}
-                "<a style='color:blue;text-decoration:underline;' href='{{$column.Url}}{{if compareString $column.LoadParamName "" }}{{else}}?{{ $column.LoadParamName}}={{if compareString $column.LoadParamValue "id" }}{{$model.Id}}{{else}}{{dealJsonString $propValue}}{{end}}{{end}}'>{{dealJsonString $propValue}}</a>"
-                {{if compareInt $propIndex $fieldLength "lt"}},{{end}}
-                {{else}}
                 "{{dealJsonString $propValue}}"{{if compareInt $propIndex $fieldLength "lt"}},{{end}}
-                {{end}}
-
-
                 {{end}}
             ]
         }{{if compareInt $modelIndex $dataLength "lt"}},{{end}}

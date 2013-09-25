@@ -16,7 +16,7 @@
         <field name="htmltext"/>
         <field name="sid"/>
         <!--在已经配置field的情况下，需要再配置ref来实现多表的数据获取-->
-        <ref entity="school" field="sid" refEntityField="sid">
+        <ref entity="school" field="sid" refEntityField="sid" alias="school1">
             <field name="sid"/>
             <field name="name"/>
         </ref>
