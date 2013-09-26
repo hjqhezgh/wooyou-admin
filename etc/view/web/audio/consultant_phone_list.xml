@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="电话录音报表" url="javascript:void(0);"/>
+        <crumb text="顾问通话报表" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="250" loadUrl="false">
+        <column field="centerName" desc="所属门店"/>
+        <column field="centerId" desc="所属门店ID" hidden="true"/>
+        <column field="employeeId" desc="顾问ID"  hidden="true"/>
+        <column field="employeeName" desc="顾问名称" linkType="currentPage" url="/consultant_phone_detail_list" loadParamName="eid" loadParamValue="2"/>
+        <column field="validPhoneNum" desc="总电话数"/>
+        <column field="rank" desc="顾问排名（未实现）"/>
+        <column field="newPhoneNum" desc="新增电话数（未实现）"/>
+        <column field="oldPhoneNum" desc="跟踪电话数（未实现)"/>
+    </customgridpanel>
+</viewport>

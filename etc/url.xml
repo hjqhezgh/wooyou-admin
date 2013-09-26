@@ -22,9 +22,5 @@
 <urls>
     <!--至少保留一种终端，并在view文件夹下为该终端配置页面-->
     <terminal>web</terminal>
-    <terminal>phone</terminal>
-    <url path="/web/mytest" view="web/mytest.xml" />
-    <url path="/web/mutiform" view="web/mutiform.xml" />
-    <url path="/web/statistics" view="web/statistics.xml" />
-    <url path="/web/statistics-add" view="web/statistics-add.xml" />
+    <url path="/web/audio/consultant_phone_list" view="web/audio/consultant_phone_list.xml" />
 </urls>
