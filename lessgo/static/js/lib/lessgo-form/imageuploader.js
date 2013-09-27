@@ -58,6 +58,7 @@ ImageUploader.prototype = {
                 $.ajaxFileUpload({
                     url:"/imgageuplaod",
                     secureuri:false,
+                    data:{fileInputName : mythis.container.attr('field-name')},
                     fileElementId:'fileToUpload',//文件上传的id属性
                     dataType: 'json',//返回值类型为json
                     success: function (data, status){//服务器成功响应处理函数
@@ -65,7 +66,7 @@ ImageUploader.prototype = {
                             mythis.container.find(":hidden").val(data.tmpfile);
                             mythis.container.find("img").attr("src",data.tmpfile);
                         }else{
-                            alert('图片上传视频，请重新上传');
+                            alert('图片上传失败，请重新上传');
                         }
                     },
                     error: function (data, status, e) {//服务器响应失败处理函数
