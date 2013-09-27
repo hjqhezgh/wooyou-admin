@@ -82,4 +82,38 @@ func LoginAction(w http.ResponseWriter,r *http.Request ) {
 	return
 }
 
+type Employee struct {
+	UserId       string `json:"userId"`
+	UserName     string `json:"userName"`
+	ReallyName   string `json:"reallyName"`
+	DepartmentId string `json:"departmentId"`
+	CenterId 	 string `json:"centerId"`
+}
+
+//根据id获取员工信息
+func FindEmployeeById(id int) (Employee,error) {
+
+	var employee Employee
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select user_id,username,really_name,department_id,center_id from employee where user_id=?"
+
+	rows, err := db.Query(sql, id)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return  employee, err
+	}
+
+	if rows.Next() {
+		err := commonlib.PutRecord(rows,&employee.UserId, &employee.UserName,&employee.ReallyName, &employee.DepartmentId, &employee.CenterId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return  employee, err
+		}
+	}
+
+	return employee , nil
+}
 

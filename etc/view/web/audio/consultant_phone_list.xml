@@ -6,7 +6,7 @@
         <crumb text="顾问通话报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="250" loadUrl="false">
+    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="250" loadUrl="true">
         <column field="centerName" desc="所属门店"/>
         <column field="centerId" desc="所属门店ID" hidden="true"/>
         <column field="employeeId" desc="顾问ID"  hidden="true"/>

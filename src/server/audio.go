@@ -70,12 +70,44 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 		}
 	}
 
+	dataType := r.FormValue("dataType")
+
+	if dataType != "all" && dataType != "center" && dataType != "self" {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "非法的url请求"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	params := []interface{}{}
+
 	sql := ""
 	countSql := ""
 
 	sqlForAllData := "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone"
+	sqlForCenterData := "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where cid=? group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone"
+	sqlForEmployeeData := "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone where e.user_id=?"
 
-	sql = sqlForAllData
+	if dataType=="all" {
+		sql = sqlForAllData
+	}else if  dataType=="center"{
+		sql = sqlForCenterData
+		userId,_ := strconv.Atoi(employee.UserId)
+		_employee,err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+		params = append(params,_employee.CenterId)
+	}else if  dataType=="self"{
+		sql = sqlForEmployeeData
+		params = append(params,employee.UserId)
+	}
+
 
 	countSql = "select count(1) from (" +  sql + ") num"
 
@@ -84,7 +116,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql)
+	rows, err := db.Query(countSql,params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -120,7 +152,10 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 
 	lessgo.Log.Debug(sql+" limit ?,?")
 
-	rows, err = db.Query(sql+" limit ?,?", (currPageNo-1)*pageSize, pageSize)
+	params = append(params,(currPageNo-1)*pageSize)
+	params = append(params,pageSize)
+
+	rows, err = db.Query(sql+" limit ?,?", params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
