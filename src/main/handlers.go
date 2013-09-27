@@ -24,4 +24,5 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//音频相关服务
 	"/consultant_phone_list.json": server.ConsultantPhoneListAction,
+	"/consultant_phone_detail_list.json": server.ConsultantPhoneDetailListAction,
 }

@@ -23,4 +23,5 @@
     <!--至少保留一种终端，并在view文件夹下为该终端配置页面-->
     <terminal>web</terminal>
     <url path="/web/audio/consultant_phone_list" view="web/audio/consultant_phone_list.xml" />
+    <url path="/web/audio/consultant_phone_detail_list" view="web/audio/consultant_phone_detail_list.xml" />
 </urls>
