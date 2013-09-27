@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="基础设置" url="javascript:void(0)"/>
+        <crumb text="中心管理" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel entity="center" pageSize="15" title="中心数据" id="grid" width="1200" height="250">
+        <search field="name" searchType="like" inputType="text" desc="中心名字"/>
+
+        <column field="name" desc="名字"/>
+        <column field="telephone" desc="联系电话"/>
+        <column field="intro" desc="简介"/>
+
+        <action desc="添加" action="add" />
+        <action desc="修改" action="modify" />
+    </gridpanel>
+</viewport>

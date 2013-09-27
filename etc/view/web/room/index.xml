@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="基础设置" url="javascript:void(0)"/>
+        <crumb text="教室管理" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel entity="room" pageSize="15" title="中心数据" id="grid" width="1200" height="250">
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+
+        <column field="center.name" desc="所属中心"/>
+        <column field="name" desc="名字"/>
+        <column field="channel" desc="所属视频通道"/>
+
+        <action desc="添加" action="add" />
+        <action desc="修改" action="modify" />
+    </gridpanel>
+</viewport>

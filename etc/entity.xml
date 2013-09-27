@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--该文件用来配置数据库实体-->
 <entitys>
+    <!--中心-->
+    <entity id="center">
+        <pk>cid</pk>
+        <field name="name"/>
+        <field name="telephone"/>
+        <field name="intro"/>
+    </entity>
 
+    <!--教室-->
+    <entity id="room">
+        <pk>rid</pk>
+        <field name="name"/>
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="channel"/>
+    </entity>
 </entitys>
