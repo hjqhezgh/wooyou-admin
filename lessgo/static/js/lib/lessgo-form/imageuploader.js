@@ -46,6 +46,8 @@ ImageUploader.prototype = {
             fieldName:mythis.container.attr('field-name'),
             fieldDesc:mythis.container.attr('field-desc')
         }));
+
+        mythis.fieldName = mythis.container.attr('field-name')
     },
 
     bind : function(){
@@ -58,7 +60,7 @@ ImageUploader.prototype = {
                 $.ajaxFileUpload({
                     url:"/imgageuplaod",
                     secureuri:false,
-                    data:{fileInputName : mythis.container.attr('field-name')},
+                    data:{fileInputName : mythis.fieldName},
                     fileElementId:'fileToUpload',//文件上传的id属性
                     dataType: 'json',//返回值类型为json
                     success: function (data, status){//服务器成功响应处理函数
