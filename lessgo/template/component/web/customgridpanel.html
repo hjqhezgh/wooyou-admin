@@ -97,7 +97,7 @@
         var dataUrl = '{{.CustomGridPanel.Url}}?componentId={{.CustomGridPanel.Id}}'
         {{if compareString .CustomGridPanel.LoadUrl "true"}}
         if(document.URL.lastIndexOf('?')>-1){
-            dataUrl = dataUrl + "&"+ document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length-1);
+            dataUrl = dataUrl + "&"+ document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
         }
         {{end}}
 
