@@ -19,8 +19,6 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"strconv"
 	"math"
-	"math/rand"
-	"time"
 	"fmt"
 	"text/template"
 )
@@ -71,10 +69,39 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 	}
 
 	eid := r.FormValue("eid")
+	year := r.FormValue("year-eq")
+	month := r.FormValue("month-eq")
+	week := r.FormValue("week-eq")
+	startTime := r.FormValue("start_time-eq")
+
+	st := ""
+	et := ""
+
+	if startTime != ""{
+		st = startTime + " 00:00:00"
+		et = startTime + " 23:59:59"
+	}else{
+		if week != "" && month != "" && year != ""{
+			st,et = lessgo.FindRangeTimeDim("","",year+month+week)
+		}else if month != "" && year != ""{
+			st,et = lessgo.FindRangeTimeDim("",year+month,"")
+		}else if year != ""{
+			st,et = lessgo.FindRangeTimeDim(year,"","")
+		}
+	}
 
 	params := []interface{}{}
 
-	sql := "select case a.remotephone when c.father_phone then c.father when c.mother_phone then c.mother  else '未知客户' end as c_name,a.remotephone,a.start_time,a.seconds,a.inout from audio a left join consumer c on (a.remotephone=c.mother_phone and c.mother_phone!='' and c.mother_phone is not null ) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.phone_in_center=a.localphone where a.remotephone !='' and a.remotephone is not null and e.user_id=? order by a.start_time desc"
+	sql := "select a.aid,case a.remotephone when c.father_phone then c.father when c.mother_phone then c.mother  else '未知客户' end as c_name,a.remotephone,e.really_name,a.start_time,a.seconds,a.inout from audio a left join consumer c on (a.remotephone=c.mother_phone and c.mother_phone!='' and c.mother_phone is not null ) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.phone_in_center=a.localphone where a.remotephone !='' and a.remotephone is not null and e.user_id=? "
+
+	params = append(params,eid)
+
+	if st!= "" && et != ""{
+		sql += " and a.start_time >= ? and a.start_time<= ?"
+		params = append(params,st)
+		params = append(params,et)
+	}
+
 	countSql := ""
 
 	countSql = "select count(1) from (" +  sql + ") num"
@@ -84,7 +111,6 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	params = append(params,eid)
 	rows, err := db.Query(countSql,params...)
 
 	if err != nil {
@@ -119,12 +145,15 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 		currPageNo = totalPage
 	}
 
-	lessgo.Log.Debug(sql+" limit ?,?")
+
+	sql += " order by a.start_time desc  limit ?,?"
+
+	lessgo.Log.Debug(sql)
 
 	params = append(params,(currPageNo-1)*pageSize)
 	params = append(params,pageSize)
 
-	rows, err = db.Query(sql+" limit ?,?", params...)
+	rows, err = db.Query(sql, params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -140,13 +169,12 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 	for rows.Next() {
 
 		model := new(lessgo.Model)
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		model.Id = r.Intn(1000)
-		model.Props = []*lessgo.Prop{}
 
 		fillObjects := []interface{}{}
 
-		for i:=0;i<5;i++{
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i:=0;i<6;i++{
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
