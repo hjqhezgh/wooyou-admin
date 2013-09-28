@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"strconv"
 	"github.com/hjqhezgh/lessgo"
+	"server"
 )
 
 func main() {
@@ -38,4 +39,13 @@ func main() {
 
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
+}
+
+//URL映射列表
+var handlers = map[string]func(http.ResponseWriter, *http.Request){
+	"/login": server.LoginAction,
+
+	//音频相关服务
+	"/consultant_phone_list.json": server.ConsultantPhoneListAction,
+	"/consultant_phone_detail_list.json": server.ConsultantPhoneDetailListAction,
 }
