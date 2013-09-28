@@ -199,22 +199,21 @@ jQuery.fn.form = function (opts) {
 
             $(element).find('textarea').attr('htmleditor',"true");
 
-            KindEditor.ready(function(K) {
-                mythis.editor = K.create('textarea[name="'+$(element).find('textarea').attr('name')+'"]', {
-                    items:[
-                        'source', '|', 'undo', 'redo', '|', 'preview', 'cut', 'copy', 'paste',
-                        'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
-                        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-                        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
-                        'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
-                        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
-                        'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
-                        'anchor', 'link', 'unlink'
-                    ],
-                    uploadJson : '/kindeditorImageUpload'
-                });
+            mythis.editor = KindEditor.create('textarea[name="' + $(element).find('textarea').attr('name') + '"]', {
+                items: [
+                    'source', '|', 'undo', 'redo', '|', 'preview', 'cut', 'copy', 'paste',
+                    'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+                    'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+                    'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
+                    'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+                    'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
+                    'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
+                    'anchor', 'link', 'unlink'
+                ],
+                uploadJson: '/kindeditorImageUpload'
             });
         });
+
 
         //多对多控件
         myform.find('[field-type=checkbox]').each(function(index,element){
@@ -260,6 +259,12 @@ jQuery.fn.form = function (opts) {
                         $(element).find('[data-field]').val(value);
                     });
 
+                    var value = $(element).attr('field-value');
+                    var values = value.split(',')
+                    for(var i=0;i<values.length;i++){
+                        $(element).find('[value='+values[i]+']').prop('checked',true);
+                    }
+
                 } else{
                     alert(data.msg);
                 }
@@ -279,6 +284,11 @@ jQuery.fn.form = function (opts) {
         if(opts.afterRender){
             opts.afterRender(mythis);
         }
+    }
+
+    this.loadValue = function(field,value){
+        var mythis = this;
+        myform.find('[field-name='+field+']').attr("field-value",value);
     }
 
     this.bindEvent = function(){
@@ -448,8 +458,23 @@ jQuery.fn.form = function (opts) {
         return true;
     }
 
-    this.render();
-    this.bindEvent();
+
+    if(opts.loadUrl){
+        var url = opts.loadUrl + document.URL.substring(document.URL.lastIndexOf('?'));
+        $.post(url,{},function(data){
+            if(data.success){
+                for(var i=0;i<data.datas.length;i++){
+                    _this.loadValue(data.datas[i].field,data.datas[i].value);
+                }
+                _this.render();
+                _this.bindEvent();
+            }else{
+                alert(data.msg);
+            }
+        },'json');
+    }
 
     return this;
 }
+
+

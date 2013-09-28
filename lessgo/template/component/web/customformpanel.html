@@ -45,18 +45,27 @@
     seajs.use('lessgo-form',function(){
         $('#{{$id}}').form({
             saveUrl : '{{.CustomFormPanel.SaveUrl}}',
+            {{if compareString .CustomFormPanel.Load "true" }}
+            loadUrl : '{{.CustomFormPanel.LoadUrl}}',
+            {{end}}
             successCallback : function(data){
                 alert('保存成功');
                 //window.close();
             },
-            failCallback : function(data){
-                alert(data.msg);
-            },
+            {{if .CustomFormPanel.BeforeSave}}
+            {{else}}
             beforeSave : function(container){
                 {{.CustomFormPanel.BeforeSave}}
             },
+            {{end}}
+            {{if .CustomFormPanel.AfterRender}}
+            {{else}}
             afterRender : function(container){
                 {{.CustomFormPanel.AfterRender}}
+            },
+            {{end}}
+            failCallback : function(data){
+                alert(data.msg);
             }
         });
     });

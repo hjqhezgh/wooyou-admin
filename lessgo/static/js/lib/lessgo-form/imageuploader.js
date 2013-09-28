@@ -29,7 +29,7 @@ var ImageUploader = function(dom){
 
 ImageUploader.prototype = {
 
-    fileInput : '<label class="control-label">${fieldDesc}：</label><input id="fileToUpload" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><span class="img-pre"><img src="/lessgo/static/img/default_image.gif" width="100" height="100" /></span>',
+    fileInput : '<label class="control-label">${fieldDesc}：</label><input id="fileToUpload" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" width="100" height="100" /></span>',
 
     init : function(){
 
@@ -41,9 +41,9 @@ ImageUploader.prototype = {
     render : function(){
 
         var mythis = this;
-
         mythis.container.append(juicer(mythis.fileInput,{
             fieldName:mythis.container.attr('field-name'),
+            fieldValue:mythis.container.attr('field-value'),
             fieldDesc:mythis.container.attr('field-desc')
         }));
 
