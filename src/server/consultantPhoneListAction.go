@@ -80,19 +80,67 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 		return
 	}
 
+	cid := r.FormValue("cid-eq")
+	name := r.FormValue("name-like")
+	year := r.FormValue("year-eq")
+	month := r.FormValue("month-eq")
+	week := r.FormValue("week-eq")
+	startTime := r.FormValue("start_time-eq")
+
+	st := ""
+	et := ""
+	flag := true
+
+	if startTime != ""{
+		st = startTime + " 00:00:00"
+		et = startTime + " 23:59:59"
+	}else{
+		if week != "" && month != "" && year != ""{
+			st,et,flag = lessgo.FindRangeTimeDim("","",year+month+week)
+		}else if month != "" && year != ""{
+			st,et,flag = lessgo.FindRangeTimeDim("",year+month,"")
+		}else if year != ""{
+			st,et,flag = lessgo.FindRangeTimeDim(year,"","")
+		}
+	}
+
 	params := []interface{}{}
 
 	sql := ""
 	countSql := ""
 
-	sqlForAllData := "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone"
-	sqlForCenterData := "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where cid=? group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone"
-	sqlForEmployeeData := "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone where e.user_id=?"
-
 	if dataType=="all" {
-		sql = sqlForAllData
+
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
+
+		if cid!= "" {
+			sql += " and cid=? "
+			params = append(params,cid)
+		}
+
+		if flag {
+			if st!= "" && et != ""{
+				sql += " and start_time >= ? and start_time<= ?"
+				params = append(params,st)
+				params = append(params,et)
+			}
+		}else{//找不到相应的时间区间
+			sql += " and start_time >= ? and start_time<= ?"
+			params = append(params,"2000-01-01 00:00:00")
+			params = append(params,"2000-01-01 00:00:01")
+		}
+
+		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone "
+
+		if name != "" {
+			sql += " where e.really_name like ? "
+			params = append(params,"%"+name+"%")
+		}
+
 	}else if  dataType=="center"{
-		sql = sqlForCenterData
+
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio  where cid=? and remotephone!='' and remotephone is not null "
+
 		userId,_ := strconv.Atoi(employee.UserId)
 		_employee,err := FindEmployeeById(userId)
 		if err != nil {
@@ -103,11 +151,46 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 			return
 		}
 		params = append(params,_employee.CenterId)
+
+		if flag {
+			if st!= "" && et != ""{
+				sql += " and start_time >= ? and start_time<= ?"
+				params = append(params,st)
+				params = append(params,et)
+			}
+		}else{//找不到相应的时间区间
+			sql += " and start_time >= ? and start_time<= ?"
+			params = append(params,"2000-01-01 00:00:00")
+			params = append(params,"2000-01-01 00:00:01")
+		}
+
+		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone "
+
+		if name != "" {
+			sql += " where e.really_name like ? "
+			params = append(params,"%"+name+"%")
+		}
+
 	}else if  dataType=="self"{
-		sql = sqlForEmployeeData
+
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,phone_count.num b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
+
+		if flag {
+			if st!= "" && et != ""{
+				sql += " and start_time >= ? and start_time<= ?"
+				params = append(params,st)
+				params = append(params,et)
+			}
+		}else{//找不到相应的时间区间
+			sql += " and start_time >= ? and start_time<= ?"
+			params = append(params,"2000-01-01 00:00:00")
+			params = append(params,"2000-01-01 00:00:01")
+		}
+
+		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone where e.user_id=?"
+
 		params = append(params,employee.UserId)
 	}
-
 
 	countSql = "select count(1) from (" +  sql + ") num"
 

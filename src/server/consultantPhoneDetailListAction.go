@@ -76,17 +76,18 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 
 	st := ""
 	et := ""
+	flag := true
 
 	if startTime != ""{
 		st = startTime + " 00:00:00"
 		et = startTime + " 23:59:59"
 	}else{
 		if week != "" && month != "" && year != ""{
-			st,et = lessgo.FindRangeTimeDim("","",year+month+week)
+			st,et,flag = lessgo.FindRangeTimeDim("","",year+month+week)
 		}else if month != "" && year != ""{
-			st,et = lessgo.FindRangeTimeDim("",year+month,"")
+			st,et,flag = lessgo.FindRangeTimeDim("",year+month,"")
 		}else if year != ""{
-			st,et = lessgo.FindRangeTimeDim(year,"","")
+			st,et,flag = lessgo.FindRangeTimeDim(year,"","")
 		}
 	}
 
@@ -96,10 +97,16 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 
 	params = append(params,eid)
 
-	if st!= "" && et != ""{
+	if flag {
+		if st!= "" && et != ""{
+			sql += " and a.start_time >= ? and a.start_time<= ?"
+			params = append(params,st)
+			params = append(params,et)
+		}
+	}else{//找不到相应的时间区间
 		sql += " and a.start_time >= ? and a.start_time<= ?"
-		params = append(params,st)
-		params = append(params,et)
+		params = append(params,"2000-01-01 00:00:00")
+		params = append(params,"2000-01-01 00:00:01")
 	}
 
 	countSql := ""
