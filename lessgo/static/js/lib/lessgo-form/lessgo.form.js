@@ -275,6 +275,10 @@ jQuery.fn.form = function (opts) {
         this.find('a[data-action=save]').button();
 
         myform.find('.nav-tabs').find('li:first').addClass('active');
+
+        if(opts.afterRender){
+            opts.afterRender(mythis);
+        }
     }
 
     this.bindEvent = function(){
@@ -303,6 +307,15 @@ jQuery.fn.form = function (opts) {
                     return false;
                 }
             });
+
+            if(flag){
+                if(opts.beforeSave){
+                    flag = opts.beforeSave(mythis);
+                }
+            }else{
+                return;
+            }
+
 
             if(flag){
                 $.post(opts.saveUrl,params,function(data){
@@ -440,5 +453,3 @@ jQuery.fn.form = function (opts) {
 
     return this;
 }
-
-
