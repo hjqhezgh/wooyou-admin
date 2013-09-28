@@ -8,6 +8,8 @@ jQuery.fn.form = function (opts) {
     var selectFieldTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><select name="${fieldName}" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}disabled{@/if} ></select></div>';
     var optionTemp = '<option value="${value}">${desc}</option>';
     var textAreaTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><textarea name="${fieldName}" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} >${fieldValue}</textarea></div>';
+    var checkboxContainerTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input data-field type="hidden" name="${fieldName}" validate="${fieldValidate}"  /></div>';
+    var checkboxTemp = '<input validate="${fieldValidate}" value="${value}" type="checkbox" {@if fieldReadOnly=="true"}readonly{@/if} />${desc}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
     //初始化html编辑器对象，一个表单只能拥有一个编辑器
     this.editor = "";
@@ -149,23 +151,23 @@ jQuery.fn.form = function (opts) {
             }));
 
             $.get(url,{},function(data){
-               if(data.success){
-                   var objects = data.datas;
+                if(data.success){
+                    var objects = data.datas;
 
-                   for(var i=0;i<objects.length;i++){
-                       select.append(juicer(optionTemp,{
-                           value:objects[i][valueField],
-                           desc:objects[i][descField]
-                       }));
-                   }
+                    for(var i=0;i<objects.length;i++){
+                        select.append(juicer(optionTemp,{
+                            value:objects[i][valueField],
+                            desc:objects[i][descField]
+                        }));
+                    }
 
-                   if(value){
-                       select.find("option[value="+value+"]").attr("selected","selected");
-                   }
+                    if(value){
+                        select.find("option[value="+value+"]").attr("selected","selected");
+                    }
 
-               } else{
-                   alert(data.msg);
-               }
+                } else{
+                    alert(data.msg);
+                }
             },'json');
 
         });
@@ -214,8 +216,58 @@ jQuery.fn.form = function (opts) {
             });
         });
 
+        //多对多控件
+        myform.find('[field-type=checkbox]').each(function(index,element){
+            var url = $(element).attr('field-url');
+            var valueField = $(element).attr('field-valueField');
+            var descField = $(element).attr('field-descField');
 
-        this.removeConfigAttr();
+            $(element).append(juicer(checkboxContainerTemp,{
+                fieldName:$(element).attr('field-name'),
+                fieldDesc:$(element).attr('field-desc'),
+                fieldValidate:$(element).attr('field-validate')
+            }));
+
+            var checkboxContainer = $(element).find('.controls');
+
+            $.get(url,{},function(data){
+                if(data.success){
+                    var objects = data.datas;
+
+                    for(var i=0;i<objects.length;i++){
+                        checkboxContainer.append(juicer(checkboxTemp,{
+                            fieldReadOnly:$(element).attr('field-readonly'),
+                            value:objects[i][valueField],
+                            desc:objects[i][descField]
+                        }));
+                    }
+
+                    $(element).on('click',':checkbox',function(){
+                        $(element).find('[data-field]').val('');
+
+                        var value = "";
+
+                        $(element).find(':checkbox').each(function(){
+                            if($(this).prop('checked')){
+                                value += $(this).val()+ ","
+                            }
+                        });
+
+                        if(value.length > 0 ){
+                            value = value.substring(0,value.length-1);
+                        }
+
+                        $(element).find('[data-field]').val(value);
+                    });
+
+                } else{
+                    alert(data.msg);
+                }
+            },'json');
+        });
+
+
+        //this.removeConfigAttr();
 
         //美化按钮
         this.find('a[data-action=reset]').button();
@@ -272,16 +324,16 @@ jQuery.fn.form = function (opts) {
 
     this.removeConfigAttr = function(){
         this.find('div.form-field').removeAttr("field-type")
-        .removeAttr("field-name")
-        .removeAttr("field-value")
-        .removeAttr("field-desc")
-        .removeAttr("field-localData")
-        .removeAttr("field-url")
-        .removeAttr("field-valueField")
-        .removeAttr("field-descField")
-        .removeAttr("field-readonly")
-        .removeAttr("field-defaultValue")
-        .removeAttr("field-validate");
+            .removeAttr("field-name")
+            .removeAttr("field-value")
+            .removeAttr("field-desc")
+            .removeAttr("field-localData")
+            .removeAttr("field-url")
+            .removeAttr("field-valueField")
+            .removeAttr("field-descField")
+            .removeAttr("field-readonly")
+            .removeAttr("field-defaultValue")
+            .removeAttr("field-validate");
     }
 
     //验证对象至少需要validate方法

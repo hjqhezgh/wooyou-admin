@@ -13,30 +13,33 @@
         <div class="input-box">
             <form class="form-horizontal">
                 <div class="form-field" field-type="hidden" field-name="{{$entity.Pk}}" field-value="{{if $model}}{{$model.Id}}{{end}}">
-                {{range $elementIndex,$element := .Formpanel.Elements}}
+                    {{range $elementIndex,$element := .Formpanel.Elements}}
                     {{$value := ""}}
-                {{$value := getPropValue $model $element.Field}}
-                <div class="control-group form-field"
-                     field-type="{{$element.Type}}"
-                     field-desc="{{$element.Desc}}"
-                     field-name="{{$element.Field}}"
-                     field-value="{{if $model}}{{dealHTMLEscaper $value }}{{end}}"
-                     field-localData="{{$element.LocalData}}"
-                     field-url="{{$element.Url}}"
-                     field-valueField="{{$element.ValueField}}"
-                     field-descField="{{$element.DescField}}"
-                     field-readonly="{{$element.Readonly}}"
-                     field-defaultValue="{{$element.DefaultValue}}"
-                     field-validate="{{$element.Validate}}"
-                        >
-                </div>
-                {{end}}
-                <div class="control-group text-center">
-                    <div class="controls">
-                        <a href="javascript:void(0);" data-action="save" class="btn btn-primary">保存</a>
-                        <a href="javascript:void(0);" data-action="reset" class="btn">重置</a>
+                    {{$value := getPropValue $model $element.Field}}
+                    <div class="control-group form-field"
+                         field-type="{{$element.Type}}"
+                         field-desc="{{$element.Desc}}"
+                         field-name="{{$element.Field}}"
+                         field-value="{{if $model}}{{dealHTMLEscaper $value }}{{end}}"
+                         field-localData="{{$element.LocalData}}"
+                         field-url="{{$element.Url}}"
+                         field-valueField="{{$element.ValueField}}"
+                         field-descField="{{$element.DescField}}"
+                         field-readonly="{{$element.Readonly}}"
+                         field-defaultValue="{{$element.DefaultValue}}"
+                         field-validate="{{$element.Validate}}"
+                         field-refTable="{{$element.RefTable}}"
+                         field-selfId="{{$element.SelfId}}"
+                         field-refId="{{$element.RefId}}"
+                            >
                     </div>
-                </div>
+                    {{end}}
+                    <div class="control-group text-center">
+                        <div class="controls">
+                            <a href="javascript:void(0);" data-action="save" class="btn btn-primary">保存</a>
+                            <a href="javascript:void(0);" data-action="reset" class="btn">重置</a>
+                        </div>
+                    </div>
             </form>
         </div><!--E input-box-->
         <div class="table-box"></div><!--E table-box-->
