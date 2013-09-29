@@ -460,8 +460,12 @@ jQuery.fn.form = function (opts) {
 
 
     if(opts.loadUrl){
-        var url = opts.loadUrl + document.URL.substring(document.URL.lastIndexOf('?'));
-        $.post(url,{},function(data){
+        var url = opts.loadUrl;
+        if(document.URL.indexOf('?')>-1){
+            url = opts.loadUrl + document.URL.substring(document.URL.lastIndexOf('?'));
+        }
+
+        $.get(url,{},function(data){
             if(data.success){
                 for(var i=0;i<data.datas.length;i++){
                     _this.loadValue(data.datas[i].field,data.datas[i].value);
@@ -472,6 +476,9 @@ jQuery.fn.form = function (opts) {
                 alert(data.msg);
             }
         },'json');
+    }else{
+        _this.render();
+        _this.bindEvent();
     }
 
     return this;
