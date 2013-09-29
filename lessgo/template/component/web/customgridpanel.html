@@ -98,7 +98,7 @@
             "formatter":function(cellvalue, options, rowObject){
                  var value = "";
                 {{range $index,$action := .CustomGridPanel.Actions}}
-                value += gridActionRender(cellvalue, options, rowObject,'{{$action.LinkType}}','{{$action.Desc}}','{{$action.Url}}','{{$action.ActionParams}}');
+                value += gridActionRender(cellvalue, options, rowObject,'{{$action.LinkType}}','{{$action.Desc}}','{{$action.Url}}',"{{$action.ActionParams}}");
                 {{end}}
                 return value;
             }

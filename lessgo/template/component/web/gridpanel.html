@@ -105,7 +105,7 @@
         });
         {{$id}}ColumnNames.push('操作');
 
-        var dataUrl = '/{{.Terminal}}/{{.Entity.Id}}/page?componentId={{.Gridpanel.Id}}'
+        var dataUrl = '/{{.Terminal}}/{{$entity.Id}}/page?componentId={{.Gridpanel.Id}}'
         {{if compareString .Gridpanel.LoadUrl "true"}}
         if(document.URL.lastIndexOf('?')>-1){
             dataUrl = dataUrl + "&"+ document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
@@ -116,9 +116,6 @@
             tableId : '{{$tableId}}',
             pageId : '{{$pageId}}',
             dataurl: dataUrl,
-            addurl:'/{{$terminal}}/{{$entity.Id}}/add',
-            modifyurl:'/{{$terminal}}/{{$entity.Id}}/modify/',
-            deleteurl:'/{{$terminal}}/{{$entity.Id}}/delete/',
             colNames:{{$id}}ColumnNames,
             width:{{$id}}Width,
             height:{{.Gridpanel.Height}},
