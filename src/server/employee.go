@@ -12,7 +12,6 @@
 package server
 
 import (
-	"net/http"
 	"github.com/hjqhezgh/lessgo"
 	"github.com/hjqhezgh/commonlib"
 )
@@ -48,38 +47,6 @@ func CheckPwd(username, password string) (bool, lessgo.Employee, string){
 	}
 
 	return true, employee, ""
-}
-
-func LoginAction(w http.ResponseWriter,r *http.Request ) {
-
-	data := make(map[string]interface {})
-
-	username := r.FormValue("username")
-	if username == "" {
-		lessgo.Log.Warn("username is NULL!")
-		return
-	}
-
-	password := r.FormValue("password")
-	if password == "" {
-		lessgo.Log.Warn("password is NULL!")
-		return
-	}
-
-	ret, employee, msg := CheckPwd(username, password)
-
-	if ret{
-		//密码正确
-		data["success"] = true
-		lessgo.SetCurrentEmployee(employee,w,r)
-	} else {
-		data["success"] = false
-		data["msg"] = msg
-	}
-
-	commonlib.OutputJson(w, data,"")
-
-	return
 }
 
 type Employee struct {
