@@ -19,7 +19,7 @@
         <column field="employeeId" desc="顾问ID"  hidden="true"/>
         <column field="employeeName" desc="顾问名称" linkType="currentPage" url="/web/audio/consultant_phone_detail_list" loadParamName="eid" loadParamValue="2"/>
         <column field="validPhoneNum" desc="总电话数"/>
-        <column field="rank" desc="顾问排名（未实现）"/>
+        <column field="rank" desc="所有门店的顾问总排名"/>
         <column field="newPhoneNum" desc="新增电话数（未实现）"/>
         <column field="oldPhoneNum" desc="跟踪电话数（未实现)"/>
     </customgridpanel>

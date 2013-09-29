@@ -50,15 +50,15 @@
             {{end}}
             successCallback : function(data){
                 alert('保存成功');
-                //window.close();
+                window.close();
             },
-            {{if .CustomFormPanel.BeforeSave}}
+            {{if compareString .CustomFormPanel.BeforeSave ""}}
             {{else}}
             beforeSave : function(container){
                 {{.CustomFormPanel.BeforeSave}}
             },
             {{end}}
-            {{if .CustomFormPanel.AfterRender}}
+            {{if compareString .CustomFormPanel.AfterRender ""}}
             {{else}}
             afterRender : function(container){
                 {{.CustomFormPanel.AfterRender}}
