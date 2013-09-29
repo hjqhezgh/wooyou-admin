@@ -271,4 +271,38 @@ jQuery.fn.grid = function (opts) {
     return this;
 }
 
+/*****
+ * 表格操作列渲染器
+ **/
+function gridActionRender(cellvalue, options, rowObject,linkType,desc,url,actionParams) {
+    var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" {@if linkType=="newPage"}target="_blank"{@/if}>${desc}</a>&nbsp;';
 
+    if (linkType == "newPage"){
+        var params = "";
+
+        if(actionParams!=""){
+            params = "?";
+            actionParams = eval('('+actionParams+')');
+            for(var i=0;i<actionParams.length;i++){
+                if(i!=0){
+                    params +="&";
+                }
+                params += actionParams[i].name + "=";
+
+                if(actionParams[i].value=="id"){
+                    params += options.rowId;
+                }else{
+                    params += rowObject[actionParams[i].value];
+                }
+            }
+
+        }
+
+        return juicer(tmp,{
+            url:url,
+            linkType:linkType,
+            desc:desc,
+            params:params
+        });
+    }
+}

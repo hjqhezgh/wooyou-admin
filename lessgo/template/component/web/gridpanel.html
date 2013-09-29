@@ -84,15 +84,26 @@
         {{$id}}ColumnNames.push('{{$column.Desc}}');
         {{end}}
 
-        {{if .Gridpanel.Actions}}
-        {{range .Gridpanel.Actions}}
-        {{$id}}Actions.push({
-            action : '{{.Action}}',
-            desc : '{{.Desc}}',
-            url : '{{.Url}}'
+        //放置操作列
+        {{$id}}ColumnModels.push({
+            "name" : '操作',
+            "index" : '操作',
+            "width":70,
+            "sortable":false,
+            {{if compareInt .ActionLength 0 "gt"}}
+            "hidden" : false,
+            {{else}}
+            "hidden" : true,
+            {{end}}
+            "formatter":function(cellvalue, options, rowObject){
+                var value = "";
+                {{range $index,$action := .Gridpanel.Actions}}
+                value += gridActionRender(cellvalue, options, rowObject,'{{$action.LinkType}}','{{$action.Desc}}','{{$action.Url}}',"{{$action.ActionParams}}");
+                {{end}}
+                return value;
+            }
         });
-        {{end}}
-        {{end}}
+        {{$id}}ColumnNames.push('操作');
 
         var dataUrl = '/{{.Terminal}}/{{.Entity.Id}}/page?componentId={{.Gridpanel.Id}}'
         {{if compareString .Gridpanel.LoadUrl "true"}}

@@ -11,8 +11,9 @@
             "cell": [
                 {{range $propIndex,$prop := $model.Props}}
                 {{$propValue := getPropValue $model $prop.Name}}
-                "{{dealJsonString $propValue}}"{{if compareInt $propIndex $fieldLength "lt"}},{{end}}
+                "{{dealJsonString $propValue}}",
                 {{end}}
+                "操作列"
             ]
         }{{if compareInt $modelIndex $dataLength "lt"}},{{end}}
         {{end}}
