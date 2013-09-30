@@ -61,25 +61,13 @@
             {{if compareString $column.Hidden "true"}}
             "hidden" : true,
             {{end}}
+            {{if compareString $column.Formatter ""}}
+            {{else}}
             "formatter":function(cellvalue, options, rowObject){
-                var newValue = cellvalue;
-
-                {{if compareString $column.Format "" }}
-                {{else}}
-                var formatObject = eval('('+"{{$column.Format}}"+')');
-                for(var i=0;i<formatObject.length;i++){
-                    if(formatObject[i].value == newValue){
-                        newValue = formatObject[i].desc;
-                    }
-                }
-                {{end}}
-
-                {{if compareString $column.LinkType "currentPage"}}
-                newValue = "<a style='color:blue;text-decoration:underline;' href='{{$column.Url}}{{if compareString $column.LoadParamName "" }}{{else}}?{{ $column.LoadParamName}}="{{if compareString $column.LoadParamValue "id" }}+options.rowId+{{else}}{{if compareString $column.LoadParamValue "this"}}+newValue+{{else}}+rowObject[{{$column.LoadParamValue}}]+{{end}}{{end}}{{end}}"'>"+newValue+"</a>"
-                {{end}}
-
-                return newValue;
-            }
+                {{$column.Formatter}}
+            },
+            {{end}}
+            "width":70
         });
         {{$id}}ColumnNames.push('{{$column.Desc}}');
         {{end}}

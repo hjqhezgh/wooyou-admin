@@ -12,14 +12,29 @@
         <search field="month" searchType="eq" inputType="localSelect" desc="月" localData="[{desc:'1月',value:'01'},{desc:'2月',value:'02'},{desc:'3月',value:'03'},{desc:'4月',value:'04'},{desc:'5月',value:'05'},{desc:'6月',value:'06'},{desc:'7月',value:'07'},{desc:'8月',value:'08'},{desc:'9月',value:'09'},{desc:'10月',value:'10'},{desc:'11月',value:'11'},{desc:'12月',value:'12'}]"/>
         <search field="week" searchType="eq" inputType="localSelect" desc="周" localData="[{desc:'第1周',value:'1'},{desc:'第2周',value:'2'},{desc:'第3周',value:'3'},{desc:'第4周',value:'4'},{desc:'第5周',value:'5'},{desc:'第6周',value:'6'}]"/>
         <search field="start_time" searchType="eq" inputType="date" desc="日期"/>
-
-        <column field="cName" desc="客户姓名"/>
-        <column field="remotephone" desc="客户电话" linkType="currentPage" url="/downloadAudio" loadParamName="id" loadParamValue="id"/>
+        <column field="cName" desc="客户姓名">
+            <formatter>
+                <![CDATA[
+                    if(cellvalue=="未知客户"){
+                        return cellvalue + '&nbsp;<a style="color:blue;text-decoration: underline;" href="#">记录客户</a>';
+                    }else{
+                        return cellvalue;
+                    }
+                ]]>
+            </formatter>
+        </column>
+        <column field="remotephone" desc="客户电话" linkType="currentPage" url="/downloadAudio" loadParamName="id" loadParamValue="id">
+            <formatter>
+                <![CDATA[
+                return cellvalue + '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" href="/downloadAudio?id='+options.rowId+'">下载录音</a>';
+                ]]>
+            </formatter>
+        </column>
         <column field="employeeName" desc="顾问名称"/>
         <column field="startTime" desc="通话时间"/>
         <column field="seconds" desc="通话时长"/>
         <column field="inout" desc="电话方向"/>
 
-        <action desc="下载录音" url="/downloadAudio" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <!--<action desc="下载录音" url="/downloadAudio" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>-->
     </customgridpanel>
 </viewport>
