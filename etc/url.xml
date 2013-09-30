@@ -22,6 +22,11 @@
 <urls>
     <!--至少保留一种终端，并在view文件夹下为该终端配置页面-->
     <terminal>web</terminal>
+    <!--顾问通话报表-->
     <url path="/web/audio/consultant_phone_list" view="web/audio/consultant_phone_list.xml" />
+    <!--顾问通话详情-->
     <url path="/web/audio/consultant_phone_detail_list" view="web/audio/consultant_phone_detail_list.xml" />
+
+    <!--运营汇总报表-->
+    <url path="/web/statistics" view="web/statistics.xml" />
 </urls>

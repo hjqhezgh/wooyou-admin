@@ -20,4 +20,104 @@
         </ref>
         <field name="channel"/>
     </entity>
+
+    <entity id="hr_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="plan_num"/>
+        <field name="teacher"/>
+        <field name="sa"/>
+        <field name="other"/>
+        <field name="new_staff"/>
+        <field name="leave_num"/>
+        <field name="best_continue_teacher"/>
+        <field name="best_seller"/>
+        <field name="best_exper_teacher"/>
+    </entity>
+
+    <entity id="inside_cost_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="budget"/>
+        <field name="toy_amount"/>
+        <field name="toy_num"/>
+        <field name="toy_sell_amount"/>
+        <field name="toy_sell_num"/>
+        <field name="teaching_aid_amount"/>
+        <field name="material_sell_amount"/>
+        <field name="teaching_aid_sell_amount"/>
+        <field name="water_elec_cost"/>
+        <field name="consumables_amount"/>
+        <field name="phone_cost"/>
+    </entity>
+
+    <entity id="marketing_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="plan_amount"/>
+        <field name="total_class_num"/>
+        <field name="new_class_num"/>
+        <field name="attendance"/>
+        <field name="sell_amount"/>
+        <field name="new_member_num"/>
+        <field name="continue_amount"/>
+        <field name="continue_member_num"/>
+        <field name="continue_rate"/>
+        <field name="lost_member_num"/>
+        <field name="market_list_num"/>
+        <field name="phone_num"/>
+        <field name="attempt_num"/>
+        <field name="sell_rate"/>
+    </entity>
+
+    <entity id="outside_cost_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="plan_amount"/>
+        <field name="ad_amount"/>
+        <field name="activity_charge"/>
+        <field name="activity_per_num"/>
+        <field name="activity_cost"/>
+        <field name="activity_list_num"/>
+        <field name="bee_salary"/>
+    </entity>
+
+    <entity id="satisfaction_data">
+        <pk>id</pk>
+        <!--field的name是数据库字段拼写-->
+        <field name="cid"/>
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="week"/>
+        <field name="en_satisfaction"/>
+        <field name="art_satisfaction"/>
+        <field name="complaint_num"/>
+        <field name="reason"/>
+    </entity>
 </entitys>
