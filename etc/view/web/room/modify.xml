@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport>
-    <formpanel entity="room" id="form" load="true">
+    <crumbs>
+        <crumb text="基础设置" url="javascript:void(0)"/>
+        <crumb text="中心管理" url="/web/room"/>
+        <crumb text="教室修改" currentPage="true"/>
+    </crumbs>
+    <formpanel entity="room" id="form" load="true" title="教室修改">
         <element field="name" type="text" validate="notNull" desc="名字"/>
         <element field="cid" type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
         <element field="channel" type="text" validate="" desc="所属通道"/>
