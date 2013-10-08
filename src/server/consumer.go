@@ -23,7 +23,7 @@ import (
 	"text/template"
 )
 
-//顾问分页数据服务
+//客户分页数据服务
 func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 
 	m := make(map[string]interface{})
@@ -191,3 +191,67 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 
 }
 
+//客户保存服务
+func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	mother := r.FormValue("mother")
+	motherPhone := r.FormValue("motherPhone")
+	father := r.FormValue("father")
+	fatherPhone := r.FormValue("fatherPhone")
+	homePhone := r.FormValue("homePhone")
+
+	sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id) values(?,?,?,?,?,?)"
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	stmt, err := db.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(father,fatherPhone,mother,motherPhone,homePhone,employee.UserId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	m["success"] = true
+	commonlib.OutputJson(w, m, " ")
+}

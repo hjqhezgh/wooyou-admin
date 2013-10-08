@@ -52,4 +52,5 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 
 	"/consumer.json": server.ConsumerListAction,
+	"/consumerSave.json": server.ConsumerSaveAction,
 }

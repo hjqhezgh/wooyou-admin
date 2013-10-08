@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <crumbs>
+        <crumb text="客户信息" url="javascript:void(0)"/>
+        <crumb text="客户管理" url="/web/consumer"/>
+        <crumb text="添加客户" currentPage="true"/>
+    </crumbs>
+
+    <customformpanel id="form" title="添加客户" saveUrl="/consumerSave.json" load="false" loadUrl="">
+        <element field="mother" type="text" validate="" desc="母亲姓名"/>
+        <element field="motherPhone" type="text" validate="" desc="母亲电话"/>
+        <element field="father" type="text" validate="" desc="父亲姓名"/>
+        <element field="fatherPhone" type="text" validate="" desc="父亲电话"/>
+        <element field="homePhone" type="text" validate="" desc="家庭电话"/>
+
+        <beforeSave>
+            <![CDATA[
+                var mother = container.find('form').find('[name=mother]').val()
+                var motherPhone = container.find('form').find('[name=motherPhone]').val()
+                var father = container.find('form').find('[name=father]').val()
+                var fatherPhone = container.find('form').find('[name=fatherPhone]').val()
+
+                if(motherPhone=='' && fatherPhone=='' ){
+                    alert('母亲电话和父亲电话请至少填写一个');
+                    return false;
+                }
+
+                if(motherPhone!='' && mother==''){
+                    alert('请填写母亲姓名');
+                    return false;
+                }
+
+                if(fatherPhone!='' && father==''){
+                    alert('请填写父亲姓名');
+                    return false;
+                }
+
+                return true;
+            ]]>
+        </beforeSave>
+
+        <afterRender>
+        </afterRender>
+    </customformpanel>
+</viewport>
