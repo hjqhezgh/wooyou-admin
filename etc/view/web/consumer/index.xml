@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="客户信息" url="javascript:void(0);"/>
+        <crumb text="客户管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="350" loadUrl="false">
+
+        <search field="name" searchType="like" inputType="text" desc="客户姓名"/>
+        <search field="mySort" searchType="eq" inputType="localSelect" desc="排序方式（默认按最后通话时间）" localData="[{desc:'按最后通话时间',value:'time'},{desc:'按频率',value:'frequency'}]"/>
+
+        <column field="centerName" desc="所属门店"/>
+        <column field="employeeName" desc="顾问名称"/>
+        <column field="consumer_name" desc="母亲"/>
+        <column field="consumer_name" desc="母亲电话"/>
+        <column field="consumer_name" desc="父亲"/>
+        <column field="consumer_name" desc="父亲电话"/>
+        <column field="consumer_name" desc="家庭电话"/>
+        <column field="consumer_name" desc="通话数"/>
+        <column field="consumer_name" desc="最后通话时间"/>
+
+        <action desc="添加" url="/web/consumer/add" linkType="newPage"/>
+        <action desc="修改" url="/web/consumer/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

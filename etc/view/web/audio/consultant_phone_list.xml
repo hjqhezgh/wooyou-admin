@@ -6,7 +6,7 @@
         <crumb text="顾问通话报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="250" loadUrl="true">
+    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="350" loadUrl="true">
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="name" searchType="like" inputType="text" desc="顾问姓名"/>
         <search field="year" searchType="eq" inputType="localSelect" desc="年" localData="[{desc:'2013年',value:'2013'},{desc:'2014年',value:'2014'},{desc:'2015年',value:'2015'},{desc:'2016年',value:'2016'},{desc:'2017年',value:'2017'}]"/>

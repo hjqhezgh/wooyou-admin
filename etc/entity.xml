@@ -120,4 +120,18 @@
         <field name="complaint_num"/>
         <field name="reason"/>
     </entity>
+
+    <!--客户，这里的主要用于销售人员使用的客户信息-->
+    <entity id="consumer">
+        <pk>id</pk>
+        <field name="father"/>
+        <field name="father_phone"/>
+        <field name="mother"/>
+        <field name="mother_phone"/>
+        <field name="home_phone"/>
+        <ref entity="employee" field="employee_id" refEntityField="user_id">
+            <field name="user_id"/>
+            <field name="really_name"/>
+        </ref>
+    </entity>
 </entitys>

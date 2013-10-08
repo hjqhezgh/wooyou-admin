@@ -49,4 +49,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consultant_phone_list.json": server.ConsultantPhoneListAction,
 	"/consultant_phone_detail_list.json": server.ConsultantPhoneDetailListAction,
 	"/downloadAudio": server.DownloadAudioAction,
+
+
+	"/consumer.json": server.ConsumerListAction,
 }
