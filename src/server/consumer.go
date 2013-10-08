@@ -217,23 +217,116 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 		return
 	}
 
+	id := r.FormValue("id")
 	mother := r.FormValue("mother")
 	motherPhone := r.FormValue("motherPhone")
 	father := r.FormValue("father")
 	fatherPhone := r.FormValue("fatherPhone")
 	homePhone := r.FormValue("homePhone")
 
-	sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id) values(?,?,?,?,?,?)"
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	if id==""{
+		sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id) values(?,?,?,?,?,?)"
+
+		lessgo.Log.Debug(sql)
+
+		stmt, err := db.Prepare(sql)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(father,fatherPhone,mother,motherPhone,homePhone,employee.UserId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		m["success"] = true
+		commonlib.OutputJson(w, m, " ")
+	}else{
+		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=? where id=? "
+
+		lessgo.Log.Debug(sql)
+
+		stmt, err := db.Prepare(sql)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(father,fatherPhone,mother,motherPhone,homePhone,id)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		m["success"] = true
+		commonlib.OutputJson(w, m, " ")
+	}
+
+}
+
+//客户保存服务
+func ConsumerLoadAction(w http.ResponseWriter,r *http.Request ) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("id")
+
+	sql := "select father,father_phone,mother,mother_phone,home_phone from consumer where id=? "
 
 	lessgo.Log.Debug(sql)
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	stmt, err := db.Prepare(sql)
+	rows, err := db.Query(sql,id)
 
 	if err != nil {
-		lessgo.Log.Warn(err.Error())
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -241,17 +334,66 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 		return
 	}
 
-	_, err = stmt.Exec(father,fatherPhone,mother,motherPhone,homePhone,employee.UserId)
+	var father,fatherPhone,mother,motherPhone,homePhone string
 
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &father,&fatherPhone,&mother,&motherPhone,&homePhone)
+
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
 	}
 
 	m["success"] = true
+
+	hehes := []Hehe{}
+
+	h1 := Hehe{"id",id}
+	h2 := Hehe{"father",father}
+	h3 := Hehe{"fatherPhone",fatherPhone}
+	h4 := Hehe{"mother",mother}
+	h5 := Hehe{"motherPhone",motherPhone}
+	h6 := Hehe{"homePhone",homePhone}
+
+	/*
+	h2 := new(Hehe)
+	h2.Field = "fatherPhone"
+	h2.Value = fatherPhone
+
+
+	h3 := new(Hehe)
+	h3.Field = "mother"
+	h3.Value = mother
+
+
+	h4 := new(Hehe)
+	h4.Field = "motherPhone"
+	h4.Value = motherPhone
+
+
+	h5 := new(Hehe)
+	h5.Field = "homePhone"
+	h5.Value = homePhone*/
+
+	hehes = append(hehes,h1)
+	hehes = append(hehes,h2)
+	hehes = append(hehes,h3)
+	hehes = append(hehes,h4)
+	hehes = append(hehes,h5)
+	hehes = append(hehes,h6)
+
+	fmt.Println(h1,h2,h3,h4,h5)
+	fmt.Println(hehes)
+
+	m["datas"] = hehes
 	commonlib.OutputJson(w, m, " ")
+}
+
+type  Hehe struct {
+	Field		string `json:"field"`
+	Value       string `json:"value"`
 }
