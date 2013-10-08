@@ -386,50 +386,22 @@ func ConsumerLoadAction(w http.ResponseWriter,r *http.Request ) {
 
 	m["success"] = true
 
-	hehes := []Hehe{}
+	loadFormObjects := []lessgo.LoadFormObject{}
 
-	h1 := Hehe{"id",id}
-	h2 := Hehe{"father",father}
-	h3 := Hehe{"fatherPhone",fatherPhone}
-	h4 := Hehe{"mother",mother}
-	h5 := Hehe{"motherPhone",motherPhone}
-	h6 := Hehe{"homePhone",homePhone}
+	h1 := lessgo.LoadFormObject{"id",id}
+	h2 := lessgo.LoadFormObject{"father",father}
+	h3 := lessgo.LoadFormObject{"fatherPhone",fatherPhone}
+	h4 := lessgo.LoadFormObject{"mother",mother}
+	h5 := lessgo.LoadFormObject{"motherPhone",motherPhone}
+	h6 := lessgo.LoadFormObject{"homePhone",homePhone}
 
-	/*
-	h2 := new(Hehe)
-	h2.Field = "fatherPhone"
-	h2.Value = fatherPhone
+	loadFormObjects = append(loadFormObjects,h1)
+	loadFormObjects = append(loadFormObjects,h2)
+	loadFormObjects = append(loadFormObjects,h3)
+	loadFormObjects = append(loadFormObjects,h4)
+	loadFormObjects = append(loadFormObjects,h5)
+	loadFormObjects = append(loadFormObjects,h6)
 
-
-	h3 := new(Hehe)
-	h3.Field = "mother"
-	h3.Value = mother
-
-
-	h4 := new(Hehe)
-	h4.Field = "motherPhone"
-	h4.Value = motherPhone
-
-
-	h5 := new(Hehe)
-	h5.Field = "homePhone"
-	h5.Value = homePhone*/
-
-	hehes = append(hehes,h1)
-	hehes = append(hehes,h2)
-	hehes = append(hehes,h3)
-	hehes = append(hehes,h4)
-	hehes = append(hehes,h5)
-	hehes = append(hehes,h6)
-
-	fmt.Println(h1,h2,h3,h4,h5)
-	fmt.Println(hehes)
-
-	m["datas"] = hehes
+	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
-}
-
-type  Hehe struct {
-	Field		string `json:"field"`
-	Value       string `json:"value"`
 }
