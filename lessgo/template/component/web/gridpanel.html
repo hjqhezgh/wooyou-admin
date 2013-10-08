@@ -3,7 +3,7 @@
 {{$tableId := getComponentId "table" }}
 {{$pageId := getComponentId "page" }}
 {{$terminal := .Terminal }}
-<div class="block gridpanel" id="{{$id}}" style="width: {{.Gridpanel.Width}}px;">
+<div class="block gridpanel" id="{{$id}}" style="width: 100%">
     <h4 class="title">
         <i class="icon-table"></i>{{.Gridpanel.Title}}
 	 			<span class="iconright">
@@ -50,7 +50,7 @@
         var {{$id}}ColumnNames = [];
         var {{$id}}Actions = [];
 
-        var {{$id}}Width = {{.Gridpanel.Width}}-50;
+        var {{$id}}Width = $('#{{$id}}').width()-50;
 
         {{range $columnIndex,$column := .Gridpanel.Columns}}
         {{$id}}ColumnModels.push({
