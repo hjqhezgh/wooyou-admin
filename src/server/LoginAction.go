@@ -14,15 +14,14 @@
 package server
 
 import (
-	"net/http"
-	"github.com/hjqhezgh/lessgo"
 	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
+	"net/http"
 )
 
+func LoginAction(w http.ResponseWriter, r *http.Request) {
 
-func LoginAction(w http.ResponseWriter,r *http.Request ) {
-
-	data := make(map[string]interface {})
+	data := make(map[string]interface{})
 
 	username := r.FormValue("username")
 	if username == "" {
@@ -38,17 +37,16 @@ func LoginAction(w http.ResponseWriter,r *http.Request ) {
 
 	ret, employee, msg := CheckPwd(username, password)
 
-	if ret{
+	if ret {
 		//密码正确
 		data["success"] = true
-		lessgo.SetCurrentEmployee(employee,w,r)
+		lessgo.SetCurrentEmployee(employee, w, r)
 	} else {
 		data["success"] = false
 		data["msg"] = msg
 	}
 
-	commonlib.OutputJson(w, data,"")
+	commonlib.OutputJson(w, data, "")
 
 	return
 }
-
