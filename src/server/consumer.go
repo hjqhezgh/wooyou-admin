@@ -21,6 +21,7 @@ import (
 	"math"
 	"fmt"
 	"text/template"
+	"strings"
 )
 
 //客户分页数据服务
@@ -37,6 +38,22 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 		m["msg"] = "用户未登陆"
 		commonlib.OutputJson(w, m, " ")
 		return
+	}
+
+	dataType := ""
+
+	roleIds := strings.Split(employee.RoleId,",")
+
+	for _,roleId := range roleIds{
+		if roleId == "1" || roleId == "3"{
+			dataType = "all"
+			break;
+		}else if roleId == "2" {
+			dataType = "center"
+			break;
+		}else if roleId== ""{
+			dataType = "self"
+		}
 	}
 
 	err := r.ParseForm()
@@ -73,12 +90,31 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 
 	params := []interface{}{}
 
-	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,a.num,a.maxtime from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=e.center_id "
+	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,a.num,a.maxtime from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=e.center_id where 1=1 "
 
 	if name!= "" {
 		params = append(params,"%"+name+"%")
 		params = append(params,"%"+name+"%")
-		sql += " where c.mother like ? or c.father like ? "
+		sql += " and c.mother like ? or c.father like ? "
+	}
+
+	if dataType == "center" {
+		userId,_ := strconv.Atoi(employee.UserId)
+		_employee,err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+		params = append(params,_employee.CenterId)
+		sql += " and ce.cid=? "
+	}
+
+	if dataType == "self" {
+		params = append(params,employee.UserId)
+		sql += " and e.user_id=? "
 	}
 
 	countSql := ""

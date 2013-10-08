@@ -23,6 +23,7 @@ import (
 	"time"
 	"fmt"
 	"text/template"
+	"strings"
 )
 
 //顾问分页数据服务
@@ -70,14 +71,20 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 		}
 	}
 
-	dataType := r.FormValue("dataType")
+	dataType := ""
 
-	if dataType != "all" && dataType != "center" && dataType != "self" {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "非法的url请求"
-		commonlib.OutputJson(w, m, " ")
-		return
+	roleIds := strings.Split(employee.RoleId,",")
+
+	for _,roleId := range roleIds{
+		if roleId == "1" || roleId == "3"{
+			dataType = "all"
+			break;
+		}else if roleId == "2" {
+			dataType = "center"
+			break;
+		}else if roleId== ""{
+			dataType = "self"
+		}
 	}
 
 	cid := r.FormValue("cid-eq")
