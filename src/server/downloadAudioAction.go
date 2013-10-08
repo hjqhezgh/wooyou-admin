@@ -16,18 +16,18 @@ package server
 import (
 	"bufio"
 	"fmt"
+	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-	"github.com/hjqhezgh/lessgo"
-	"github.com/hjqhezgh/commonlib"
 )
 
 //顾问分页数据服务
-func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
+func DownloadAudioAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -40,7 +40,7 @@ func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = err.Error()
-		commonlib.OutputJson(w, m,"")
+		commonlib.OutputJson(w, m, "")
 	}
 
 	audio, err := FindAudioById(id)
@@ -50,7 +50,7 @@ func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = err.Error()
-		commonlib.OutputJson(w, m,"")
+		commonlib.OutputJson(w, m, "")
 		return
 	}
 
@@ -63,11 +63,11 @@ func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = err.Error()
-		commonlib.OutputJson(w, m,"")
+		commonlib.OutputJson(w, m, "")
 		return
 	}
 
-	audioRootPath ,_ := lessgo.Config.GetValue("wooyou","audioRootPath")
+	audioRootPath, _ := lessgo.Config.GetValue("wooyou", "audioRootPath")
 
 	filePath := fmt.Sprint(audioRootPath, "/", audio.Cid, "/", sendTime.Format("2006-1-2"), "/", audio.Filename)
 
@@ -78,7 +78,7 @@ func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = err.Error()
-		commonlib.OutputJson(w, m,"")
+		commonlib.OutputJson(w, m, "")
 		return
 	}
 
@@ -89,7 +89,7 @@ func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = err.Error()
-		commonlib.OutputJson(w, m,"")
+		commonlib.OutputJson(w, m, "")
 		return
 	}
 
@@ -98,4 +98,3 @@ func DownloadAudioAction(w http.ResponseWriter,r *http.Request ) {
 
 	w.Write(datas)
 }
-

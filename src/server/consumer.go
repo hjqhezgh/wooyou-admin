@@ -14,18 +14,18 @@
 package server
 
 import (
-	"net/http"
-	"github.com/hjqhezgh/lessgo"
-	"github.com/hjqhezgh/commonlib"
-	"strconv"
-	"math"
 	"fmt"
-	"text/template"
+	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
+	"math"
+	"net/http"
+	"strconv"
 	"strings"
+	"text/template"
 )
 
 //客户分页数据服务
-func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
+func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -42,16 +42,16 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId,",")
+	roleIds := strings.Split(employee.RoleId, ",")
 
-	for _,roleId := range roleIds{
-		if roleId == "1" || roleId == "3"{
+	for _, roleId := range roleIds {
+		if roleId == "1" || roleId == "3" {
 			dataType = "all"
-			break;
-		}else if roleId == "2" {
+			break
+		} else if roleId == "2" {
 			dataType = "center"
-			break;
-		}else if roleId== ""{
+			break
+		} else if roleId == "" {
 			dataType = "self"
 		}
 	}
@@ -92,15 +92,15 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 
 	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,a.num,a.maxtime from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=e.center_id where 1=1 "
 
-	if name!= "" {
-		params = append(params,"%"+name+"%")
-		params = append(params,"%"+name+"%")
+	if name != "" {
+		params = append(params, "%"+name+"%")
+		params = append(params, "%"+name+"%")
 		sql += " and c.mother like ? or c.father like ? "
 	}
 
 	if dataType == "center" {
-		userId,_ := strconv.Atoi(employee.UserId)
-		_employee,err := FindEmployeeById(userId)
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
 		if err != nil {
 			m["success"] = false
 			m["code"] = 100
@@ -108,25 +108,25 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-		params = append(params,_employee.CenterId)
+		params = append(params, _employee.CenterId)
 		sql += " and ce.cid=? "
 	}
 
 	if dataType == "self" {
-		params = append(params,employee.UserId)
+		params = append(params, employee.UserId)
 		sql += " and e.user_id=? "
 	}
 
 	countSql := ""
 
-	countSql = "select count(1) from (" +  sql + ") num"
+	countSql = "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql,params...)
+	rows, err := db.Query(countSql, params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -160,16 +160,16 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 		currPageNo = totalPage
 	}
 
-	if mySort=="" || mySort == "time" {
+	if mySort == "" || mySort == "time" {
 		sql += " order by a.maxtime desc  limit ?,?"
-	}else if mySort =="frequency" {
+	} else if mySort == "frequency" {
 		sql += " order by a.num desc  limit ?,?"
 	}
 
 	lessgo.Log.Debug(sql)
 
-	params = append(params,(currPageNo-1)*pageSize)
-	params = append(params,pageSize)
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
 
 	rows, err = db.Query(sql, params...)
 
@@ -192,14 +192,13 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i:=0;i<9;i++{
+		for i := 0; i < 9; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
 			fillObjects = append(fillObjects, &prop.Value)
 			model.Props = append(model.Props, prop)
 		}
-
 
 		err = commonlib.PutRecord(rows, fillObjects...)
 
@@ -228,7 +227,7 @@ func ConsumerListAction(w http.ResponseWriter,r *http.Request ) {
 }
 
 //客户保存服务
-func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
+func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -263,7 +262,7 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	if id==""{
+	if id == "" {
 		sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id) values(?,?,?,?,?,?)"
 
 		lessgo.Log.Debug(sql)
@@ -279,7 +278,7 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 			return
 		}
 
-		_, err = stmt.Exec(father,fatherPhone,mother,motherPhone,homePhone,employee.UserId)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -292,7 +291,7 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
-	}else{
+	} else {
 		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=? where id=? "
 
 		lessgo.Log.Debug(sql)
@@ -308,7 +307,7 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 			return
 		}
 
-		_, err = stmt.Exec(father,fatherPhone,mother,motherPhone,homePhone,id)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -325,8 +324,8 @@ func ConsumerSaveAction(w http.ResponseWriter,r *http.Request ) {
 
 }
 
-//客户保存服务
-func ConsumerLoadAction(w http.ResponseWriter,r *http.Request ) {
+//客户读取服务
+func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -360,7 +359,7 @@ func ConsumerLoadAction(w http.ResponseWriter,r *http.Request ) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(sql,id)
+	rows, err := db.Query(sql, id)
 
 	if err != nil {
 		m["success"] = false
@@ -370,10 +369,10 @@ func ConsumerLoadAction(w http.ResponseWriter,r *http.Request ) {
 		return
 	}
 
-	var father,fatherPhone,mother,motherPhone,homePhone string
+	var father, fatherPhone, mother, motherPhone, homePhone string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father,&fatherPhone,&mother,&motherPhone,&homePhone)
+		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone)
 
 		if err != nil {
 			m["success"] = false
@@ -388,19 +387,19 @@ func ConsumerLoadAction(w http.ResponseWriter,r *http.Request ) {
 
 	loadFormObjects := []lessgo.LoadFormObject{}
 
-	h1 := lessgo.LoadFormObject{"id",id}
-	h2 := lessgo.LoadFormObject{"father",father}
-	h3 := lessgo.LoadFormObject{"fatherPhone",fatherPhone}
-	h4 := lessgo.LoadFormObject{"mother",mother}
-	h5 := lessgo.LoadFormObject{"motherPhone",motherPhone}
-	h6 := lessgo.LoadFormObject{"homePhone",homePhone}
+	h1 := lessgo.LoadFormObject{"id", id}
+	h2 := lessgo.LoadFormObject{"father", father}
+	h3 := lessgo.LoadFormObject{"fatherPhone", fatherPhone}
+	h4 := lessgo.LoadFormObject{"mother", mother}
+	h5 := lessgo.LoadFormObject{"motherPhone", motherPhone}
+	h6 := lessgo.LoadFormObject{"homePhone", homePhone}
 
-	loadFormObjects = append(loadFormObjects,h1)
-	loadFormObjects = append(loadFormObjects,h2)
-	loadFormObjects = append(loadFormObjects,h3)
-	loadFormObjects = append(loadFormObjects,h4)
-	loadFormObjects = append(loadFormObjects,h5)
-	loadFormObjects = append(loadFormObjects,h6)
+	loadFormObjects = append(loadFormObjects, h1)
+	loadFormObjects = append(loadFormObjects, h2)
+	loadFormObjects = append(loadFormObjects, h3)
+	loadFormObjects = append(loadFormObjects, h4)
+	loadFormObjects = append(loadFormObjects, h5)
+	loadFormObjects = append(loadFormObjects, h6)
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")

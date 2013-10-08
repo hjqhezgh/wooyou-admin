@@ -14,17 +14,17 @@
 package server
 
 import (
-	"net/http"
-	"github.com/hjqhezgh/lessgo"
-	"github.com/hjqhezgh/commonlib"
-	"strconv"
-	"math"
 	"fmt"
+	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
+	"math"
+	"net/http"
+	"strconv"
 	"text/template"
 )
 
 //顾问分页数据服务
-func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
+func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -78,16 +78,16 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 	et := ""
 	flag := true
 
-	if startTime != ""{
+	if startTime != "" {
 		st = startTime + " 00:00:00"
 		et = startTime + " 23:59:59"
-	}else{
-		if week != "" && month != "" && year != ""{
-			st,et,flag = lessgo.FindRangeTimeDim("","",year+month+week)
-		}else if month != "" && year != ""{
-			st,et,flag = lessgo.FindRangeTimeDim("",year+month,"")
-		}else if year != ""{
-			st,et,flag = lessgo.FindRangeTimeDim(year,"","")
+	} else {
+		if week != "" && month != "" && year != "" {
+			st, et, flag = lessgo.FindRangeTimeDim("", "", year+month+week)
+		} else if month != "" && year != "" {
+			st, et, flag = lessgo.FindRangeTimeDim("", year+month, "")
+		} else if year != "" {
+			st, et, flag = lessgo.FindRangeTimeDim(year, "", "")
 		}
 	}
 
@@ -95,30 +95,30 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 
 	sql := "select a.aid,case a.remotephone when c.father_phone then c.father when c.mother_phone then c.mother  else '未知客户' end as c_name,a.remotephone,e.really_name,a.start_time,a.seconds,a.inout from audio a left join consumer c on (a.remotephone=c.mother_phone and c.mother_phone!='' and c.mother_phone is not null ) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.phone_in_center=a.localphone where a.remotephone !='' and a.remotephone is not null and e.user_id=? "
 
-	params = append(params,eid)
+	params = append(params, eid)
 
 	if flag {
-		if st!= "" && et != ""{
+		if st != "" && et != "" {
 			sql += " and a.start_time >= ? and a.start_time<= ?"
-			params = append(params,st)
-			params = append(params,et)
+			params = append(params, st)
+			params = append(params, et)
 		}
-	}else{//找不到相应的时间区间
+	} else { //找不到相应的时间区间
 		sql += " and a.start_time >= ? and a.start_time<= ?"
-		params = append(params,"2000-01-01 00:00:00")
-		params = append(params,"2000-01-01 00:00:01")
+		params = append(params, "2000-01-01 00:00:00")
+		params = append(params, "2000-01-01 00:00:01")
 	}
 
 	countSql := ""
 
-	countSql = "select count(1) from (" +  sql + ") num"
+	countSql = "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql,params...)
+	rows, err := db.Query(countSql, params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -152,13 +152,12 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 		currPageNo = totalPage
 	}
 
-
 	sql += " order by a.start_time desc  limit ?,?"
 
 	lessgo.Log.Debug(sql)
 
-	params = append(params,(currPageNo-1)*pageSize)
-	params = append(params,pageSize)
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
 
 	rows, err = db.Query(sql, params...)
 
@@ -181,14 +180,13 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i:=0;i<6;i++{
+		for i := 0; i < 6; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
 			fillObjects = append(fillObjects, &prop.Value)
 			model.Props = append(model.Props, prop)
 		}
-
 
 		err = commonlib.PutRecord(rows, fillObjects...)
 
@@ -215,4 +213,3 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter,r *http.Request ) {
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
 }
-

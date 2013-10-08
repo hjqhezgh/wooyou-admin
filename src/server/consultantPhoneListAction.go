@@ -14,20 +14,20 @@
 package server
 
 import (
-	"net/http"
-	"github.com/hjqhezgh/lessgo"
+	"fmt"
 	"github.com/hjqhezgh/commonlib"
-	"strconv"
+	"github.com/hjqhezgh/lessgo"
 	"math"
 	"math/rand"
-	"time"
-	"fmt"
-	"text/template"
+	"net/http"
+	"strconv"
 	"strings"
+	"text/template"
+	"time"
 )
 
 //顾问分页数据服务
-func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
+func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -73,16 +73,16 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId,",")
+	roleIds := strings.Split(employee.RoleId, ",")
 
-	for _,roleId := range roleIds{
-		if roleId == "1" || roleId == "3"{
+	for _, roleId := range roleIds {
+		if roleId == "1" || roleId == "3" {
 			dataType = "all"
-			break;
-		}else if roleId == "2" {
+			break
+		} else if roleId == "2" {
 			dataType = "center"
-			break;
-		}else if roleId== ""{
+			break
+		} else if roleId == "" {
 			dataType = "self"
 		}
 	}
@@ -98,16 +98,16 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 	et := ""
 	flag := true
 
-	if startTime != ""{
+	if startTime != "" {
 		st = startTime + " 00:00:00"
 		et = startTime + " 23:59:59"
-	}else{
-		if week != "" && month != "" && year != ""{
-			st,et,flag = lessgo.FindRangeTimeDim("","",year+month+week)
-		}else if month != "" && year != ""{
-			st,et,flag = lessgo.FindRangeTimeDim("",year+month,"")
-		}else if year != ""{
-			st,et,flag = lessgo.FindRangeTimeDim(year,"","")
+	} else {
+		if week != "" && month != "" && year != "" {
+			st, et, flag = lessgo.FindRangeTimeDim("", "", year+month+week)
+		} else if month != "" && year != "" {
+			st, et, flag = lessgo.FindRangeTimeDim("", year+month, "")
+		} else if year != "" {
+			st, et, flag = lessgo.FindRangeTimeDim(year, "", "")
 		}
 	}
 
@@ -116,56 +116,56 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 	sql := ""
 	countSql := ""
 
-	if dataType=="all" {
+	if dataType == "all" {
 
 		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
-		if cid!= "" {
+		if cid != "" {
 			sql += " and cid=? "
-			params = append(params,cid)
+			params = append(params, cid)
 		}
 
 		if flag {
-			if st!= "" && et != ""{
+			if st != "" && et != "" {
 				sql += " and start_time >= ? and start_time<= ?"
-				params = append(params,st)
-				params = append(params,et)
+				params = append(params, st)
+				params = append(params, et)
 			}
-		}else{//找不到相应的时间区间
+		} else { //找不到相应的时间区间
 			sql += " and start_time >= ? and start_time<= ?"
-			params = append(params,"2000-01-01 00:00:00")
-			params = append(params,"2000-01-01 00:00:01")
+			params = append(params, "2000-01-01 00:00:00")
+			params = append(params, "2000-01-01 00:00:01")
 		}
 
 		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
-			if st!= "" && et != ""{
+			if st != "" && et != "" {
 				sql += " and start_time >= ? and start_time<= ?"
-				params = append(params,st)
-				params = append(params,et)
+				params = append(params, st)
+				params = append(params, et)
 			}
-		}else{//找不到相应的时间区间
+		} else { //找不到相应的时间区间
 			sql += " and start_time >= ? and start_time<= ?"
-			params = append(params,"2000-01-01 00:00:00")
-			params = append(params,"2000-01-01 00:00:01")
+			params = append(params, "2000-01-01 00:00:00")
+			params = append(params, "2000-01-01 00:00:01")
 		}
 
 		sql += " group by  localphone order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone "
 
 		if name != "" {
 			sql += " where e.really_name like ? "
-			params = append(params,"%"+name+"%")
+			params = append(params, "%"+name+"%")
 		}
 
 		sql += " order by rank.rowNo "
 
-	}else if  dataType=="center"{
+	} else if dataType == "center" {
 
 		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio  where cid=? and remotephone!='' and remotephone is not null "
 
-		userId,_ := strconv.Atoi(employee.UserId)
-		_employee,err := FindEmployeeById(userId)
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
 		if err != nil {
 			m["success"] = false
 			m["code"] = 100
@@ -173,90 +173,90 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-		params = append(params,_employee.CenterId)
+		params = append(params, _employee.CenterId)
 
 		if flag {
-			if st!= "" && et != ""{
+			if st != "" && et != "" {
 				sql += " and start_time >= ? and start_time<= ?"
-				params = append(params,st)
-				params = append(params,et)
+				params = append(params, st)
+				params = append(params, et)
 			}
-		}else{//找不到相应的时间区间
+		} else { //找不到相应的时间区间
 			sql += " and start_time >= ? and start_time<= ?"
-			params = append(params,"2000-01-01 00:00:00")
-			params = append(params,"2000-01-01 00:00:01")
+			params = append(params, "2000-01-01 00:00:00")
+			params = append(params, "2000-01-01 00:00:01")
 		}
 
 		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone  left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
-			if st!= "" && et != ""{
+			if st != "" && et != "" {
 				sql += " and start_time >= ? and start_time<= ?"
-				params = append(params,st)
-				params = append(params,et)
+				params = append(params, st)
+				params = append(params, et)
 			}
-		}else{//找不到相应的时间区间
+		} else { //找不到相应的时间区间
 			sql += " and start_time >= ? and start_time<= ?"
-			params = append(params,"2000-01-01 00:00:00")
-			params = append(params,"2000-01-01 00:00:01")
+			params = append(params, "2000-01-01 00:00:00")
+			params = append(params, "2000-01-01 00:00:01")
 		}
 
 		sql += " group by  localphone order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone "
 
 		if name != "" {
 			sql += " where e.really_name like ? "
-			params = append(params,"%"+name+"%")
+			params = append(params, "%"+name+"%")
 		}
 
 		sql += " order by rank.rowNo "
 
-	}else if  dataType=="self"{
+	} else if dataType == "self" {
 
 		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
-			if st!= "" && et != ""{
+			if st != "" && et != "" {
 				sql += " and start_time >= ? and start_time<= ?"
-				params = append(params,st)
-				params = append(params,et)
+				params = append(params, st)
+				params = append(params, et)
 			}
-		}else{//找不到相应的时间区间
+		} else { //找不到相应的时间区间
 			sql += " and start_time >= ? and start_time<= ?"
-			params = append(params,"2000-01-01 00:00:00")
-			params = append(params,"2000-01-01 00:00:01")
+			params = append(params, "2000-01-01 00:00:00")
+			params = append(params, "2000-01-01 00:00:01")
 		}
 
 		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone  left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
-			if st!= "" && et != ""{
+			if st != "" && et != "" {
 				sql += " and start_time >= ? and start_time<= ?"
-				params = append(params,st)
-				params = append(params,et)
+				params = append(params, st)
+				params = append(params, et)
 			}
-		}else{//找不到相应的时间区间
+		} else { //找不到相应的时间区间
 			sql += " and start_time >= ? and start_time<= ?"
-			params = append(params,"2000-01-01 00:00:00")
-			params = append(params,"2000-01-01 00:00:01")
+			params = append(params, "2000-01-01 00:00:00")
+			params = append(params, "2000-01-01 00:00:01")
 		}
 
 		sql += " group by  localphone order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone "
 
 		sql += " where e.user_id=? "
 
-		params = append(params,employee.UserId)
+		params = append(params, employee.UserId)
 
 		sql += " order by rank.rowNo "
 	}
 
-	countSql = "select count(1) from (" +  sql + ") num"
+	countSql = "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql,params...)
+	rows, err := db.Query(countSql, params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -290,10 +290,10 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 		currPageNo = totalPage
 	}
 
-	lessgo.Log.Debug(sql+" limit ?,?")
+	lessgo.Log.Debug(sql + " limit ?,?")
 
-	params = append(params,(currPageNo-1)*pageSize)
-	params = append(params,pageSize)
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
 
 	rows, err = db.Query(sql+" limit ?,?", params...)
 
@@ -317,14 +317,13 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 
 		fillObjects := []interface{}{}
 
-		for i:=0;i<8;i++{
+		for i := 0; i < 8; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
 			fillObjects = append(fillObjects, &prop.Value)
 			model.Props = append(model.Props, prop)
 		}
-
 
 		err = commonlib.PutRecord(rows, fillObjects...)
 
@@ -351,4 +350,3 @@ func ConsultantPhoneListAction(w http.ResponseWriter,r *http.Request ) {
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
 }
-

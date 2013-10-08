@@ -12,11 +12,11 @@
 package server
 
 import (
-	"github.com/hjqhezgh/lessgo"
 	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
 )
 
-func CheckPwd(username, password string) (bool, lessgo.Employee, string){
+func CheckPwd(username, password string) (bool, lessgo.Employee, string) {
 
 	var employee lessgo.Employee
 	var dbPwd string
@@ -32,7 +32,7 @@ func CheckPwd(username, password string) (bool, lessgo.Employee, string){
 	}
 	if rows.Next() {
 		err := rows.Scan(&employee.UserId, &employee.UserName,
-						&dbPwd, &employee.ReallyName, &employee.DepartmentId)
+			&dbPwd, &employee.ReallyName, &employee.DepartmentId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, employee, " 数据库异常!"
@@ -68,11 +68,11 @@ type Employee struct {
 	UserName     string `json:"userName"`
 	ReallyName   string `json:"reallyName"`
 	DepartmentId string `json:"departmentId"`
-	CenterId 	 string `json:"centerId"`
+	CenterId     string `json:"centerId"`
 }
 
 //根据id获取员工信息
-func FindEmployeeById(id int) (Employee,error) {
+func FindEmployeeById(id int) (Employee, error) {
 
 	var employee Employee
 
@@ -84,17 +84,16 @@ func FindEmployeeById(id int) (Employee,error) {
 	rows, err := db.Query(sql, id)
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return  employee, err
+		return employee, err
 	}
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows,&employee.UserId, &employee.UserName,&employee.ReallyName, &employee.DepartmentId, &employee.CenterId)
+		err := commonlib.PutRecord(rows, &employee.UserId, &employee.UserName, &employee.ReallyName, &employee.DepartmentId, &employee.CenterId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
-			return  employee, err
+			return employee, err
 		}
 	}
 
-	return employee , nil
+	return employee, nil
 }
-
