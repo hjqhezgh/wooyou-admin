@@ -26,6 +26,8 @@
     <url path="/web/audio/consultant_phone_list" view="web/audio/consultant_phone_list.xml" />
     <!--顾问通话详情-->
     <url path="/web/audio/consultant_phone_detail_list" view="web/audio/consultant_phone_detail_list.xml" />
+    <!--添加通话备注信息-->
+    <url path="/web/audio/note" view="web/audio/note.xml" />
 
     <!--运营汇总报表-->
     <url path="/web/statistics" view="web/statistics.xml" />

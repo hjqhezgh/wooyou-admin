@@ -15,19 +15,19 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
 	"github.com/hjqhezgh/lessgo"
+	"net/http"
 	"server"
+	"strconv"
 )
 
 func main() {
 
 	r := lessgo.ConfigLessgo()
 
-	portString,_ := lessgo.Config.GetValue("lessgo","port")
+	portString, _ := lessgo.Config.GetValue("lessgo", "port")
 
-	port,_ := strconv.Atoi(portString)
+	port, _ := strconv.Atoi(portString)
 
 	for url, handler := range handlers {
 		r.HandleFunc(url, handler)
@@ -35,7 +35,7 @@ func main() {
 
 	http.Handle("/", r)
 
-	fmt.Println("服务器监听",portString,"端口")
+	fmt.Println("服务器监听", portString, "端口")
 
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
@@ -46,12 +46,14 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/login": server.LoginAction,
 
 	//音频相关服务
-	"/consultant_phone_list.json": server.ConsultantPhoneListAction,
+	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
 	"/consultant_phone_detail_list.json": server.ConsultantPhoneDetailListAction,
-	"/downloadAudio": server.DownloadAudioAction,
+	"/downloadAudio":                     server.DownloadAudioAction,
+	"/audioNoteLoad.json":                server.AudioNoteLoadAction,
+	"/audioNoteSave.json":                server.AudioNoteSaveAction,
 
-
-	"/consumer.json": server.ConsumerListAction,
+	//客户相关服务
+	"/consumer.json":     server.ConsumerListAction,
 	"/consumerSave.json": server.ConsumerSaveAction,
 	"/consumerLoad.json": server.ConsumerLoadAction,
 }

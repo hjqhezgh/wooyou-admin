@@ -93,7 +93,7 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select a.aid,case a.remotephone when c.father_phone then c.father when c.mother_phone then c.mother  else '未知客户' end as c_name,a.remotephone,e.really_name,a.start_time,a.seconds,a.inout from audio a left join consumer c on (a.remotephone=c.mother_phone and c.mother_phone!='' and c.mother_phone is not null ) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.phone_in_center=a.localphone where a.remotephone !='' and a.remotephone is not null and e.user_id=? "
+	sql := "select a.aid,case a.remotephone when c.father_phone then c.father when c.mother_phone then c.mother  else '未知客户' end as c_name,a.remotephone,e.really_name,a.start_time,a.seconds,a.inout,a.is_upload_finish,a.note from audio a left join consumer c on (a.remotephone=c.mother_phone and c.mother_phone!='' and c.mother_phone is not null ) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.phone_in_center=a.localphone where a.remotephone !='' and a.remotephone is not null and e.user_id=? "
 
 	params = append(params, eid)
 
@@ -180,7 +180,7 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 6; i++ {
+		for i := 0; i < 8; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
