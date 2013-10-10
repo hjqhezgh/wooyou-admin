@@ -75,3 +75,12 @@ ul,li{ list-style:none;margin:0; padding:0;}
 .login-cont .form-horizontal .controls{margin-left:140px;}
 .loginbtnbox .checkbox{margin-bottom:10px;}
 .loginbtnbox button{margin-left:120px;}
+
+/*10.10*/
+.btn-box{padding:0 10px;height:100%;overflow:hidden;}
+.btn-box a{float:left;padding:3px 10px;margin-right:10px;border:1px solid #f2f2f2;color:#fff;}
+.btn-box a:hover{text-decoration:none;color:#eee;}
+.h-bg-blue{background-color:#006dcc;}
+.h-bg-green{background-color:#5bb75b;}
+.h-bg-red{background-color:#da4f49;}
+.h-bg-org{background-color:#faa732;}

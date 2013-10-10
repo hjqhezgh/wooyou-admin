@@ -36,6 +36,12 @@
             </form>
             {{end}}
 
+            <div class="btn-box">
+                {{range $toolActionIndex,$toolAction := .CustomGridPanel.ToolActions}}
+                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" target="_blank">{{$toolAction.Desc}}</a>
+                {{end}}
+            </div><!--E btn-box-->
+
             <div class="table-box">
                 <table id="{{$tableId}}"></table>
                 <div class="page" id="{{$pageId}}"></div>

@@ -9,6 +9,8 @@
     <gridpanel entity="center" pageSize="15" title="中心数据" id="grid" width="1200" height="250">
         <search field="name" searchType="like" inputType="text" desc="中心名字"/>
 
+        <toolaction desc="添加中心" url="/web/center/add" linkType="newPage" colorClass="h-bg-green"/>
+
         <column field="name" desc="名字"/>
         <column field="telephone" desc="联系电话"/>
         <column field="intro" desc="简介"/>

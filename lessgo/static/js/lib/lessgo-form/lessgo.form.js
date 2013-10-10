@@ -97,6 +97,22 @@ jQuery.fn.form = function (opts) {
 
         });
 
+        //无日期时间域
+        myform.find('[field-type=time]').each(function(index,element){
+            $(element).append(juicer(textFieldTemp,{
+                fieldName:$(element).attr('field-name'),
+                fieldValue:$(element).attr('field-value'),
+                fieldDesc:$(element).attr('field-desc'),
+                fieldReadOnly:$(element).attr('field-readonly'),
+                fieldValidate:$(element).attr('field-validate')
+            }));
+
+            if($(element).attr('field-readonly')!="true"){
+                $(element).find('input').timepicker();
+            }
+
+        });
+
         //本地下拉框
         myform.find('[field-type=localSelect]').each(function(index,element){
             $(element).append(juicer(selectFieldTemp,{

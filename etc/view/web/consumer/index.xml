@@ -11,6 +11,8 @@
         <search field="name" searchType="like" inputType="text" desc="客户姓名"/>
         <search field="mySort" searchType="eq" inputType="localSelect" desc="排序方式（默认按最后通话时间）" localData="[{desc:'按最后通话时间',value:'time'},{desc:'按频率',value:'frequency'}]"/>
 
+        <toolaction desc="添加客户" url="/web/consumer/add" linkType="newPage" colorClass="h-bg-green"/>
+
         <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="顾问名称"/>
         <column field="consumer_name" desc="母亲"/>

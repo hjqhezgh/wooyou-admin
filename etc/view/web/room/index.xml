@@ -9,6 +9,8 @@
     <gridpanel entity="room" pageSize="15" title="中心数据" id="grid" width="1200" height="250">
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
 
+        <toolaction desc="添加教室" url="/web/room/add" linkType="newPage" colorClass="h-bg-green"/>
+
         <column field="center.name" desc="所属中心"/>
         <column field="name" desc="名字"/>
         <column field="channel" desc="所属视频通道"/>
