@@ -3,10 +3,10 @@
     <!--面包屑-->
     <crumbs>
         <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="顾问通话详情" currentPage="true"/>
+        <crumb text="通话详情" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consultant_phone_detail_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="350" loadUrl="true">
+    <customgridpanel url="/consultant_phone_detail_list.json" pageSize="15" title="通话详情" id="grid1" width="1200" height="370" loadUrl="true">
 
         <search field="year" searchType="eq" inputType="localSelect" desc="年" localData="[{desc:'2013年',value:'2013'},{desc:'2014年',value:'2014'},{desc:'2015年',value:'2015'},{desc:'2016年',value:'2016'},{desc:'2017年',value:'2017'}]"/>
         <search field="month" searchType="eq" inputType="localSelect" desc="月" localData="[{desc:'1月',value:'01'},{desc:'2月',value:'02'},{desc:'3月',value:'03'},{desc:'4月',value:'04'},{desc:'5月',value:'05'},{desc:'6月',value:'06'},{desc:'7月',value:'07'},{desc:'8月',value:'08'},{desc:'9月',value:'09'},{desc:'10月',value:'10'},{desc:'11月',value:'11'},{desc:'12月',value:'12'}]"/>
@@ -18,7 +18,7 @@
                 if(cellvalue=='未知客户'){
                     return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add">'+cellvalue+'</a>';
                 }else{
-                    return cellvalue;
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'">'+cellvalue+'</a>';
                 }
                 ]]>
             </formatter>
@@ -30,7 +30,7 @@
                     if(rowObject[6]=='0'){
                         value =  cellvalue + '&nbsp;';
                     }else{
-                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="/downloadAudio?id='+options.rowId+'">'+cellvalue+'</a>' + '&nbsp;';
+                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="/downloadAudioc?id='+options.rowId+'">'+cellvalue+'</a>' + '&nbsp;';
                     }
 
                     value += '<a style="color:green;text-decoration: underline;" target="_blank" title="点击添加备注信息" href="/web/audio/note?id='+options.rowId+'">备注</a>' ;
@@ -45,6 +45,7 @@
         <column field="inout" desc="电话方向"/>
         <column field="is_upload_finish" desc="是否下载完成" hidden="true"/>
         <column field="note" desc="备注"/>
+        <column field="cid" desc="客户id" hidden="true"/>
 
         <!--<action desc="下载录音" url="/downloadAudio" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>-->
     </customgridpanel>

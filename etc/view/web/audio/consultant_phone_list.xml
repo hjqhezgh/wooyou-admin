@@ -3,10 +3,10 @@
     <!--面包屑-->
     <crumbs>
         <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="顾问通话报表" currentPage="true"/>
+        <crumb text="通话报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="顾问通话报表" id="grid1" width="1200" height="350" loadUrl="true">
+    <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="通话报表" id="grid1" width="1200" height="350" loadUrl="true">
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="name" searchType="like" inputType="text" desc="顾问姓名"/>
         <search field="year" searchType="eq" inputType="localSelect" desc="年" localData="[{desc:'2013年',value:'2013'},{desc:'2014年',value:'2014'},{desc:'2015年',value:'2015'},{desc:'2016年',value:'2016'},{desc:'2017年',value:'2017'}]"/>
@@ -20,7 +20,7 @@
         <column field="employeeName" desc="顾问名称">
             <formatter>
                 <![CDATA[
-                return '<a style="color:blue;text-decoration: underline;" title="查看顾问通话详情" href="/web/audio/consultant_phone_detail_list?eid='+rowObject[2]+'">'+cellvalue+'</a>';
+                return '<a style="color:blue;text-decoration: underline;" title="查看顾问通话详情" href="/web/audio/consultant_phone_detail_list?eid='+rowObject[2]+'">'+cellvalue+'</a>' + '('+rowObject[8]+')';
                 ]]>
             </formatter>
         </column>
@@ -28,5 +28,6 @@
         <column field="rank" desc="所有门店的顾问总排名"/>
         <column field="newPhoneNum" desc="新增电话数（未实现）"/>
         <column field="oldPhoneNum" desc="跟踪电话数（未实现)"/>
+        <column field="localphone" desc="本地电话" hidden="true"/>
     </customgridpanel>
 </viewport>

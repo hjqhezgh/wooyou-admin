@@ -82,7 +82,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 		} else if roleId == "2" {
 			dataType = "center"
 			break
-		} else if roleId == "" {
+		} else{
 			dataType = "self"
 		}
 	}
@@ -118,7 +118,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	if dataType == "all" {
 
-		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d,phone_count.localphone from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if cid != "" {
 			sql += " and cid=? "
@@ -162,7 +162,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	} else if dataType == "center" {
 
-		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio  where cid=? and remotephone!='' and remotephone is not null "
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d,phone_count.localphone from (select count(*) num,localphone,cid from audio  where cid=? and remotephone!='' and remotephone is not null "
 
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
@@ -212,7 +212,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	} else if dataType == "self" {
 
-		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d,phone_count.localphone from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
 			if st != "" && et != "" {
@@ -317,7 +317,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects := []interface{}{}
 
-		for i := 0; i < 8; i++ {
+		for i := 0; i < 9; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
