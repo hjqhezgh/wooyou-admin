@@ -134,4 +134,36 @@
             <field name="really_name"/>
         </ref>
     </entity>
+
+    <!--试听课程-->
+    <entity id="apply_log">
+        <pk>aid</pk>
+        <field name="year"/>
+        <field name="month"/>
+        <field name="childname"/>
+        <field name="phone"/>
+        <field name="create_time"/>
+        <field name="center_id"/>
+        <ref entity="center" field="center_id" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="come_from"/>
+        <field name="type"/>
+    </entity>
+
+    <!--雇员-->
+    <entity id="employee">
+        <pk>user_id</pk>
+        <field name="username"/>
+        <field name="reallly_name"/>
+        <field name="department_id"/>
+        <field name="center_id"/>
+        <ref entity="center" field="center_id" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="is_leave"/>
+        <field name="phone"/>
+    </entity>
 </entitys>

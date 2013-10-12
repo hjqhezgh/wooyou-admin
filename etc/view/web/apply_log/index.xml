@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="试听课程" url="javascript:void(0);"/>
+        <crumb text="试听课程" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel  entity="apply_log" pageSize="15" title="试听课程人员" id="grid1" width="1200" height="350">
+
+        <search field="center_id" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+
+        <column field="year" desc="年"/>
+        <column field="month" desc="月"/>
+        <column field="childname" desc="孩子姓名"/>
+        <column field="phone" desc="手机号"/>
+        <column field="create_time" desc="创建时间"/>
+        <column field="center.name" desc="中心名称"/>
+        <column field="come_from" desc="来自"/>
+        <column field="type" desc="类型">
+            <formatter>
+                <![CDATA[
+                if(cellvalue == 1) {
+                    return "英语"
+                } else if(cellvalue == 2){
+                    return "美术"
+                } else {
+                    return "未知"
+                }
+                ]]>
+            </formatter>
+        </column>
+
+        <action desc="添加" url="/web/apply_log/add" linkType="newPage"/>
+        <action desc="修改" url="/web/apply_log/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+    </gridpanel>
+
+</viewport>
