@@ -15,7 +15,7 @@
         <column field="telephone" desc="联系电话"/>
         <column field="intro" desc="简介"/>
 
-        <action desc="添加" url="/web/center/add" linkType="newPage"/>
+        <action desc="添加" url="/web/center/add" linkType="newPage" colorClass="h-bg-green"/>
         <action desc="修改" url="/web/center/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
     </gridpanel>
 </viewport>

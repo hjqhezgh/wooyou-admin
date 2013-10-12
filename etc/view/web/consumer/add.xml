@@ -12,6 +12,7 @@
         <element field="father" type="text" validate="" desc="父亲姓名"/>
         <element field="fatherPhone" type="text" validate="" desc="父亲电话"/>
         <element field="homePhone" type="text" validate="" desc="家庭电话"/>
+        <element field="child" type="text" validate="" desc="小孩姓名"/>
 
         <beforeSave>
             <![CDATA[
