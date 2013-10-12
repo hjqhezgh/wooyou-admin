@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <crumbs>
+        <crumb text="基础设置" url="javascript:void(0)"/>
+        <crumb text="中心管理" url="/web/center"/>
+        <crumb text="中心修改" currentPage="true"/>
+    </crumbs>
+    <formpanel entity="apply_log" id="form" title="添加中心" load="true">
+        <element field="year" type="text" validate="" desc="年"/>
+        <element field="month"  type="text" desc="月" />
+        <element field="childname"  type="text" desc="孩子姓名" />
+        <element field="phone"  type="text" desc="电话" />
+        <element field="create_time"  type="date" desc="创建时间" />
+        <element field="center_id"  type="text" desc="中心ID" />
+        <element field="come_from"  type="text" desc="来自" />
+        <element field="type"  type="text" desc="类型" />
+    </formpanel>
+</viewport>
