@@ -30,7 +30,7 @@
                     if(rowObject[6]=='0'){
                         value =  cellvalue + '&nbsp;';
                     }else{
-                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="/downloadAudioc?id='+options.rowId+'">'+cellvalue+'</a>' + '&nbsp;';
+                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="/downloadAudio?id='+options.rowId+'">'+cellvalue+'</a>' + '&nbsp;';
                     }
 
                     value += '<a style="color:green;text-decoration: underline;" target="_blank" title="点击添加备注信息" href="/web/audio/note?id='+options.rowId+'">备注</a>' ;

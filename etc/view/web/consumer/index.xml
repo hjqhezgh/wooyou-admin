@@ -20,10 +20,11 @@
         <column field="consumer_name" desc="父亲"/>
         <column field="consumer_name" desc="父亲电话"/>
         <column field="consumer_name" desc="家庭电话"/>
+        <column field="consumer_name" desc="孩子姓名"/>
         <column field="consumer_name" desc="通话数"/>
         <column field="consumer_name" desc="最后通话时间"/>
 
-        <action desc="添加" url="/web/consumer/add" linkType="newPage"/>
+        <!--<action desc="添加" url="/web/consumer/add" linkType="newPage"/>-->
         <action desc="修改" url="/web/consumer/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
     </customgridpanel>
 </viewport>
