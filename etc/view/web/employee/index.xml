@@ -25,8 +25,8 @@
             </formatter>
         </column>
         <column field="phone_in_center" desc="联系电话"/>
-        <action desc="添加" url="/web/apply_log/add" linkType="newPage"/>
-        <action desc="修改" url="/web/apply_log/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <toolaction desc="添加" url="/web/employee/add" linkType="newPage" colorClass="h-bg-green"/>
+        <action desc="修改" url="/web/employee/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
     </gridpanel>
 
 </viewport>

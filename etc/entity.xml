@@ -156,7 +156,7 @@
     <entity id="employee">
         <pk>user_id</pk>
         <field name="username"/>
-        <field name="reallly_name"/>
+        <field name="really_name"/>
         <field name="department_id"/>
         <field name="center_id"/>
         <ref entity="center" field="center_id" refEntityField="cid">
@@ -164,6 +164,6 @@
             <field name="name"/>
         </ref>
         <field name="is_leave"/>
-        <field name="phone"/>
+        <field name="phone_in_center"/>
     </entity>
 </entitys>
