@@ -33,10 +33,12 @@ func main() {
 		r.HandleFunc(url, handler)
 	}
 
+
 	http.Handle("/", r)
 
 	fmt.Println("服务器监听", portString, "端口")
 
+	go server.VedioTimer()
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
 }
@@ -48,6 +50,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
 	"/consultant_phone_detail_list.json": server.ConsultantPhoneDetailListAction,
+	"/queryVedio.json": server.VideoListAction,
 	"/downloadAudio":                     server.DownloadAudioAction,
 	"/audioNoteLoad.json":                server.AudioNoteLoadAction,
 	"/audioNoteSave.json":                server.AudioNoteSaveAction,

@@ -12,7 +12,5 @@
         <element field="phone"  type="text" desc="电话" />
         <element field="create_time"  type="date" desc="创建时间" />
         <element field="center_id"  type="text" desc="中心ID" />
-        <element field="come_from"  type="text" desc="来自" />
-        <element field="type"  type="text" desc="类型" />
     </formpanel>
 </viewport>

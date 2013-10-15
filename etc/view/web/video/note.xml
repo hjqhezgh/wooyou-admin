@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <crumbs>
+        <crumb text="电话录音报表" url="javascript:void(0)"/>
+        <crumb text="顾问通话报表" url="/web/center"/>
+        <crumb text="备注信息" currentPage="true"/>
+    </crumbs>
+
+    <customformpanel id="form" title="通话备注信息" saveUrl="/audioNoteSave.json" load="true" loadUrl="/audioNoteLoad.json">
+        <element field="mother" type="text" validate="" desc="母亲姓名" readonly="true"/>
+        <element field="motherPhone" type="text" validate="" desc="母亲电话" readonly="true"/>
+        <element field="father" type="text" validate="" desc="父亲姓名" readonly="true"/>
+        <element field="fatherPhone" type="text" validate="" desc="父亲电话" readonly="true"/>
+        <element field="homePhone" type="text" validate="" desc="家庭电话" readonly="true"/>
+        <element field="startTime" type="text" validate="" desc="通话时间" readonly="true"/>
+        <element field="note" type="textarea" validate="" desc="备注"/>
+        <element field="aid" type="hidden" validate="" desc=""/>
+
+        <beforeSave>
+            <![CDATA[
+                var note = container.find('form').find('[name=note]').val();
+
+                if(!note){
+                    alert('请填写备注信息');
+                    return false;
+                }
+
+                return true;
+            ]]>
+        </beforeSave>
+
+        <afterRender>
+        </afterRender>
+    </customformpanel>
+</viewport>

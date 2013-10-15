@@ -31,4 +31,5 @@
 
     <!--运营汇总报表-->
     <url path="/web/statistics" view="web/statistics.xml" />
+    <url path="/web/video/review" view="web/video/review.xml" />
 </urls>
