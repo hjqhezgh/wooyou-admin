@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="电话录音报表" url="javascript:void(0);"/>
+        <crumb text="Call Center跟踪" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="Call Center统计数据" id="grid1" width="1200" height="350" loadUrl="false">
+        <column field="centerId" desc="" hidden="true"/>
+        <column field="centerName" desc="所属中心" hidden="true"/>
+        <column field="totalNum" desc="CallCenter名单总数"/>
+        <column field="haveTmkNum" desc="已分配TMK的名单数"/>
+        <column field="noHaveTmkNum" desc="未分配TMK的名单数"/>
+        <column field="noContactNum" desc="未联系的名单数"/>
+        <column field="waitNum" desc="待确认的名单数"/>
+        <column field="badNum" desc="已废弃的名单数"/>
+        <column field="inviteNum" desc="已邀约的名单数"/>
+        <column field="sureNum" desc="确认签到的名单数"/>
+
+        <toolaction desc="为CallCenter分配名单" url="javascript:void(0)" linkType="newPage" colorClass="h-bg-green"/>
+        <action desc="查看详情" url="javascript:void(0)" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

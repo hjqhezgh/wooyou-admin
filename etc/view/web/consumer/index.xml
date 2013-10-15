@@ -23,6 +23,23 @@
         <column field="consumer_name" desc="孩子姓名"/>
         <column field="consumer_name" desc="通话数"/>
         <column field="consumer_name" desc="最后通话时间"/>
+        <column field="consumer_name" desc="电话销售状态">
+            <formatter>
+                <![CDATA[
+                if(cellvalue==1){
+                    return '<span style="color:red;">未联系</span>';
+                }else if(cellvalue==2){
+                    return '<span>待确认</span>';
+                }else if(cellvalue==3){
+                    return '<span style="color:#ccc;">已废弃</span>';
+                }else if(cellvalue==4){
+                    return '<span style="color:blue;">已邀约至中心</span>';
+                }else if(cellvalue==5){
+                    return '<span style="color:green;">签到成功</span>';
+                }
+                ]]>
+            </formatter>
+        </column>
 
         <!--<action desc="添加" url="/web/consumer/add" linkType="newPage"/>-->
         <action desc="修改" url="/web/consumer/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>

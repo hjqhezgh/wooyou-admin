@@ -45,7 +45,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleIds := strings.Split(employee.RoleId, ",")
 
 	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" {
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10" {
 			dataType = "all"
 			break
 		} else if roleId == "2" {
@@ -90,7 +90,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
+	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime,c.contact_status from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
 
 	if name != "" {
 		params = append(params, "%"+name+"%")
@@ -193,7 +193,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 11; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
