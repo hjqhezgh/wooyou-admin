@@ -30,7 +30,6 @@ import (
 /*
 select c.cid,c.name,count(tc.id) as '全部名单',count(tc.employee_id) as '已分配',count(tc.id)-count(tc.employee_id) as '未分配',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' from center c
 left join tmk_consumer tc on c.cid=tc.center_id
-left join tmk_consumer tc1 on c.cid=tc1.center_id and tc1.employee_id is null or tc1.employee_id=0
 left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0
 left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0
 left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0
@@ -101,7 +100,6 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	sql := "select c.cid,c.name,count(tc.id) as '全部名单',count(tc.employee_id) as '已分配',count(tc.id)-count(tc.employee_id) as '未分配',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' from center c "
 	sql += " left join tmk_consumer tc on c.cid=tc.center_id "
-	sql += " left join tmk_consumer tc1 on c.cid=tc1.center_id and tc1.employee_id is null or tc1.employee_id=0 "
 	sql += " left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0 "
 	sql += " left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0 "
 	sql += " left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0 "

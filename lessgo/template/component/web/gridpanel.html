@@ -38,7 +38,7 @@
 
             <div class="btn-box">
                 {{range $toolActionIndex,$toolAction := .Gridpanel.ToolActions}}
-                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" target="_blank">{{$toolAction.Desc}}</a>
+                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" {{if compareString $toolAction.LinkType "newPage"}}target="_blank"{{end}}>{{$toolAction.Desc}}</a>
                 {{end}}
             </div><!--E btn-box-->
 
