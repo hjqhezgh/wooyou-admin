@@ -90,7 +90,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=e.center_id where 1=1 "
+	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
 
 	if name != "" {
 		params = append(params, "%"+name+"%")
@@ -260,12 +260,13 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	fatherPhone := r.FormValue("fatherPhone")
 	homePhone := r.FormValue("homePhone")
 	child := r.FormValue("child")
+	comeFromId := r.FormValue("come_from_id")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
 	if id == "" {
-		sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id,child) values(?,?,?,?,?,?,?)"
+		sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id,child,come_from_id,center_id) values(?,?,?,?,?,?,?,?,?)"
 
 		lessgo.Log.Debug(sql)
 
@@ -280,7 +281,10 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId,child)
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId,child,comeFromId,_employee.CenterId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -294,7 +298,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
 	} else {
-		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=?,child=? where id=? "
+		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=?,child=?,come_from_id=? where id=? "
 
 		lessgo.Log.Debug(sql)
 
@@ -309,7 +313,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone,child, id)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone,child,comeFromId, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -354,7 +358,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	sql := "select father,father_phone,mother,mother_phone,home_phone,child from consumer where id=? "
+	sql := "select father,father_phone,mother,mother_phone,home_phone,child,come_from_id from consumer where id=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -371,10 +375,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var father, fatherPhone, mother, motherPhone, homePhone,child string
+	var father, fatherPhone, mother, motherPhone, homePhone,child,comeFrom string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone,&child)
+		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone,&child,&comeFrom)
 
 		if err != nil {
 			m["success"] = false
@@ -396,6 +400,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	h5 := lessgo.LoadFormObject{"motherPhone", motherPhone}
 	h6 := lessgo.LoadFormObject{"homePhone", homePhone}
 	h7 := lessgo.LoadFormObject{"child", child}
+	h8 := lessgo.LoadFormObject{"come_from_id", comeFrom}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -404,6 +409,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects = append(loadFormObjects, h5)
 	loadFormObjects = append(loadFormObjects, h6)
 	loadFormObjects = append(loadFormObjects, h7)
+	loadFormObjects = append(loadFormObjects, h8)
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")

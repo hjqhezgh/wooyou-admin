@@ -21,6 +21,12 @@
         <field name="channel"/>
     </entity>
 
+    <!--客户来源-->
+    <entity id="come_from">
+        <pk>id</pk>
+        <field name="name"/>
+    </entity>
+
     <entity id="hr_data">
         <pk>id</pk>
         <!--field的name是数据库字段拼写-->
@@ -132,6 +138,10 @@
         <ref entity="employee" field="employee_id" refEntityField="user_id">
             <field name="user_id"/>
             <field name="really_name"/>
+        </ref>
+        <ref entity="come_from" field="come_from_id" refEntityField="id">
+            <field name="id"/>
+            <field name="name"/>
         </ref>
     </entity>
 
