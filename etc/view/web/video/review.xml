@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="电话录音报表" url="javascript:void(0);"/>
+        <crumb text="通话报表" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/queryVedio.json" pageSize="15" title="通话报表" id="grid1" width="1200" height="350" loadUrl="true">
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="name" searchType="like" inputType="text" desc="顾问姓名"/>
+        <search field="year" searchType="eq" inputType="localSelect" desc="年" localData="[{desc:'2013年',value:'2013'},{desc:'2014年',value:'2014'},{desc:'2015年',value:'2015'},{desc:'2016年',value:'2016'},{desc:'2017年',value:'2017'}]"/>
+        <search field="month" searchType="eq" inputType="localSelect" desc="月" localData="[{desc:'1月',value:'01'},{desc:'2月',value:'02'},{desc:'3月',value:'03'},{desc:'4月',value:'04'},{desc:'5月',value:'05'},{desc:'6月',value:'06'},{desc:'7月',value:'07'},{desc:'8月',value:'08'},{desc:'9月',value:'09'},{desc:'10月',value:'10'},{desc:'11月',value:'11'},{desc:'12月',value:'12'}]"/>
+        <search field="week" searchType="eq" inputType="localSelect" desc="周" localData="[{desc:'第1周',value:'1'},{desc:'第2周',value:'2'},{desc:'第3周',value:'3'},{desc:'第4周',value:'4'},{desc:'第5周',value:'5'},{desc:'第6周',value:'6'}]"/>
+        <search field="start_time" searchType="eq" inputType="date" desc="日期"/>
+
+        <column field="centerName" desc="开始时间"/>
+        <column field="centerId" desc="结束时间"/>
+        <column field="employeeId" desc="课程ID" hidden="true"/>
+        <column field="centerName" desc="课程"/>
+        <column field="centerId" desc="员工ID" hidden="true"/>
+        <column field="employeeId" desc="教师"/>
+    </customgridpanel>
+</viewport>

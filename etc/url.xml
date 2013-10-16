@@ -31,6 +31,8 @@
 
     <!--运营汇总报表-->
     <url path="/web/statistics" view="web/statistics.xml" />
+    <!--视频review-->
+    <url path="/web/video/review" view="web/video/review.xml" />
 
     <!--中心CD的CallCenter跟踪统计模块-->
     <url path="/web/audio/center_callcenter_statistics" view="web/audio/center_call_center_statistics.xml" />
