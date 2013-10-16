@@ -81,7 +81,7 @@ func getWeekAgoDate(db *sql.DB) string{
 	return dateString
 }
 
-func UpdateVedioStatus() {
+func UpdateVideoStatus() {
 
 	type Ret struct {
 		id 			int
@@ -132,7 +132,7 @@ func UpdateVedioStatus() {
 		flag = true
 	}
 	fmt.Println(video_rets)
-	//i >0 表示有未登记的video文件，查询课程安排表关联
+	//flag 表示有未登记的video文件，查询课程安排表关联
 	if flag {
 		rows, err = db.Query(sql_class, TimeString(week_ago_date))
 		if err != nil {
