@@ -59,4 +59,13 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consumer.json":     server.ConsumerListAction,
 	"/consumerSave.json": server.ConsumerSaveAction,
 	"/consumerLoad.json": server.ConsumerLoadAction,
+
+	//Call Center统计
+	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
+	//CD获取可以分配给CallCenter名单
+	"/validForCallCenterList.json": server.ValidForCallCenterListAction,
+	//分配给CallCenter
+	"/web/consumer/sendToCallCenter": server.SendToCallCenterAction,
+	//全部分配给CallCenter
+	"/web/consumer/allSendToCallCenter": server.AllSendToCallCenter,
 }

@@ -2,18 +2,15 @@
 <viewport>
     <!--面包屑-->
     <crumbs>
-        <crumb text="客户信息" url="javascript:void(0);"/>
-        <crumb text="客户管理" currentPage="true"/>
+        <crumb text="电话录音报表" url="javascript:void(0);"/>
+        <crumb text="Call Center跟踪" url="/web/audio/center_callcenter_statistics"/>
+        <crumb text="Call Center名单分配" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="350" loadUrl="false">
+        <customgridpanel url="/validForCallCenterList.json" pageSize="15" title="Call Center名单分配" id="grid1" width="1200" height="350" loadUrl="false">
 
-        <search field="name" searchType="like" inputType="text" desc="客户姓名"/>
-        <search field="mySort" searchType="eq" inputType="localSelect" desc="排序方式（默认按最后通话时间）" localData="[{desc:'按最后通话时间',value:'time'},{desc:'按频率',value:'frequency'}]"/>
+        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'}]"/>
 
-        <toolaction desc="添加客户" url="/web/consumer/add" linkType="newPage" colorClass="h-bg-green"/>
-
-        <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="所属顾问"/>
         <column field="consumer_name" desc="母亲"/>
         <column field="consumer_name" desc="母亲电话"/>
@@ -21,8 +18,6 @@
         <column field="consumer_name" desc="父亲电话"/>
         <column field="consumer_name" desc="家庭电话"/>
         <column field="consumer_name" desc="孩子姓名"/>
-        <column field="consumer_name" desc="通话数"/>
-        <column field="consumer_name" desc="最后通话时间"/>
         <column field="consumer_name" desc="状态">
             <formatter>
                 <![CDATA[
@@ -41,7 +36,7 @@
             </formatter>
         </column>
 
-        <!--<action desc="添加" url="/web/consumer/add" linkType="newPage"/>-->
-        <action desc="修改" url="/web/consumer/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <toolaction desc="全部分配给Call Center" url="/web/consumer/allSendToCallCenter" linkType="newPage" colorClass="h-bg-green"/>
+        <action desc="分配给Call Center" url="/web/consumer/sendToCallCenter" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
     </customgridpanel>
 </viewport>

@@ -20,16 +20,18 @@ jQuery.extend({
  * 图片上传预览控件、
  */
 
-var ImageUploader = function(dom){
+var ImageUploader = function(dom,inputId){
 
     this.container = $(dom);
+
+    this.inputId = inputId;
 
     this.init();
 }
 
 ImageUploader.prototype = {
 
-    fileInput : '<label class="control-label">${fieldDesc}：</label><input id="fileToUpload" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" width="100" height="100" /></span>',
+    fileInput : '<label class="control-label">${fieldDesc}：</label><input id="${inputId}" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" width="100" height="100" /></span>',
 
     init : function(){
 
@@ -44,7 +46,8 @@ ImageUploader.prototype = {
         mythis.container.append(juicer(mythis.fileInput,{
             fieldName:mythis.container.attr('field-name'),
             fieldValue:mythis.container.attr('field-value'),
-            fieldDesc:mythis.container.attr('field-desc')
+            fieldDesc:mythis.container.attr('field-desc'),
+            inputId:mythis.inputId
         }));
 
         mythis.fieldName = mythis.container.attr('field-name')
@@ -61,7 +64,7 @@ ImageUploader.prototype = {
                     url:"/imgageuplaod",
                     secureuri:false,
                     data:{fileInputName : mythis.fieldName},
-                    fileElementId:'fileToUpload',//文件上传的id属性
+                    fileElementId:mythis.inputId,//文件上传的id属性
                     dataType: 'json',//返回值类型为json
                     success: function (data, status){//服务器成功响应处理函数
                         if(data.success){
