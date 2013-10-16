@@ -200,7 +200,7 @@ jQuery.fn.form = function (opts) {
 
         //图片上传
         myform.find('[field-type=image]').each(function(index,element){
-            new ImageUploader($(this));
+            new ImageUploader($(this),$(this).attr('field-name'));
         });
 
         //html编辑框
