@@ -38,6 +38,14 @@
     <url path="/web/audio/center_callcenter_statistics" view="web/audio/center_call_center_statistics.xml" />
     <!--总部的CallCenter跟踪统计模块-->
     <url path="/web/audio/callcenter_statistics" view="web/audio/call_center_statistics.xml" />
+    <!--tmk的CallCenter跟踪统计模块-->
+    <url path="/web/audio/tmk_callcenter_statistics" view="web/audio/tmk_callcenter_statistics.xml" />
+    <!--tmk查看中心CallCenter详情-->
+    <url path="/web/audio/tmk_center_callcenter_detail" view="web/audio/tmk_center_callcenter_detail.xml" />
     <!--CD查看可以分配给总部CallCenter的客户列表-->
     <url path="/web/consumer/valid_for_callcenter_list" view="web/consumer/valid_for_callcenter_list.xml" />
+    <!--查看中心CallCenter详情-->
+    <url path="/web/audio/center_callcenter_detail" view="web/audio/center_callcenter_detail.xml" />
+    <!--查看中心CallCenter详情-->
+    <url path="/web/audio/sendToTmk" view="web/audio/sendToTmk.xml" />
 </urls>

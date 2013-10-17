@@ -1,16 +1,16 @@
-// Title：Call Center跟踪统计
+// Title：
 //
 // Description:
 //
 // Author:black
 //
-// Createtime:2013-09-26 15:50
+// Createtime:2013-10-16 14:24
 //
 // Version:1.0
 //
 // 修改历史:版本号 修改日期 修改人 修改说明
 //
-// 1.0 2013-10-15 10:46 black 创建文档
+// 1.0 2013-10-16 14:24 black 创建文档
 package server
 
 import (
@@ -22,23 +22,9 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
-	"math/rand"
-	"time"
 )
 
-//CallCenter 统计报表
-/*
-select c.cid,c.name,count(tc.id) as '全部名单',count(tc.employee_id) as '已分配',count(tc.id)-count(tc.employee_id) as '未分配',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' from center c
-left join tmk_consumer tc on c.cid=tc.center_id
-left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0
-group by c.cid
-limit 0,100;
-*/
-func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
+func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -82,6 +68,9 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	status := r.FormValue("status-eq")
+	centerId := r.FormValue("id")
+
 	dataType := ""
 
 	roleIds := strings.Split(employee.RoleId, ",")
@@ -100,20 +89,27 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select c.cid,c.name,count(tc.id) as '全部名单',count(tc.employee_id) as '已分配',count(tc.id)-count(tc.employee_id) as '未分配',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' from center c "
-	sql += " left join tmk_consumer tc on c.cid=tc.center_id "
-	sql += " left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0 where c.cid!=9 "//将总部过滤掉
+	sql := ""
+	countSql := ""
+
+	sql += "select tc.id,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,c.contact_status from tmk_consumer tc left join consumer c on tc.consumer_id=c.id left join employee e on e.user_id = tc.employee_id where tc.center_id=? "
+
+	if dataType == "all" {
+		params = append(params,centerId)
+
+		if status != "" {
+			if status == "no employee"{
+				sql += " and tc.employee_id is null or tc.employee_id=0 "
+			}else{
+				sql += " and c.contact_status=? "
+				params = append(params,status)
+			}
+		}
 
 
-	if (dataType == "center"){
-		sql += " and c.cid=? "
+	}else if dataType == "center"{
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
-
 		if err != nil {
 			m["success"] = false
 			m["code"] = 100
@@ -121,20 +117,31 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-
 		params = append(params,_employee.CenterId)
-	}else if(dataType == "self"){
-		// fix
-		sql += " and tc.employee_id="+employee.UserId
+
+		if status != "" {
+			if status == "no employee"{
+				sql += " and tc.employee_id is null or tc.employee_id=0 "
+			}else{
+				sql += " and c.contact_status=? "
+				params = append(params,status)
+			}
+		}
+
+	}else{
+
+		params = append(params,centerId)
+
+		sql += " and tc.employee_id=? "
+		params = append(params,employee.UserId)
+
+		if status != "" && status!= "no employee"{
+			sql += " and c.contact_status=? "
+			params = append(params,status)
+		}
 	}
 
-	sql += " group by c.cid "
-
-	countSql := "select count(1) from center where cid!=9 "
-
-	if (dataType == "center"){
-		countSql += " and cid=? "
-	}
+	countSql = "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
@@ -175,12 +182,12 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " limit ?,?"
+	sql += " order by tc.cd_create_time desc  limit ?,?"
+
+	lessgo.Log.Debug(sql)
 
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
-
-	lessgo.Log.Debug(sql)
 
 	rows, err = db.Query(sql, params...)
 
@@ -198,13 +205,12 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 
 		model := new(lessgo.Model)
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		model.Id = r.Intn(1000)
-		model.Props = []*lessgo.Prop{}
 
 		fillObjects := []interface{}{}
 
-		for i := 0; i < 10; i++ {
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 8; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -235,4 +241,5 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
+
 }
