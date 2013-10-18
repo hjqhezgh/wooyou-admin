@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 )
 
 //客户分页数据服务
@@ -413,4 +414,128 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
+}
+
+func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("id")
+	status := r.FormValue("status")
+
+	sql := "select contact_status from consumer where id=?"
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, id)
+
+	var oldStatus string
+
+	if rows.Next() {
+		err := commonlib.PutRecord(rows,&oldStatus)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql = "update consumer set contact_status=? where id=? "
+
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(status, id)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql = "insert into consumer_statuts_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+
+	lessgo.Log.Debug(sql)
+
+	stmt, err = tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(id, employee.UserId,time.Now().Format("20060102150405"),oldStatus,status)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = "客户状态更改成功"
+	commonlib.OutputJson(w, m, " ")
+
 }

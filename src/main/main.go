@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"server"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -78,4 +79,6 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/sendToTmkLoad.json": server.SendToTmkLoadAction,
 	//分配tmk页面的表单保存
 	"/sendToTmkSave.json": server.SendToTmkSaveAction,
+	//客户状态变更
+	"/consumerStatusChange": server.ConsumerStatusChangeAction,
 }

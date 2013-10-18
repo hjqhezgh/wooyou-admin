@@ -92,7 +92,7 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 	sql := ""
 	countSql := ""
 
-	sql += "select tc.id,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,c.contact_status from tmk_consumer tc left join consumer c on tc.consumer_id=c.id left join employee e on e.user_id = tc.employee_id where tc.center_id=? "
+	sql += "select tc.id,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,c.contact_status,c.id as 'cid' from tmk_consumer tc left join consumer c on tc.consumer_id=c.id left join employee e on e.user_id = tc.employee_id where tc.center_id=? "
 
 	if dataType == "all" {
 		params = append(params,centerId)
@@ -210,7 +210,7 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 8; i++ {
+		for i := 0; i < 9; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

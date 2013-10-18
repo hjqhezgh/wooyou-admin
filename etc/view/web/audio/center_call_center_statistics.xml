@@ -19,6 +19,6 @@
         <column field="sureNum" desc="确认签到的名单数"/>
 
         <toolaction desc="为CallCenter分配名单" url="/web/consumer/valid_for_callcenter_list" linkType="currentPage" colorClass="h-bg-green"/>
-        <action desc="查看详情" url="javascript:void(0)" linkType="newPage" actionParams="[{name:'id',value:'0'}]"/>
+        <action desc="查看详情" url="/web/audio/center_callcenter_detail" linkType="newPage" actionParams="[{name:'id',value:'0'}]"/>
     </customgridpanel>
 </viewport>
