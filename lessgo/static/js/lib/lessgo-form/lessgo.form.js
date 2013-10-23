@@ -8,7 +8,7 @@ jQuery.fn.form = function (opts) {
     var selectFieldTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><select name="${fieldName}" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}disabled{@/if} ></select><span>${fieldTip}</span></div>';
     var optionTemp = '<option value="${value}">${desc}</option>';
     var textAreaTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><textarea name="${fieldName}" rows="7" style="width:60%" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} >${fieldValue}</textarea><span>${fieldTip}</span></div>';
-    var checkboxContainerTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input data-field type="hidden" name="${fieldName}" validate="${fieldValidate}"  /></div>';
+    var checkboxContainerTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input data-field type="hidden" name="${fieldName}" validate="${fieldValidate}" data-desc="${fieldDesc}"  /></div>';
     var checkboxTemp = '<input validate="${fieldValidate}" value="${value}" type="checkbox" {@if fieldReadOnly=="true"}readonly{@/if} />${desc}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
     //初始化html编辑器对象，一个表单只能拥有一个编辑器
@@ -253,7 +253,7 @@ jQuery.fn.form = function (opts) {
             var checkboxContainer = $(element).find('.controls');
 
             if(valueField){
-                $(element).find('[data-field]').val(valueField);
+                $(element).find('[data-field]').val($(element).attr('field-value'));
             }
 
             $.get(url,{},function(data){

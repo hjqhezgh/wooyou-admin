@@ -34,13 +34,14 @@ var ImageUploader = function(dom,inputId){
     this.minHeight = this.container.attr('field-minHeight');
     this.maxSize = this.container.attr('field-maxSize');
     this.resolution = this.container.attr('field-resolution');
+    this.tip = this.container.attr('field-tip');
 
     this.init();
 }
 
 ImageUploader.prototype = {
 
-    fileInput : '<label class="control-label">${fieldDesc}：</label><input id="${inputId}" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><input type="hidden" data-field name="${fieldName}_s" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" width="100" height="100" /></span>',
+    fileInput : '<label class="control-label">${fieldDesc}：</label><input id="${inputId}" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><input type="hidden" data-field name="${fieldName}_s" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" width="100" height="100" /></span><span>${fieldTip}</span>',
 
     init : function(){
 
@@ -56,6 +57,7 @@ ImageUploader.prototype = {
             fieldName:mythis.container.attr('field-name'),
             fieldValue:mythis.container.attr('field-value'),
             fieldDesc:mythis.container.attr('field-desc'),
+            fieldTip:mythis.container.attr('field-tip'),
             inputId:mythis.inputId
         }));
 
