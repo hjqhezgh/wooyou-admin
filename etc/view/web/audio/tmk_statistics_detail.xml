@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="电话录音报表" url="javascript:void(0);"/>
+        <crumb text="TMK运营报表" url="/web/audio/tmk_statistics"/>
+        <crumb text="TMK运营报表详情" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/tmk_statistics_detail.json" pageSize="15" title="TMK运营报表详情" id="grid1" width="1200" height="350" loadUrl="true">
+        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未分配',value:'no employee'},{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
+
+        <column field="consume_id" desc="客户id" hidden="true"/>
+        <column field="employee_id" desc="tmkid" hidden="true"/>
+        <column field="employee_name" desc="所属TMK" />
+        <column field="centerName" desc="名单所属中心"/>
+        <column field="mother" desc="母亲"/>
+        <column field="mother_phone" desc="母亲电话"/>
+        <column field="father" desc="父亲"/>
+        <column field="father_name" desc="父亲电话"/>
+        <column field="home_phone" desc="家庭电话"/>
+        <column field="childname" desc="孩子姓名"/>
+        <column field="status" desc="状态">
+            <formatter>
+                <![CDATA[
+                if(cellvalue==1){
+                    return '<span style="color:red;">未联系</span>';
+                }else if(cellvalue==2){
+                    return '<span>待确认</span>';
+                }else if(cellvalue==3){
+                    return '<span style="color:#ccc;">已废弃</span>';
+                }else if(cellvalue==4){
+                    return '<span>已邀约至中心</span>';
+                }else if(cellvalue==5){
+                    return '<span style="color:green;">签到成功</span>';
+                }
+                ]]>
+            </formatter>
+        </column>
+    </customgridpanel>
+</viewport>

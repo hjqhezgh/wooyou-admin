@@ -77,6 +77,10 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/consumer/sendToCallCenter": server.SendToCallCenterAction,
 	//全部分配给CallCenter
 	"/web/consumer/allSendToCallCenter": server.AllSendToCallCenter,
+	//tmk运营报表
+	"/tmkStatistics.json": server.TmkStatisticsAction,
+	//tmk运营报表详情
+	"/tmk_statistics_detail.json": server.TmkStatisticsDetailAction,
 	//分配tmk页面的表单加载
 	"/sendToTmkLoad.json": server.SendToTmkLoadAction,
 	//分配tmk页面的表单保存

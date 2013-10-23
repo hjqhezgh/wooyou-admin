@@ -48,4 +48,8 @@
     <url path="/web/audio/center_callcenter_detail" view="web/audio/center_callcenter_detail.xml" />
     <!--查看中心CallCenter详情-->
     <url path="/web/audio/sendToTmk" view="web/audio/sendToTmk.xml" />
+    <!--tmk运营报表-->
+    <url path="/web/audio/tmk_statistics" view="web/audio/tmk_statistics.xml" />
+    <!--tmk运营报表详情-->
+    <url path="/web/audio/tmk_statistics_detail" view="web/audio/tmk_statistics_detail.xml" />
 </urls>
