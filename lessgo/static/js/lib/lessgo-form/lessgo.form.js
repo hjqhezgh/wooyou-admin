@@ -252,7 +252,7 @@ jQuery.fn.form = function (opts) {
 
             var checkboxContainer = $(element).find('.controls');
 
-            if(valueField){
+            if($(element).attr('field-value')){
                 $(element).find('[data-field]').val($(element).attr('field-value'));
             }
 
