@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"server"
 	"strconv"
-	"strings"
 )
 
 func main() {
@@ -37,9 +36,12 @@ func main() {
 
 	http.Handle("/", r)
 
+	http.Handle("/js/", http.FileServer(http.Dir("../static")))
+	http.Handle("/img/", http.FileServer(http.Dir("../static")))
+	http.Handle("/css/", http.FileServer(http.Dir("../static")))
+
 	fmt.Println("服务器监听", portString, "端口")
 
-//	go server.UpdateVedioStatus()
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
 }
