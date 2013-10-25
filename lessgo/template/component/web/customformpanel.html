@@ -54,7 +54,7 @@
 <script type="text/javascript">
     seajs.use('lessgo-form',function(){
         $('#{{$id}}').form({
-            saveUrl : '/{{.Terminal}}/{{.Entity.Id}}/save?componentId={{.CustomFormPanel.Id}}',
+            saveUrl : '{{.CustomFormPanel.SaveUrl}}',
             {{if compareString .CustomFormPanel.AfterSave ""}}
             successCallback : function(data){
                 alert('保存成功');
