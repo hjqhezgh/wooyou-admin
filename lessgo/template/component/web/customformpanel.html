@@ -55,6 +55,9 @@
     seajs.use('lessgo-form',function(){
         $('#{{$id}}').form({
             saveUrl : '{{.CustomFormPanel.SaveUrl}}',
+            {{if compareString .CustomFormPanel.Load "true" }}
+            loadUrl : '{{.CustomFormPanel.LoadUrl}}',
+            {{end}}
             {{if compareString .CustomFormPanel.AfterSave ""}}
             successCallback : function(data){
                 alert('保存成功');
