@@ -3,21 +3,21 @@
     <!--面包屑-->
     <crumbs>
         <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="Call Center跟踪" currentPage="true"/>
+        <crumb text="TMK报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="Call Center统计数据" id="grid1" width="1200" height="350" loadUrl="false">
+    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="TMK报表" id="grid1" width="1200" height="350" loadUrl="false">
         <column field="centerId" desc="" hidden="true"/>
         <column field="centerName" desc="所属中心">
             <formatter>
                 <![CDATA[
-                    return '<a style="color:blue;text-decoration: underline;" title="查看该中心CallCenter详情" href="/web/audio/center_callcenter_detail?id='+rowObject[0]+'">'+cellvalue+'</a>'
+                    return '<a style="color:blue;text-decoration: underline;" title="查看该中心CallCenter详情" href="/web/audio/tmk_center_callcenter_detail?id='+rowObject[0]+'">'+cellvalue+'</a>'
                 ]]>
             </formatter>
         </column>
         <column field="totalNum" desc="CallCenter名单总数"/>
-        <column field="haveTmkNum" desc="已分配TMK的名单数"/>
-        <column field="noHaveTmkNum" desc="未分配TMK的名单数"/>
+        <column field="haveTmkNum" desc="已分配TMK的名单数" hidden="true"/>
+        <column field="noHaveTmkNum" desc="未分配TMK的名单数"  hidden="true"/>
         <column field="noContactNum" desc="未联系的名单数"/>
         <column field="waitNum" desc="待确认的名单数"/>
         <column field="badNum" desc="已废弃的名单数"/>

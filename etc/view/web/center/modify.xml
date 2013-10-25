@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport>
-    <crumbs>
-        <crumb text="基础设置" url="javascript:void(0)"/>
-        <crumb text="中心管理" url="/web/center"/>
-        <crumb text="中心修改" currentPage="true"/>
-    </crumbs>
-    <formpanel entity="center" load="true" id="form" title="中心修改">
+<viewport  window="true">
+    <formpanel entity="center" load="true" id="form" title="中心修改"  inwindow="true">
         <element field="name" type="text" validate="notNull" desc="名字"/>
         <element field="telephone" type="text" validate="" desc="联系电话"/>
         <element field="intro"  type="textarea" desc="简介" />

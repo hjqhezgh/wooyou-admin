@@ -26,6 +26,16 @@
                          field-refTable="{{$element.RefTable}}"
                          field-selfId="{{$element.SelfId}}"
                          field-refId="{{$element.RefId}}"
+                         field-tip="{{$element.Tip}}"
+
+                         field-imageType="{{$element.ImageType}}"
+                         field-maxWidth="{{$element.MaxWidth}}"
+                         field-maxHeight="{{$element.MaxHeight}}"
+                         field-minWidth="{{$element.MinWidth}}"
+                         field-minHeight="{{$element.MinHeight}}"
+                         field-maxSize="{{$element.MaxSize}}"
+                         field-resolution="{{$element.Resolution}}"
+                         field-widths="{{$element.Widths}}"
                             >
                     </div>
                     {{end}}
@@ -44,29 +54,40 @@
 <script type="text/javascript">
     seajs.use('lessgo-form',function(){
         $('#{{$id}}').form({
-            saveUrl : '{{.CustomFormPanel.SaveUrl}}',
-            {{if compareString .CustomFormPanel.Load "true" }}
-            loadUrl : '{{.CustomFormPanel.LoadUrl}}',
-            {{end}}
+            saveUrl : '/{{.Terminal}}/{{.Entity.Id}}/save?componentId={{.CustomFormPanel.Id}}',
+            {{if compareString .CustomFormPanel.AfterSave ""}}
             successCallback : function(data){
                 alert('保存成功');
+                {{if compareString .CustomFormPanel.Inwindow "true"}}
+                $.getParentComponentObject(sourceComponentId).getGrid().trigger("reloadGrid");
+                top.layer.close(top.layer.getFrameIndex(window.name));
+                {{else}}
                 window.close();
+                {{end}}
             },
+            {{else}}
+            successCallback : function(data){
+                {{.CustomFormPanel.AfterSave}}
+            },
+            {{end}}
+
             {{if compareString .CustomFormPanel.BeforeSave ""}}
             {{else}}
             beforeSave : function(container){
                 {{.CustomFormPanel.BeforeSave}}
             },
             {{end}}
+
             {{if compareString .CustomFormPanel.AfterRender ""}}
             {{else}}
             afterRender : function(container){
                 {{.CustomFormPanel.AfterRender}}
             },
             {{end}}
+
             failCallback : function(data){
                 alert(data.msg);
             }
-        });
+    });
     });
 </script>

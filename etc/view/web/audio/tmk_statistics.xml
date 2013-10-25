@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="电话录音报表" url="javascript:void(0);"/>
+        <crumb text="TMK运营报表" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/tmkStatistics.json" pageSize="15" title="TMK运营报表" id="grid1" width="1200" height="350" loadUrl="false">
+        <column field="employeeId" desc="" hidden="true"/>
+        <column field="employeeName" desc="tmk姓名">
+            <formatter>
+                <![CDATA[
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" href="/web/audio/tmk_statistics_detail?id='+rowObject[0]+'">'+cellvalue+'</a>';
+                ]]>
+            </formatter>
+        </column>
+        <column field="totalNum" desc="名单总数"/>
+        <column field="noContactNum" desc="未联系的名单数"/>
+        <column field="waitNum" desc="待确认的名单数"/>
+        <column field="badNum" desc="已废弃的名单数"/>
+        <column field="inviteNum" desc="已邀约的名单数"/>
+        <column field="sureNum" desc="确认签到的名单数"/>
+    </customgridpanel>
+</viewport>

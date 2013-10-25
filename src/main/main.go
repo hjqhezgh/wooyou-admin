@@ -36,9 +36,12 @@ func main() {
 
 	http.Handle("/", r)
 
+	http.Handle("/js/", http.FileServer(http.Dir("../static")))
+	http.Handle("/img/", http.FileServer(http.Dir("../static")))
+	http.Handle("/css/", http.FileServer(http.Dir("../static")))
+
 	fmt.Println("服务器监听", portString, "端口")
 
-	go server.UpdateVedioStatus()
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
 }
@@ -46,6 +49,10 @@ func main() {
 //URL映射列表
 var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/login": server.LoginAction,
+
+	//根据角色ID获取员工列表
+	"/employeeListByRoleId.json":        server.EmployeeListByRoleIdAction,
+
 
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
@@ -64,8 +71,20 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
 	//CD获取可以分配给CallCenter名单
 	"/validForCallCenterList.json": server.ValidForCallCenterListAction,
+	//中心的CallCenter详情
+	"/centerCallCenterDetail.json": server.CenterCallCenterDetailAction,
 	//分配给CallCenter
 	"/web/consumer/sendToCallCenter": server.SendToCallCenterAction,
 	//全部分配给CallCenter
 	"/web/consumer/allSendToCallCenter": server.AllSendToCallCenter,
+	//tmk运营报表
+	"/tmkStatistics.json": server.TmkStatisticsAction,
+	//tmk运营报表详情
+	"/tmk_statistics_detail.json": server.TmkStatisticsDetailAction,
+	//分配tmk页面的表单加载
+	"/sendToTmkLoad.json": server.SendToTmkLoadAction,
+	//分配tmk页面的表单保存
+	"/sendToTmkSave.json": server.SendToTmkSaveAction,
+	//客户状态变更
+	"/consumerStatusChange": server.ConsumerStatusChangeAction,
 }

@@ -37,8 +37,13 @@
             {{end}}
 
             <div class="btn-box">
-                {{range $toolActionIndex,$toolAction := .CustomGridPanel.ToolActions}}
-                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" {{if compareString $toolAction.LinkType "newPage"}}target="_blank"{{end}}>{{$toolAction.Desc}}</a>
+                {{range $toolActionIndex,$toolAction := .Gridpanel.ToolActions}}
+                {{if compareString $toolAction.LinkType "newPage"}}
+                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" target="_blank">{{$toolAction.Desc}}</a>
+                {{end}}
+                {{if compareString $toolAction.LinkType "iframeWindow"}}
+                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-action="openIframeWindow" window-width="{{$toolAction.Width}}"  window-height="{{$toolAction.Height}}"   window-title="{{$toolAction.Title}}">{{$toolAction.Desc}}</a>
+                {{end}}
                 {{end}}
             </div><!--E btn-box-->
 
@@ -92,7 +97,16 @@
             "formatter":function(cellvalue, options, rowObject){
                  var value = "";
                 {{range $index,$action := .CustomGridPanel.Actions}}
-                value += gridActionRender(cellvalue, options, rowObject,'{{$action.LinkType}}','{{$action.Desc}}','{{$action.Url}}',"{{$action.ActionParams}}");
+                var action = {
+                    linkType : '{{$action.LinkType}}',
+                    desc : '{{$action.Desc}}',
+                    url : '{{$action.Url}}',
+                    actionParams : "{{$action.ActionParams}}",
+                    width : '{{$action.Width}}',
+                    height : '{{$action.Height}}',
+                    title : '{{$action.Title}}'
+                }
+                value += gridActionRender(cellvalue, options, rowObject,action);
                 {{end}}
                 return value;
             }

@@ -31,6 +31,16 @@
                          field-refTable="{{$element.RefTable}}"
                          field-selfId="{{$element.SelfId}}"
                          field-refId="{{$element.RefId}}"
+                         field-tip="{{$element.Tip}}"
+
+                         field-imageType="{{$element.ImageType}}"
+                         field-maxWidth="{{$element.MaxWidth}}"
+                         field-maxHeight="{{$element.MaxHeight}}"
+                         field-minWidth="{{$element.MinWidth}}"
+                         field-minHeight="{{$element.MinHeight}}"
+                         field-maxSize="{{$element.MaxSize}}"
+                         field-resolution="{{$element.Resolution}}"
+                         field-widths="{{$element.Widths}}"
                             >
                     </div>
                     {{end}}
@@ -51,10 +61,37 @@
     seajs.use('lessgo-form',function(){
         $('#{{$id}}').form({
             saveUrl : '/{{.Terminal}}/{{.Entity.Id}}/save?componentId={{.Formpanel.Id}}',
+            {{if compareString .Formpanel.AfterSave ""}}
             successCallback : function(data){
+                {{if compareString .Formpanel.Inwindow "true"}}
+                $.getParentComponentObject(sourceComponentId).getGrid().trigger("reloadGrid");
+                alert('保存成功');
+                top.layer.close(top.layer.getFrameIndex(window.name));
+                {{else}}
                 alert('保存成功');
                 window.close();
+                {{end}}
             },
+            {{else}}
+            successCallback : function(data){
+                {{.Formpanel.AfterSave}}
+            },
+            {{end}}
+
+            {{if compareString .Formpanel.BeforeSave ""}}
+            {{else}}
+            beforeSave : function(container){
+                {{.Formpanel.BeforeSave}}
+            },
+            {{end}}
+
+            {{if compareString .Formpanel.AfterRender ""}}
+            {{else}}
+            afterRender : function(container){
+                {{.Formpanel.AfterRender}}
+            },
+            {{end}}
+
             failCallback : function(data){
                 alert(data.msg);
             }

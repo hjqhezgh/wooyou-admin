@@ -4,11 +4,11 @@ jQuery.fn.form = function (opts) {
     var myform = this.find('form');
 
     var hiddenFieldTemp = '<input name="${fieldName}" value="${fieldValue}" type="hidden" data-field validate="${fieldValidate}" />';
-    var textFieldTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input name="${fieldName}" value="${fieldValue}" type="text" class="input-small" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} /></div>';
-    var selectFieldTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><select name="${fieldName}" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}disabled{@/if} ></select></div>';
+    var textFieldTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input name="${fieldName}" value="${fieldValue}" type="text" class="input-small" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} /><span>${fieldTip}</span></div>';
+    var selectFieldTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><select name="${fieldName}" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}disabled{@/if} ></select><span>${fieldTip}</span></div>';
     var optionTemp = '<option value="${value}">${desc}</option>';
-    var textAreaTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><textarea name="${fieldName}" rows="7" style="width:60%" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} >${fieldValue}</textarea></div>';
-    var checkboxContainerTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input data-field type="hidden" name="${fieldName}" validate="${fieldValidate}"  /></div>';
+    var textAreaTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><textarea name="${fieldName}" rows="7" style="width:60%" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} >${fieldValue}</textarea><span>${fieldTip}</span></div>';
+    var checkboxContainerTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input data-field type="hidden" name="${fieldName}" validate="${fieldValidate}" data-desc="${fieldDesc}"  /></div>';
     var checkboxTemp = '<input validate="${fieldValidate}" value="${value}" type="checkbox" {@if fieldReadOnly=="true"}readonly{@/if} />${desc}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
     //初始化html编辑器对象，一个表单只能拥有一个编辑器
@@ -45,6 +45,7 @@ jQuery.fn.form = function (opts) {
                 fieldValue:$(element).attr('field-value'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
         });
@@ -56,6 +57,7 @@ jQuery.fn.form = function (opts) {
                 fieldValue:$(element).attr('field-value'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
         });
@@ -67,6 +69,7 @@ jQuery.fn.form = function (opts) {
                 fieldValue:$(element).attr('field-value'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
 
@@ -85,6 +88,7 @@ jQuery.fn.form = function (opts) {
                 fieldValue:$(element).attr('field-value'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
 
@@ -104,6 +108,7 @@ jQuery.fn.form = function (opts) {
                 fieldValue:$(element).attr('field-value'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
 
@@ -119,6 +124,7 @@ jQuery.fn.form = function (opts) {
                 fieldName:$(element).attr('field-name'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
 
@@ -151,6 +157,7 @@ jQuery.fn.form = function (opts) {
                 fieldName:$(element).attr('field-name'),
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
+                fieldTip:$(element).attr('field-tip'),
                 fieldValidate:$(element).attr('field-validate')
             }));
 
@@ -244,6 +251,10 @@ jQuery.fn.form = function (opts) {
             }));
 
             var checkboxContainer = $(element).find('.controls');
+
+            if($(element).attr('field-value')){
+                $(element).find('[data-field]').val($(element).attr('field-value'));
+            }
 
             $.get(url,{},function(data){
                 if(data.success){
