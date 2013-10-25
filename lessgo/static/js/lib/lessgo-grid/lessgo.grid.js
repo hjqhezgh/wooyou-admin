@@ -1,5 +1,9 @@
 jQuery.fn.grid = function (opts) {
 
+    var componentId = this.attr("id");
+
+    window[componentId] = this;
+
     var _this = this;
 
     var lastId = 0;
@@ -15,10 +19,13 @@ jQuery.fn.grid = function (opts) {
         height : 600
     }, opts || {});
 
+    this.getGrid = function(){
+        return this.grid;
+    }
 
     this.render = function () {
 
-        $('#' + opts.tableId).jqGrid({
+        this.grid = $('#' + opts.tableId).jqGrid({
             url: opts.dataurl,
             datatype: 'json',
             colNames: opts.colNames,
@@ -50,6 +57,8 @@ jQuery.fn.grid = function (opts) {
         });*/
 
         this.renderSearchForm();
+
+        this.bindButtonEvent();
     }
 
     this.renderSearchForm = function(){
@@ -157,7 +166,7 @@ jQuery.fn.grid = function (opts) {
 
         });
 
-        this.removeConfigAttr();
+        //this.removeConfigAttr();
 
         //美化按钮
         this.find('a[data-action=reset]').button();
@@ -202,6 +211,20 @@ jQuery.fn.grid = function (opts) {
 
     }
 
+    this.bindButtonEvent = function(){
+        _this.on('click','[data-action=openIframeWindow]',function(event){
+            thisButton = $(this);
+            event.preventDefault();
+            $.openIframeWindow({
+                width : thisButton.attr('window-width') ,
+                height : thisButton.attr('window-height') ,
+                title : thisButton.attr('window-title'),
+                url : thisButton.attr('href'),
+                parentComponent : componentId
+            },event);
+        });
+    }
+
     this.render();
 
     return this;
@@ -210,35 +233,46 @@ jQuery.fn.grid = function (opts) {
 /*****
  * 表格操作列渲染器
  **/
-function gridActionRender(cellvalue, options, rowObject,linkType,desc,url,actionParams) {
-    var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" {@if linkType=="newPage"}target="_blank"{@/if}>${desc}</a>&nbsp;';
+function gridActionRender(cellvalue, options, rowObject,action) {
 
-    if (linkType == "newPage"){
-        var params = "";
+    var params = "";
 
-        if(actionParams!=""){
-            params = "?";
-            actionParams = eval('('+actionParams+')');
-            for(var i=0;i<actionParams.length;i++){
-                if(i!=0){
-                    params +="&";
-                }
-                params += actionParams[i].name + "=";
-
-                if(actionParams[i].value=="id"){
-                    params += options.rowId;
-                }else{
-                    params += rowObject[actionParams[i].value];
-                }
+    if(action.actionParams!=""){
+        params = "?";
+        action.actionParams = eval('('+action.actionParams+')');
+        for(var i=0;i<action.actionParams.length;i++){
+            if(i!=0){
+                params +="&";
             }
+            params += action.actionParams[i].name + "=";
 
+            if(action.actionParams[i].value=="id"){
+                params += options.rowId;
+            }else{
+                params += rowObject[action.actionParams[i].value];
+            }
         }
 
+    }
+
+    if (action.linkType == "newPage"){
+        var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" target="_blank">${desc}</a>&nbsp;';
+
         return juicer(tmp,{
-            url:url,
-            linkType:linkType,
-            desc:desc,
+            url:action.url,
+            desc:action.desc,
             params:params
+        });
+
+    }else if (action.linkType == "iframeWindow"){
+        var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" data-action="openIframeWindow" window-width="${width}"  window-height="${height}"   window-title="${title}">${desc}</a>&nbsp;';
+        return juicer(tmp,{
+            url:action.url,
+            desc:action.desc,
+            params:params,
+            width : action.width,
+            height : action.height,
+            title : action.title
         });
     }
 }

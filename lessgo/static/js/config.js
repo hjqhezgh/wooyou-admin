@@ -69,7 +69,8 @@ define(function (require, exports, module) {
                        'kindeditor',
                        'timepicker',
                        productUrl + '/lib/lessgo-form/area.js',
-                       productUrl + '/lib/lessgo-form/timedim-week.js'
+                       productUrl + '/lib/lessgo-form/timedim-week.js',
+                       'lessgo-window'
                 ]
             },
             'jq-grid' : {
@@ -82,7 +83,15 @@ define(function (require, exports, module) {
             },
             'lessgo-grid' : {
                 src: productUrl + '/lib/lessgo-grid/lessgo.grid.js',
-                deps: ['jq-grid','juicer','timepicker']
+                deps: ['jq-grid','juicer','timepicker','lessgo-window']
+            },
+            'lessgo-window' : {
+                src: productUrl + '/lib/lessgo-window/lessgo.window.js',
+                deps: ['layer']
+            },
+            'layer' : {
+                src: productUrl + '/lib/layer/layer.js',
+                deps: ['jquery']
             }
         },
         version: version,

@@ -54,29 +54,40 @@
 <script type="text/javascript">
     seajs.use('lessgo-form',function(){
         $('#{{$id}}').form({
-            saveUrl : '{{.CustomFormPanel.SaveUrl}}',
-            {{if compareString .CustomFormPanel.Load "true" }}
-            loadUrl : '{{.CustomFormPanel.LoadUrl}}',
-            {{end}}
+            saveUrl : '/{{.Terminal}}/{{.Entity.Id}}/save?componentId={{.CustomFormPanel.Id}}',
+            {{if compareString .CustomFormPanel.AfterSave ""}}
             successCallback : function(data){
                 alert('保存成功');
+                {{if compareString .CustomFormPanel.Inwindow "true"}}
+                $.getParentComponentObject(sourceComponentId).getGrid().trigger("reloadGrid");
+                top.layer.close(top.layer.getFrameIndex(window.name));
+                {{else}}
                 window.close();
+                {{end}}
             },
+            {{else}}
+            successCallback : function(data){
+                {{.CustomFormPanel.AfterSave}}
+            },
+            {{end}}
+
             {{if compareString .CustomFormPanel.BeforeSave ""}}
             {{else}}
             beforeSave : function(container){
                 {{.CustomFormPanel.BeforeSave}}
             },
             {{end}}
+
             {{if compareString .CustomFormPanel.AfterRender ""}}
             {{else}}
             afterRender : function(container){
                 {{.CustomFormPanel.AfterRender}}
             },
             {{end}}
+
             failCallback : function(data){
                 alert(data.msg);
             }
-        });
+    });
     });
 </script>
