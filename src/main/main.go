@@ -39,6 +39,8 @@ func main() {
 	http.Handle("/js/", http.FileServer(http.Dir("../static")))
 	http.Handle("/img/", http.FileServer(http.Dir("../static")))
 	http.Handle("/css/", http.FileServer(http.Dir("../static")))
+	http.Handle("/newsimg/", http.FileServer(http.Dir("../")))
+	http.Handle("/artimg/", http.FileServer(http.Dir("../")))
 
 	fmt.Println("服务器监听", portString, "端口")
 
@@ -98,4 +100,5 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/news/load.json":              wooyousite.NewsLoadAction,
 	"/web/news/save.json":              wooyousite.NewsSaveAction,
 	"/web/news/update.json":            wooyousite.NewsUpdateAction,
+	"/newsImageUplaod":            		wooyousite.NewsImageUplaodAction,
 }

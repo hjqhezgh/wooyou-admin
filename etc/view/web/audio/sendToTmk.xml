@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport>
-    <crumbs>
-        <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="Call Center跟踪" url="/web/audio/callcenter_statistics"/>
-        <crumb text="分配TMK" currentPage="true"/>
-    </crumbs>
-
-    <customformpanel id="form" title="通话备注信息" saveUrl="/sendToTmkSave.json" load="true" loadUrl="/sendToTmkLoad.json">
+<viewport window="true">
+    <customformpanel id="form" title="分配TMK" saveUrl="/sendToTmkSave.json" load="true" loadUrl="/sendToTmkLoad.json" inwindow="true">
         <element field="mother" type="text" validate="" desc="母亲姓名" readonly="true"/>
         <element field="motherPhone" type="text" validate="" desc="母亲电话" readonly="true"/>
         <element field="father" type="text" validate="" desc="父亲姓名" readonly="true"/>

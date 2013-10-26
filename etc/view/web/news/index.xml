@@ -17,14 +17,13 @@
         <search field="news_content" searchType="like" inputType="text" desc="新闻内容"/>
 
         <column field="title" desc="标题"/>
-        <column field="news_content" desc="新闻内容"/>
         <column field="preview_image" desc="预览图片">
             <formatter>
                 <![CDATA[
                     if (cellvalue == "") {
                         return "";
                     } else {
-                        return '<div style="text-align:center;"><img src="/pic/news/' + cellvalue + '" width="80px"/></div>';
+                        return '<div style="text-align:center;"><img src="/newsimg/' + cellvalue + '" width="80px"/></div>';
                     }
                 ]]>
             </formatter>
@@ -47,7 +46,7 @@
                     if (cellvalue == "") {
                         return "";
                     } else {
-                        return '<div style="text-align:center;"><img src="/pic/news/' + cellvalue + '" width="80px"/></div>';
+                        return '<div style="text-align:center;"><img src="/newsimg/' + cellvalue + '" width="80px"/></div>';
                     }
                 ]]>
             </formatter>
@@ -66,8 +65,8 @@
                 ]]>
             </formatter>
         </column>
-        <toolaction desc="添加" url="/web/news/add" linkType="newPage" colorClass="h-bg-green"/>
-        <action desc="修改" url="/web/news/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <toolaction desc="添加" url="/web/news/add" linkType="iframeWindow" colorClass="h-bg-green" width="1000" height="700"/>
+        <action desc="修改" url="/web/news/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]" width="1000" height="700"/>
         <action desc="删除" url="/web/news/delete.json" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
     </gridpanel>
 </viewport>

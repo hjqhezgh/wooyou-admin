@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport>
-    <!--面包屑-->
-    <crumbs>
-        <crumb text="新闻信息管理" currentPage="true"/>
-    </crumbs>
+<viewport window="true">
 
-    <customformpanel id="news" saveUrl="/web/news/save.json" load="false" title="新闻信息管理">
+    <customformpanel id="news" saveUrl="/web/news/save.json" load="false" title="添加新闻" inwindow="true">
         <element field="title" type="text" desc="标题" validate="notNull"/>
         <element field="news_content" type="htmleditor" desc="新闻内容" validate="notNull" uploadUrl="/newsImageUplaod"/>
         <element field="preview_image" type="image" desc="预览图片" imageEntity="pic"/>

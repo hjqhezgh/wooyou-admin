@@ -16,9 +16,9 @@ jQuery.openIframeWindow = function (opts,event) {
     top.jQuery.layer({
         type : 2,
         fix : true,
-        moveOut : true,
+        moveOut : false,
         shade : [0.8 , '#E3E3E3' , true],
-        shadeClose : true,
+        shadeClose : false,
         border : [10 , 0.7 , '#272822', true],
         title : opts.title,
         offset : ['50px',''],

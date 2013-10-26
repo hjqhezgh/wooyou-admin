@@ -55,7 +55,7 @@ func GalleryLoadAction(w http.ResponseWriter, r *http.Request) {
 	datas = append(datas, jsonImageName)
 	jsonImageSuffix := lessgo.LoadFormObject{"image_suffix", gallery.ImageSuffix}
 	datas = append(datas, jsonImageSuffix)
-	imagePath := "/pic/gallery/"
+	imagePath := "/artimg/"
 	jsonImage1 := lessgo.LoadFormObject{"image1", imagePath + gallery.ImageName + "_" + IMAGE_SIZE_1 + "." + gallery.ImageSuffix}
 	datas = append(datas, jsonImage1)
 	jsonImage2 := lessgo.LoadFormObject{"image2", imagePath + gallery.ImageName + "_" + IMAGE_SIZE_2 + "." + gallery.ImageSuffix}
@@ -209,13 +209,51 @@ func GalleryUpdateAction(w http.ResponseWriter, r *http.Request) {
 }
 
 func GalleryDelete(id string) (string, error) {
-	t := time.Now()
-	// 删除商品分类信息
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
 	sqlDelGal := "delete from gallery where id=?;"
-	_, err := DBDelete(sqlDelGal, id)
+	lessgo.Log.Debug(sqlDelGal)
+
+	tx, err := db.Begin()
 	if err != nil {
+		tx.Rollback()
 		return "删除商品分类信息，数据库异常", err
 	}
+
+	stmt, err := tx.Prepare(sqlDelGal)
+	if err != nil {
+		tx.Rollback()
+		return "删除商品分类信息，数据库异常", err
+	}
+
+	_, err = stmt.Exec(id)
+
+	if err != nil {
+		tx.Rollback()
+		return "删除商品分类信息，数据库异常", err
+	}
+
+	sqlDelGal1 := "delete from category_gallery where gallery_id=?;"
+	lessgo.Log.Debug(sqlDelGal1)
+
+	stmt1, err := tx.Prepare(sqlDelGal1)
+	if err != nil {
+		tx.Rollback()
+		return "删除商品分类信息，数据库异常", err
+	}
+
+	_, err = stmt1.Exec(id)
+
+	if err != nil {
+		tx.Rollback()
+		return "删除商品分类信息，数据库异常", err
+	}
+
+	tx.Commit()
+
+	t := time.Now()
 	lessgo.Log.Info("删除商品分类信息时间: ", time.Now().Sub(t))
 
 	return "删除成功", nil
@@ -238,7 +276,7 @@ func GalleryDeleteAction(w http.ResponseWriter, r *http.Request) {
 		m["success"] = true
 	}
 	m["msg"] = msg
-	commonlib.RenderTemplate(w, r, "notify_delete.html", m, nil, "../template/component/"+getTerminal(r.URL.Path)+"/notify_delete.html")
+	commonlib.RenderTemplate(w, r, "notify_delete.html", m, nil, "../template/notify_delete.html")
 
 	return
 }
@@ -255,6 +293,8 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 		return
 		return
 	}
+
+	artImgDir, _ := lessgo.Config.GetValue("wooyou", "artImgDir")
 
 	gallery := new(Gallery)
 	gallery.Id, _ = strconv.Atoi(r.FormValue("id"))
@@ -318,7 +358,7 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 	}
 	// 图片处理
 	// 图片1
-	if UploadImage(image1, gallery.ImageName+"_"+IMAGE_SIZE_1+"."+gallery.ImageSuffix, "../static/pic/gallery") != nil {
+	if UploadImage(image1, gallery.ImageName+"_"+IMAGE_SIZE_1+"."+gallery.ImageSuffix, artImgDir) != nil {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -327,7 +367,7 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 		return
 	}
 	// 图片2
-	if UploadImage(image2, gallery.ImageName+"_"+IMAGE_SIZE_2+"."+gallery.ImageSuffix, "../static/pic/gallery") != nil {
+	if UploadImage(image2, gallery.ImageName+"_"+IMAGE_SIZE_2+"."+gallery.ImageSuffix, artImgDir) != nil {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -336,7 +376,7 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 		return
 	}
 	// 图片3
-	if UploadImage(image3, gallery.ImageName+"_"+IMAGE_SIZE_3+"."+gallery.ImageSuffix, "../static/pic/gallery") != nil {
+	if UploadImage(image3, gallery.ImageName+"_"+IMAGE_SIZE_3+"."+gallery.ImageSuffix, artImgDir) != nil {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -345,7 +385,7 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 		return
 	}
 	// 图片4
-	if UploadImage(image4, gallery.ImageName+"_"+IMAGE_SIZE_4+"."+gallery.ImageSuffix, "../static/pic/gallery") != nil {
+	if UploadImage(image4, gallery.ImageName+"_"+IMAGE_SIZE_4+"."+gallery.ImageSuffix, artImgDir) != nil {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -354,7 +394,7 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 		return
 	}
 	// 图片5
-	if UploadImage(image5, gallery.ImageName+"_"+IMAGE_SIZE_5+"."+gallery.ImageSuffix, "../static/pic/gallery") != nil {
+	if UploadImage(image5, gallery.ImageName+"_"+IMAGE_SIZE_5+"."+gallery.ImageSuffix, artImgDir) != nil {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()

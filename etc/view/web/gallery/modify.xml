@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport>
-    <!--面包屑-->
-    <crumbs>
-        <crumb text="美术图片管理" currentPage="true"/>
-    </crumbs>
-
-    <customformpanel id="gallery" saveUrl="/web/gallery/update.json" load="true" loadUrl="/web/gallery/load.json" title="美术图片管理">
+<viewport window="true">
+    <customformpanel id="gallery" saveUrl="/web/gallery/update.json" load="true" loadUrl="/web/gallery/load.json" title="修改美术图片" inwindow="true">
         <element field="id" type="hidden"/>
         <element field="title" type="text" desc="标题" validate="notNull" readonly="true"/>
         <element field="comment" type="textarea" desc="老师评语" validate="notNull" tip="评语不能为空"/>

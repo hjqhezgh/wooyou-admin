@@ -48,14 +48,14 @@ func NewsLoadAction(w http.ResponseWriter, r *http.Request) {
 	datas = append(datas, jsonTitle)
 	jsonNewsContent := lessgo.LoadFormObject{"news_content", news.NewsContent}
 	datas = append(datas, jsonNewsContent)
-	previewImage := "/pic/news/" + news.PreviewImage
+	previewImage := "/newsimg/" + news.PreviewImage
 	jsonPreviewImage := lessgo.LoadFormObject{"preview_image", previewImage}
 	datas = append(datas, jsonPreviewImage)
 	jsonPreviewText := lessgo.LoadFormObject{"preview_text", news.PreviewText}
 	datas = append(datas, jsonPreviewText)
 	jsonIsCarousel := lessgo.LoadFormObject{"is_carousel", news.IsCarousel}
 	datas = append(datas, jsonIsCarousel)
-	carouselImage := "/pic/news/" + news.CarouselImage
+	carouselImage := "/newsimg/" + news.CarouselImage
 	jsonCarouselImage := lessgo.LoadFormObject{"carousel_image", carouselImage}
 	datas = append(datas, jsonCarouselImage)
 	if err != nil {
@@ -238,7 +238,7 @@ func NewsDeleteAction(w http.ResponseWriter, r *http.Request) {
 		m["success"] = true
 	}
 	m["msg"] = msg
-	commonlib.RenderTemplate(w, r, "notify_delete.html", m, nil, "../template/component/"+getTerminal(r.URL.Path)+"/notify_delete.html")
+	commonlib.RenderTemplate(w, r, "notify_delete.html", m, nil, "../template/notify_delete.html")
 
 	return
 }
@@ -271,6 +271,8 @@ func NewsFormAction(w http.ResponseWriter, r *http.Request, actionType string) {
 		msg, err = NewsUpdate(news)
 	}
 
+	newsImgDir, _ := lessgo.Config.GetValue("wooyou", "newsImgDir")
+
 	// 图片文件处理
 	if news.PreviewImage != "" {
 		tmpFile, err := os.OpenFile("../tmp/"+news.PreviewImage, os.O_RDWR, 0777)
@@ -284,14 +286,14 @@ func NewsFormAction(w http.ResponseWriter, r *http.Request, actionType string) {
 			return
 		}
 
-		_, err = os.Stat("../static/pic/news")
+		_, err = os.Stat(newsImgDir)
 
 		if err != nil && os.IsNotExist(err) {
-			lessgo.Log.Error("/static/pic/news", "文件夹不存在，创建")
-			os.MkdirAll("../static/pic/news", 0777)
+			lessgo.Log.Error(newsImgDir, "文件夹不存在，创建")
+			os.MkdirAll(newsImgDir, 0777)
 		}
 
-		disFile, err := os.Create("../static/pic/news/" + news.PreviewImage)
+		disFile, err := os.Create(newsImgDir + "/" + news.PreviewImage)
 
 		if err != nil {
 			m["success"] = false
@@ -319,14 +321,14 @@ func NewsFormAction(w http.ResponseWriter, r *http.Request, actionType string) {
 			return
 		}
 
-		_, err = os.Stat("../static/pic/news")
+		_, err = os.Stat(newsImgDir)
 
 		if err != nil && os.IsNotExist(err) {
-			lessgo.Log.Error("/static/pic/news", "文件夹不存在，创建")
-			os.MkdirAll("../static/pic/news", 0777)
+			lessgo.Log.Error(newsImgDir, "文件夹不存在，创建")
+			os.MkdirAll(newsImgDir, 0777)
 		}
 
-		disFile, err := os.Create("../static/pic/news/" + news.CarouselImage)
+		disFile, err := os.Create(newsImgDir + "/" + news.CarouselImage)
 
 		if err != nil {
 			m["success"] = false
