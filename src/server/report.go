@@ -12,8 +12,7 @@
 //
 // 1.0 2013-10-14 14:14 user04 创建文档package test
 
-
-package  server
+package server
 
 import (
 	//"github.com/hjqhezgh/commonlib"
@@ -23,24 +22,24 @@ import (
 )
 
 type Model struct {
-	key 	string
-	value	interface {}
+	key   string
+	value interface{}
 }
 
 type ModelList struct {
-	model 	[]*Model
+	model []*Model
 }
 
 type ReportColumn struct {
-	sqlName 	string
-	columnName	string
-	index 		int
+	sqlName    string
+	columnName string
+	index      int
 }
 
 func ReportSend() {
 
 	var modelLists []ModelList
-	var report_name,report_remark,report_sql,employee_name,employee_mail string
+	var report_name, report_remark, report_sql, employee_name, employee_mail string
 
 	sql := `select r.name,r.remark,r.sql,e.really_name,e.mail from report_manage rm left join employee e
 					on rm.employee_id=e.user_id left join report r on rm.report_id=r.id where rm.send_flag=1`
@@ -64,12 +63,12 @@ func ReportSend() {
 		//查询某张报表
 		rows2, err := db.Query(report_sql)
 		lessgo.Log.Debug(report_sql)
-		for rows2.Next() {         
-			params := []interface {} {}
+		for rows2.Next() {
+			params := []interface{}{}
 			modelList := new(ModelList)
 			column, _ := rows2.Columns()
 
-			for _, c := range(column) {
+			for _, c := range column {
 				m := new(Model)
 				m.key = c
 				params = append(params, &m.value)
@@ -85,7 +84,7 @@ func ReportSend() {
 		}
 
 		html := "<table table width='38%' border='1' cellpadding='2' cellspacing='0'><tr>"
-		rows3, err := db.Query("select rc.sql_column,rc.column_name,rc.index from report_column rc where rc.report_id=? order by rc.`index`", 1 )
+		rows3, err := db.Query("select rc.sql_column,rc.column_name,rc.index from report_column rc where rc.report_id=? order by rc.`index`", 1)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return
@@ -105,10 +104,10 @@ func ReportSend() {
 
 		str := ""
 		td := ""
-		for _, v := range(modelLists) {
+		for _, v := range modelLists {
 			lessgo.Log.Debug(v)
 			html += "<tr>"
-			for _, vv := range(v.model) {
+			for _, vv := range v.model {
 				if vv.value != nil {
 					str = string(vv.value.([]byte))
 					td = "<td>" + str + "</td>"
@@ -117,7 +116,6 @@ func ReportSend() {
 				}
 				html += td
 				lessgo.Log.Error(vv.value)
-
 
 			}
 			html += "</tr>"
@@ -130,7 +128,6 @@ func ReportSend() {
 	}
 	return
 }
-
 
 func sendMail(account, userName, subject, content string) (err error) {
 	lessgo.Log.Debug("begin sendMail")
@@ -153,5 +150,3 @@ func sendMail(account, userName, subject, content string) (err error) {
 	}
 	return
 }
-
-
