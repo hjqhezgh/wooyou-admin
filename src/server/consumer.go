@@ -505,7 +505,7 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sql = "insert into consumer_statuts_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+	sql = "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
 
 	lessgo.Log.Debug(sql)
 

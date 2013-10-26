@@ -3,6 +3,8 @@
     <formpanel entity="center" load="true" id="form" title="中心修改"  inwindow="true">
         <element field="name" type="text" validate="notNull" desc="名字"/>
         <element field="telephone" type="text" validate="" desc="联系电话"/>
+        <element field="lan_ip" type="text" validate="" desc="局域网ip"/>
+        <element field="domain_name" type="text" validate="" desc="公网域名"/>
         <element field="intro"  type="textarea" desc="简介" />
     </formpanel>
 </viewport>

@@ -11,7 +11,7 @@
         <search field="name" searchType="like" inputType="text" desc="客户姓名"/>
         <search field="mySort" searchType="eq" inputType="localSelect" desc="排序方式（默认按最后通话时间）" localData="[{desc:'按最后通话时间',value:'time'},{desc:'按频率',value:'frequency'}]"/>
 
-        <toolaction desc="添加客户" url="/web/consumer/add" linkType="newPage" colorClass="h-bg-green"/>
+        <toolaction desc="添加客户" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green" width="800" height="600"/>
 
         <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="所属顾问"/>
@@ -42,6 +42,6 @@
         </column>
 
         <!--<action desc="添加" url="/web/consumer/add" linkType="newPage"/>-->
-        <action desc="修改" url="/web/consumer/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]" width="800" height="600"/>
     </customgridpanel>
 </viewport>

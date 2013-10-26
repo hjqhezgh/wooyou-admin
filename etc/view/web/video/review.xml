@@ -2,8 +2,7 @@
 <viewport>
     <!--面包屑-->
     <crumbs>
-        <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="通话报表" currentPage="true"/>
+        <crumb text="课程review" currentPage="true"/>
     </crumbs>
 
     <customgridpanel url="/queryVedio.json" pageSize="15" title="通话报表" id="grid1" width="1200" height="350" loadUrl="true">

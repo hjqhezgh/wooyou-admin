@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport>
-    <crumbs>
-        <crumb text="基础设置" url="javascript:void(0)"/>
-        <crumb text="中心管理" url="/web/center"/>
-        <crumb text="添加中心" currentPage="true"/>
-    </crumbs>
-    <formpanel entity="employee" id="form" title="添加中心">
+<viewport window="true">
+    <formpanel entity="employee" id="form" title="添加中心" inwindow="true">
         <element field="username" type="text" validate="" desc="用户名"/>
         <element field="really_name"  type="text" desc="真实姓名" />
         <element field="department_id"  type="text" desc="所属部门" />

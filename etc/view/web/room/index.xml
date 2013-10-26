@@ -9,13 +9,13 @@
     <gridpanel entity="room" pageSize="15" title="中心数据" id="grid" width="1200" height="250">
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
 
-        <toolaction desc="添加教室" url="/web/room/add" linkType="newPage" colorClass="h-bg-green"/>
+        <toolaction desc="添加教室" url="/web/room/add" colorClass="h-bg-green" linkType="iframeWindow" width="800" height="380"/>
 
         <column field="center.name" desc="所属中心"/>
         <column field="name" desc="名字"/>
         <column field="channel" desc="所属视频通道"/>
 
-        <action desc="添加" url="/web/room/add" linkType="newPage" colorClass="h-bg-green"/>
-        <action desc="修改" url="/web/room/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="添加" url="/web/room/add" colorClass="h-bg-green" linkType="iframeWindow" width="800" height="380"/>
+        <action desc="修改" url="/web/room/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow" width="800" height="380"/>
     </gridpanel>
 </viewport>

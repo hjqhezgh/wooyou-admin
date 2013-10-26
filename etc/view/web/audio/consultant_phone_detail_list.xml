@@ -16,9 +16,9 @@
             <formatter>
                 <![CDATA[
                 if(cellvalue=='未知客户'){
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add">'+cellvalue+'</a>';
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add" data-action="openIframeWindow" window-width="800" window-height="600" window-title="">'+cellvalue+'</a>';
                 }else{
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'">'+cellvalue+'</a>';
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'" data-action="openIframeWindow" window-width="800" window-height="600" window-title="">'+cellvalue+'</a>';
                 }
                 ]]>
             </formatter>
@@ -33,7 +33,7 @@
                         value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="http://117.29.168.34:8888/manage/audioDownload?filename='+rowObject[9]+'&centerId='+rowObject[10]+'&startTime='+rowObject[3]+'">'+cellvalue+'</a>' + '&nbsp;';
                     }
 
-                    value += '<a style="color:green;text-decoration: underline;" target="_blank" title="点击添加备注信息" href="/web/audio/note?id='+options.rowId+'">备注</a>' ;
+                    value += '<a style="color:green;text-decoration: underline;" target="_blank" title="点击添加备注信息" href="/web/audio/note?id='+options.rowId+'" data-action="openIframeWindow" window-width="800" window-height="700" window-title="">备注</a>' ;
 
                     return value;
                 ]]>

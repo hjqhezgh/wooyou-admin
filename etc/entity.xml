@@ -7,6 +7,8 @@
         <field name="name"/>
         <field name="telephone"/>
         <field name="intro"/>
+        <field name="lan_ip"/>
+        <field name="domain_name"/>
     </entity>
 
     <!--教室-->

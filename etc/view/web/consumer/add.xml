@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport>
-    <crumbs>
-        <crumb text="客户信息" url="javascript:void(0)"/>
-        <crumb text="客户管理" url="/web/consumer"/>
-        <crumb text="添加客户" currentPage="true"/>
-    </crumbs>
-
-    <customformpanel id="form" title="添加客户" saveUrl="/consumerSave.json" load="false" loadUrl="">
+<viewport window="true">
+    <customformpanel id="form" title="添加客户" saveUrl="/consumerSave.json" load="false" loadUrl="" inwindow="true">
         <element field="mother" type="text" validate="" desc="母亲姓名"/>
         <element field="motherPhone" type="text" validate="" desc="母亲电话"/>
         <element field="father" type="text" validate="" desc="父亲姓名"/>
