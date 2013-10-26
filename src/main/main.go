@@ -18,6 +18,7 @@ import (
 	"github.com/hjqhezgh/lessgo"
 	"net/http"
 	"server"
+	"wooyousite"
 	"strconv"
 )
 
@@ -32,7 +33,6 @@ func main() {
 	for url, handler := range handlers {
 		r.HandleFunc(url, handler)
 	}
-
 
 	http.Handle("/", r)
 
@@ -51,13 +51,12 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/login": server.LoginAction,
 
 	//根据角色ID获取员工列表
-	"/employeeListByRoleId.json":        server.EmployeeListByRoleIdAction,
-
+	"/employeeListByRoleId.json": server.EmployeeListByRoleIdAction,
 
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
 	"/consultant_phone_detail_list.json": server.ConsultantPhoneDetailListAction,
-	"/queryVedio.json": server.VideoListAction,
+	"/queryVedio.json":                   server.VideoListAction,
 	"/downloadAudio":                     server.DownloadAudioAction,
 	"/audioNoteLoad.json":                server.AudioNoteLoadAction,
 	"/audioNoteSave.json":                server.AudioNoteSaveAction,
@@ -87,4 +86,16 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/sendToTmkSave.json": server.SendToTmkSaveAction,
 	//客户状态变更
 	"/consumerStatusChange": server.ConsumerStatusChangeAction,
+
+	//网站内容管理
+	"/web/gallery/delete.json":         wooyousite.GalleryDeleteAction,
+	"/web/gallery/image_category.json": wooyousite.GalleryImageCategoryAction,
+	"/web/gallery/load.json":           wooyousite.GalleryLoadAction,
+	"/web/gallery/save.json":           wooyousite.GallerySaveAction,
+	"/web/gallery/update.json":         wooyousite.GalleryUpdateAction,
+	"/web/gallery/list.json":			wooyousite.GalleryListAction,
+	"/web/news/delete.json":            wooyousite.NewsDeleteAction,
+	"/web/news/load.json":              wooyousite.NewsLoadAction,
+	"/web/news/save.json":              wooyousite.NewsSaveAction,
+	"/web/news/update.json":            wooyousite.NewsUpdateAction,
 }

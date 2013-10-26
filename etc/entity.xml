@@ -21,6 +21,24 @@
         <field name="channel"/>
     </entity>
 
+    <!--视频-->
+    <entity id="video">
+        <pk>vid</pk>
+        <field name="rid" />
+        <ref entity="room" field="rid" refEntityField="rid">
+            <field name="rid" />
+            <field name="name" />
+        </ref>
+        <field name="cid" />
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="start_time" />
+        <field name="end_time" />
+        <field name="filename" />
+    </entity>
+
     <!--客户来源-->
     <entity id="come_from">
         <pk>id</pk>
@@ -175,5 +193,24 @@
         </ref>
         <field name="is_leave"/>
         <field name="phone_in_center"/>
+    </entity>
+
+    <entity id="gallery">
+        <pk>id</pk>
+        <field name="title"/>
+        <field name="image_name"/>
+        <field name="image_suffix"/>
+        <field name="comment"/>
+    </entity>
+
+    <entity id="news">
+        <pk>id</pk>
+        <field name="title"/>
+        <field name="news_content"/>
+        <field name="upload_time"/>
+        <field name="preview_image"/>
+        <field name="preview_text"/>
+        <field name="is_carousel"/>
+        <field name="carousel_image"/>
     </entity>
 </entitys>

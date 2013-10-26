@@ -18,10 +18,10 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"math"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"text/template"
-	"math/rand"
 	"time"
 )
 
@@ -263,7 +263,7 @@ func TmkStatisticsDetailAction(w http.ResponseWriter, r *http.Request) {
 
 	countSql := "select count(1) from tmk_consumer where employee_id=?"
 
-	params = append(params,id)
+	params = append(params, id)
 
 	lessgo.Log.Debug(countSql)
 

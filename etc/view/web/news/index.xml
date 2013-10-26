@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="吾幼网站管理" url="javascript:void(0);"/>
+        <crumb text="新闻信息管理" currentPage="true"/>
+    </crumbs>
+
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="试听课程" url="javascript:void(0);"/>
+        <crumb text="新闻信息管理" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel entity="news" pageSize="10" title="新闻信息管理" id="news" width="1200" height="540">
+        <search field="title" searchType="like" inputType="text" desc="标题"/>
+        <search field="news_content" searchType="like" inputType="text" desc="新闻内容"/>
+
+        <column field="title" desc="标题"/>
+        <column field="news_content" desc="新闻内容"/>
+        <column field="preview_image" desc="预览图片">
+            <formatter>
+                <![CDATA[
+                    if (cellvalue == "") {
+                        return "";
+                    } else {
+                        return '<div style="text-align:center;"><img src="/pic/news/' + cellvalue + '" width="80px"/></div>';
+                    }
+                ]]>
+            </formatter>
+        </column>
+        <column field="preview_text" desc="预览文本"/>
+        <column field="is_carousel" desc="是否轮播">
+            <formatter>
+                <![CDATA[
+                if (cellvalue == "1") {
+                    return "是";
+                } else {
+                    return "否";
+                }
+                ]]>
+            </formatter>
+        </column>
+        <column field="carousel_image" desc="轮播图片">
+            <formatter>
+                <![CDATA[
+                    if (cellvalue == "") {
+                        return "";
+                    } else {
+                        return '<div style="text-align:center;"><img src="/pic/news/' + cellvalue + '" width="80px"/></div>';
+                    }
+                ]]>
+            </formatter>
+        </column>
+        <column field="upload_time" desc="发布时间">
+            <formatter>
+                <![CDATA[
+                    if (cellvalue.length == 14) {
+                        return cellvalue.substr(0, 4) + '-' + cellvalue.substr(4, 2) + '-' + cellvalue.substr(6, 2) + ' '
+                                + cellvalue.substr(8, 2) + ':' + cellvalue.substr(10, 2) + ':' + cellvalue.substr(12, 2);
+                    } else if (cellvalue.length == 8) {
+                        return cellvalue.substr(0, 4) + '-' + cellvalue.substr(4, 2) + '-' + cellvalue.substr(6, 2);
+                    } else {
+                        return cellvalue;
+                    }
+                ]]>
+            </formatter>
+        </column>
+        <toolaction desc="添加" url="/web/news/add" linkType="newPage" colorClass="h-bg-green"/>
+        <action desc="修改" url="/web/news/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="删除" url="/web/news/delete.json" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+    </gridpanel>
+</viewport>

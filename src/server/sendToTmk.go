@@ -54,10 +54,10 @@ func SendToTmkLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query(sql, id)
 
-	var tcid,employeeId,mother,motherPhone,father,fatherPhone,homePhone,child,centerName string
+	var tcid, employeeId, mother, motherPhone, father, fatherPhone, homePhone, child, centerName string
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows,&tcid,&employeeId,&mother,&motherPhone,&father,&fatherPhone,&homePhone,&child,&centerName)
+		err := commonlib.PutRecord(rows, &tcid, &employeeId, &mother, &motherPhone, &father, &fatherPhone, &homePhone, &child, &centerName)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -131,7 +131,6 @@ func SendToTmkSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	lessgo.Log.Debug(sql)
 
-
 	stmt, err := db.Prepare(sql)
 
 	if err != nil {
@@ -143,7 +142,7 @@ func SendToTmkSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(employeeId,id)
+	_, err = stmt.Exec(employeeId, id)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())

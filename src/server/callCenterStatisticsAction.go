@@ -18,11 +18,11 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"math"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
 	"text/template"
-	"math/rand"
 	"time"
 )
 
@@ -87,13 +87,13 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	roleIds := strings.Split(employee.RoleId, ",")
 
 	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
 			dataType = "all"
 			break
 		} else if roleId == "2" {
 			dataType = "center"
 			break
-		} else{
+		} else {
 			dataType = "self"
 		}
 	}
@@ -106,10 +106,9 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0 "
 	sql += " left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0 "
 	sql += " left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0 where c.cid!=9 "//将总部过滤掉
+	sql += " left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0 where c.cid!=9 " //将总部过滤掉
 
-
-	if (dataType == "center"){
+	if dataType == "center" {
 		sql += " and c.cid=? "
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
@@ -122,17 +121,17 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		params = append(params,_employee.CenterId)
-	}else if(dataType == "self"){
+		params = append(params, _employee.CenterId)
+	} else if dataType == "self" {
 		// fix
-		sql += " and tc.employee_id="+employee.UserId
+		sql += " and tc.employee_id=" + employee.UserId
 	}
 
 	sql += " group by c.cid "
 
 	countSql := "select count(1) from center where cid!=9 "
 
-	if (dataType == "center"){
+	if dataType == "center" {
 		countSql += " and cid=? "
 	}
 

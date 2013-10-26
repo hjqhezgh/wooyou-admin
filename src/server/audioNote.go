@@ -56,10 +56,10 @@ func AudioNoteLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query(sql, id)
 
-	var aid,note,startTime,mother,motherPhone,father,fatherPhone,homePhone string
+	var aid, note, startTime, mother, motherPhone, father, fatherPhone, homePhone string
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows,&aid,&note,&startTime,&mother,&motherPhone,&father,&fatherPhone,&homePhone)
+		err := commonlib.PutRecord(rows, &aid, &note, &startTime, &mother, &motherPhone, &father, &fatherPhone, &homePhone)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="美术图片管理" currentPage="true"/>
+    </crumbs>
+
+    <customformpanel id="gallery" saveUrl="/web/gallery/save.json" load="false" title="美术图片管理">
+        <element field="title" type="text" desc="标题" validate="notNull" tip="标题保存后不可修改"/>
+        <element field="comment" type="textarea" desc="老师评语" validate="notNull" tip="评语不能为空"/>
+        <element field="image_category" type="checkbox" desc="图片类别" validate="notNull" url="/web/gallery/image_category.json" valueField="value" descField="desc" tip="图片类别不能为空"/>
+        <element field="image1" type="image" desc="图片1" validate="notNull" tip="图片格式(png|jpg|jpeg);图片尺寸(290x175px)"/>
+        <element field="image2" type="image" desc="图片2" validate="notNull" tip="图片格式(png|jpg|jpeg);图片尺寸(290x370px)"/>
+        <element field="image3" type="image" desc="图片3" validate="notNull" tip="图片格式(png|jpg|jpeg);图片尺寸(590x185px)"/>
+        <element field="image4" type="image" desc="图片4" validate="notNull" tip="图片格式(png|jpg|jpeg);图片尺寸(600x370px)"/>
+        <element field="image5" type="image" desc="图片5" validate="notNull" tip="图片格式(png|jpg|jpeg);图片尺寸(800x600px)"/>
+    </customformpanel>
+</viewport>

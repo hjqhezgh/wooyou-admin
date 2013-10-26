@@ -137,7 +137,7 @@ func EmployeeListByRoleIdAction(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		employee := lessgo.Employee{}
 
-		err := commonlib.PutRecord(rows,&employee.UserId,&employee.ReallyName)
+		err := commonlib.PutRecord(rows, &employee.UserId, &employee.ReallyName)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -148,7 +148,7 @@ func EmployeeListByRoleIdAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		employees = append(employees,employee)
+		employees = append(employees, employee)
 	}
 
 	m["success"] = true

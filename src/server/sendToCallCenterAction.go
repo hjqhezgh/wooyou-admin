@@ -14,9 +14,9 @@
 package server
 
 import (
-	"net/http"
-	"github.com/hjqhezgh/lessgo"
 	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -75,9 +75,9 @@ func SendToCallCenterAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := []interface{}{}
-	params = append(params,id)
-	params = append(params,_employee.CenterId)
-	params = append(params,time.Now().Format("20060102150405"))
+	params = append(params, id)
+	params = append(params, _employee.CenterId)
+	params = append(params, time.Now().Format("20060102150405"))
 
 	res, err := stmt.Exec(params...)
 
@@ -96,7 +96,6 @@ func SendToCallCenterAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.OutputJson(w, m, " ")
 	return
 }
-
 
 func AllSendToCallCenter(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
@@ -142,7 +141,7 @@ func AllSendToCallCenter(w http.ResponseWriter, r *http.Request) {
 
 	lessgo.Log.Debug(sql)
 
-	params = append(params,_employee.CenterId)
+	params = append(params, _employee.CenterId)
 
 	rows, err := db.Query(sql, params...)
 
@@ -183,7 +182,7 @@ func AllSendToCallCenter(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(id,_employee.CenterId,time.Now().Format("20060102150405"))
+		_, err = stmt.Exec(id, _employee.CenterId, time.Now().Format("20060102150405"))
 
 		if err != nil {
 			tx.Rollback()

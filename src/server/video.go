@@ -24,8 +24,6 @@ import (
 	//"strings"
 )
 
-
-
 //顾问分页数据服务
 func VideoListAction(w http.ResponseWriter, r *http.Request) {
 
@@ -73,43 +71,43 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 
 	//dataType := ""
 
-//	roleIds := strings.Split(employee.RoleId, ",")
-//
-//	for _, roleId := range roleIds {
-//		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
-//			dataType = "all"
-//			break
-//		} else if roleId == "2" {
-//			dataType = "center"
-//			break
-//		} else{
-//			dataType = "self"
-//		}
-//	}
+	//	roleIds := strings.Split(employee.RoleId, ",")
+	//
+	//	for _, roleId := range roleIds {
+	//		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
+	//			dataType = "all"
+	//			break
+	//		} else if roleId == "2" {
+	//			dataType = "center"
+	//			break
+	//		} else{
+	//			dataType = "self"
+	//		}
+	//	}
 
-//	cid := r.FormValue("cid-eq")
-//	name := r.FormValue("name-like")
-//	year := r.FormValue("year-eq")
-//	month := r.FormValue("month-eq")
-//	week := r.FormValue("week-eq")
-//	startTime := r.FormValue("start_time-eq")
-//
-//	st := ""
-//	et := ""
-//	flag := true
-//
-//	if startTime != "" {
-//		st = startTime + " 00:00:00"
-//		et = startTime + " 23:59:59"
-//	} else {
-//		if week != "" && month != "" && year != "" {
-//			st, et, flag = lessgo.FindRangeTimeDim("", "", year+month+week)
-//		} else if month != "" && year != "" {
-//			st, et, flag = lessgo.FindRangeTimeDim("", year+month, "")
-//		} else if year != "" {
-//			st, et, flag = lessgo.FindRangeTimeDim(year, "", "")
-//		}
-//	}
+	//	cid := r.FormValue("cid-eq")
+	//	name := r.FormValue("name-like")
+	//	year := r.FormValue("year-eq")
+	//	month := r.FormValue("month-eq")
+	//	week := r.FormValue("week-eq")
+	//	startTime := r.FormValue("start_time-eq")
+	//
+	//	st := ""
+	//	et := ""
+	//	flag := true
+	//
+	//	if startTime != "" {
+	//		st = startTime + " 00:00:00"
+	//		et = startTime + " 23:59:59"
+	//	} else {
+	//		if week != "" && month != "" && year != "" {
+	//			st, et, flag = lessgo.FindRangeTimeDim("", "", year+month+week)
+	//		} else if month != "" && year != "" {
+	//			st, et, flag = lessgo.FindRangeTimeDim("", year+month, "")
+	//		} else if year != "" {
+	//			st, et, flag = lessgo.FindRangeTimeDim(year, "", "")
+	//		}
+	//	}
 
 	params := []interface{}{}
 

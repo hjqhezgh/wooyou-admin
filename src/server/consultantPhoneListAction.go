@@ -76,13 +76,13 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 	roleIds := strings.Split(employee.RoleId, ",")
 
 	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
 			dataType = "all"
 			break
 		} else if roleId == "2" {
 			dataType = "center"
 			break
-		} else{
+		} else {
 			dataType = "self"
 		}
 	}

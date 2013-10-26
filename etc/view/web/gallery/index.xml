@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="吾幼网站管理" url="javascript:void(0);"/>
+        <crumb text="美术图片管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/web/gallery/list.json" pageSize="10" title="美术图片管理" id="gallery" width="1200" height="540">
+        <search field="title" searchType="like" inputType="text" desc="标题"/>
+
+        <column field="title" desc="标题"/>
+        <column field="comment" desc="老师评语"/>
+        <column field="image_category" desc="图片类别">
+            <formatter>
+                <![CDATA[
+                    return rowObject[4];
+                ]]>
+            </formatter>
+        </column>
+        <column field="image1" desc="图片1">
+            <formatter>
+                <![CDATA[
+                    return '<div style="text-align:center;"><img src="/pic/gallery/' + rowObject[2] + '_290x175.' + rowObject[3] + '" width="80px"/></div>';
+                ]]>
+            </formatter>
+        </column>
+        <column field="image2" desc="图片2">
+            <formatter>
+                <![CDATA[
+                    return '<div style="text-align:center;"><img src="/pic/gallery/' + rowObject[2] + '_290x370.' + rowObject[3] + '" width="80px"/></div>';
+                ]]>
+            </formatter>
+        </column>
+        <column field="image3" desc="图片3">
+            <formatter>
+                <![CDATA[
+                    return '<div style="text-align:center;"><img src="/pic/gallery/' + rowObject[2] + '_590x185.' + rowObject[3] + '" width="80px"/></div>';
+                ]]>
+            </formatter>
+        </column>
+        <column field="image4" desc="图片4">
+            <formatter>
+                <![CDATA[
+                    return '<div style="text-align:center;"><img src="/pic/gallery/' + rowObject[2] + '_600x370.' + rowObject[3] + '" width="80px"/></div>';
+                ]]>
+            </formatter>
+        </column>
+        <column field="image5" desc="图片5">
+            <formatter>
+                <![CDATA[
+                    return '<div style="text-align:center;"><img src="/pic/gallery/' + rowObject[2] + '_800x600.' + rowObject[3] + '" width="80px"/></div>';
+                ]]>
+            </formatter>
+        </column>
+
+        <toolaction desc="添加" url="/web/gallery/add" linkType="newPage" colorClass="h-bg-green"/>
+        <action desc="修改" url="/web/gallery/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="删除" url="/web/gallery/delete.json" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

@@ -12,28 +12,27 @@
 //
 // 1.0 2013-10-14 15:16 Samurai 创建文档package timer
 
-
 package server
 
 import (
-	"fmt"
-	"time"
 	"database/sql"
+	"fmt"
 	"github.com/hjqhezgh/lessgo"
+	"time"
 )
 
 const (
 	//视频和课程关联的状态, 1：未关联   2：关联成功   3：关联失败
-	CLASS_STATUS_INIT = 1
+	CLASS_STATUS_INIT    = 1
 	CLASS_STATUS_SUCCESS = 2
-	CLASS_STATUS_FAILED = 3
+	CLASS_STATUS_FAILED  = 3
 )
 
 //时间串转换 2013-09-25 18:58:42 ---> 20130925185842
-func TimeString(time string) string{
+func TimeString(time string) string {
 	var bb []byte
 	b := []byte(time)
-	for _, v := range(b) {
+	for _, v := range b {
 		if v >= 48 && v <= 57 {
 			bb = append(bb, v)
 		}
@@ -62,14 +61,14 @@ func GetDateString() string {
 }
 
 //获取一周前的日期时间
-func getWeekAgoDate(db *sql.DB) string{
+func getWeekAgoDate(db *sql.DB) string {
 	var dateString string
 	sql := "select date_sub(now(),interval 1 week)"
 	//查询
 	rows, err := db.Query(sql)
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return	""
+		return ""
 	}
 	if rows.Next() {
 		err := rows.Scan(&dateString)
@@ -84,20 +83,20 @@ func getWeekAgoDate(db *sql.DB) string{
 func UpdateVideoStatus() {
 
 	type Ret struct {
-		id 			int
-		rid         int
-		cid			int
-		begin_time	string
-		end_time	string
+		id         int
+		rid        int
+		cid        int
+		begin_time string
+		end_time   string
 	}
 
 	flag := false
 	var begin_time, end_time string
-	var video_rets,class_rets []Ret
+	var video_rets, class_rets []Ret
 	var week_ago_date string
 
-	sql_video := "select vid,rid,cid,start_time,end_time from video where data_rel_status=?";
-	sql_class := "select id,room_id,center_id,real_start_time,real_end_time from class_schedule_detail where day_date>?";
+	sql_video := "select vid,rid,cid,start_time,end_time from video where data_rel_status=?"
+	sql_class := "select id,room_id,center_id,real_start_time,real_end_time from class_schedule_detail where day_date>?"
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -123,7 +122,7 @@ func UpdateVideoStatus() {
 	}
 	for rows.Next() {
 		ret := new(Ret)
-		err := rows.Scan(&ret.id, &ret.rid, &ret.cid ,&begin_time, &end_time)
+		err := rows.Scan(&ret.id, &ret.rid, &ret.cid, &begin_time, &end_time)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return
@@ -143,7 +142,7 @@ func UpdateVideoStatus() {
 		}
 		for rows.Next() {
 			ret := new(Ret)
-			err := rows.Scan(&ret.id, &ret.rid, &ret.cid ,&begin_time, &end_time)
+			err := rows.Scan(&ret.id, &ret.rid, &ret.cid, &begin_time, &end_time)
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return
@@ -154,15 +153,15 @@ func UpdateVideoStatus() {
 		}
 		fmt.Println(class_rets)
 		//关联更新
-		for _, v := range(video_rets) {
-			for _, c := range(class_rets) {
-				if v.cid==c.cid && v.rid==c.rid {
-					if (c.begin_time<v.begin_time && v.end_time<c.end_time) 										||
-							(v.begin_time<c.begin_time && c.end_time<v.end_time)									||
-								(c.begin_time>v.begin_time && v.end_time<c.end_time && v.end_time>c.begin_time)		||
-									(c.begin_time<v.begin_time && v.end_time>c.end_time && v.begin_time<c.end_time) {
+		for _, v := range video_rets {
+			for _, c := range class_rets {
+				if v.cid == c.cid && v.rid == c.rid {
+					if (c.begin_time < v.begin_time && v.end_time < c.end_time) ||
+						(v.begin_time < c.begin_time && c.end_time < v.end_time) ||
+						(c.begin_time > v.begin_time && v.end_time < c.end_time && v.end_time > c.begin_time) ||
+						(c.begin_time < v.begin_time && v.end_time > c.end_time && v.begin_time < c.end_time) {
 						lessgo.Log.Debug("新视频id：", v.id, "关联的课程时间id：", c.id)
-						updateSatus (c.id, v.id, CLASS_STATUS_SUCCESS, db)
+						updateSatus(c.id, v.id, CLASS_STATUS_SUCCESS, db)
 					}
 				}
 			}

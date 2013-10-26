@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="视频精确查询" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel entity="video" pageSize="20" title="监控视频" id="video-center" width="1200" height="400">
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="start_time" searchType="ge" inputType="datetime" desc="视频起始时间"/>
+        <search field="end_time" searchType="le" inputType="datetime" desc="视频结束时间"/>
+
+        <column field="center.name" desc="所属中心"/>
+        <column field="room.name" desc="所属房间"/>
+        <column field="start_time" desc="起始时间"/>
+        <column field="end_time" desc="结束时间"/>
+        <column field="filename" desc="文件名">
+            <formatter>
+                <![CDATA[
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" href="http://www.wooyou.com.cn:8888/manage/videoPlay?id='+options.rowId+'">'+cellvalue+'</a>';
+                ]]>
+            </formatter>
+        </column>
+    </gridpanel>
+</viewport>

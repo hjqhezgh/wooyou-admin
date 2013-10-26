@@ -46,7 +46,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleIds := strings.Split(employee.RoleId, ",")
 
 	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10" {
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
 			dataType = "all"
 			break
 		} else if roleId == "2" {
@@ -285,7 +285,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId,child,comeFromId,_employee.CenterId)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId, child, comeFromId, _employee.CenterId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -314,7 +314,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone,child,comeFromId, id)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, child, comeFromId, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -376,10 +376,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var father, fatherPhone, mother, motherPhone, homePhone,child,comeFrom string
+	var father, fatherPhone, mother, motherPhone, homePhone, child, comeFrom string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone,&child,&comeFrom)
+		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone, &child, &comeFrom)
 
 		if err != nil {
 			m["success"] = false
@@ -455,7 +455,7 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 	var oldStatus string
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows,&oldStatus)
+		err := commonlib.PutRecord(rows, &oldStatus)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -520,7 +520,7 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(id, employee.UserId,time.Now().Format("20060102150405"),oldStatus,status)
+	_, err = stmt.Exec(id, employee.UserId, time.Now().Format("20060102150405"), oldStatus, status)
 
 	if err != nil {
 		tx.Rollback()

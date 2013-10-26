@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="新闻信息管理" currentPage="true"/>
+    </crumbs>
+
+    <customformpanel id="news" saveUrl="/web/news/save.json" load="false" title="新闻信息管理">
+        <element field="title" type="text" desc="标题" validate="notNull"/>
+        <element field="news_content" type="htmleditor" desc="新闻内容" validate="notNull"/>
+        <element field="preview_image" type="image" desc="预览图片" imageEntity="pic"/>
+        <element field="preview_text" type="textarea" desc="预览文本" validate="notNull"/>
+        <element field="is_carousel" type="localSelect" desc="是否轮播" validate="notNull" localData="[{desc:'是',value:'1'},{desc:'否',value:'2'}]"/>
+        <element field="carousel_image" type="image" desc="轮播图片" imageEntity="pic"/>
+    </customformpanel>
+</viewport>

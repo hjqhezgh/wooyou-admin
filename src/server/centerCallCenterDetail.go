@@ -76,13 +76,13 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 	roleIds := strings.Split(employee.RoleId, ",")
 
 	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
 			dataType = "all"
 			break
 		} else if roleId == "2" {
 			dataType = "center"
 			break
-		} else{
+		} else {
 			dataType = "self"
 		}
 	}
@@ -95,19 +95,18 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 	sql += "select tc.id,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,c.contact_status,c.id as 'cid' from tmk_consumer tc left join consumer c on tc.consumer_id=c.id left join employee e on e.user_id = tc.employee_id where tc.center_id=? "
 
 	if dataType == "all" {
-		params = append(params,centerId)
+		params = append(params, centerId)
 
 		if status != "" {
-			if status == "no employee"{
+			if status == "no employee" {
 				sql += " and tc.employee_id is null or tc.employee_id=0 "
-			}else{
+			} else {
 				sql += " and c.contact_status=? "
-				params = append(params,status)
+				params = append(params, status)
 			}
 		}
 
-
-	}else if dataType == "center"{
+	} else if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
@@ -117,27 +116,27 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-		params = append(params,_employee.CenterId)
+		params = append(params, _employee.CenterId)
 
 		if status != "" {
-			if status == "no employee"{
+			if status == "no employee" {
 				sql += " and tc.employee_id is null or tc.employee_id=0 "
-			}else{
+			} else {
 				sql += " and c.contact_status=? "
-				params = append(params,status)
+				params = append(params, status)
 			}
 		}
 
-	}else{
+	} else {
 
-		params = append(params,centerId)
+		params = append(params, centerId)
 
 		sql += " and tc.employee_id=? "
-		params = append(params,employee.UserId)
+		params = append(params, employee.UserId)
 
-		if status != "" && status!= "no employee"{
+		if status != "" && status != "no employee" {
 			sql += " and c.contact_status=? "
-			params = append(params,status)
+			params = append(params, status)
 		}
 	}
 

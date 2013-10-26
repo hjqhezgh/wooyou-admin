@@ -83,12 +83,12 @@ func ValidForCallCenterListAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	params = append(params,_employee.CenterId)
+	params = append(params, _employee.CenterId)
 
-	if status!="" {
+	if status != "" {
 		sql += " and c.contact_status=? "
-		params = append(params,status)
-	}else{
+		params = append(params, status)
+	} else {
 		sql += " and (c.contact_status=1 or c.contact_status=2) "
 	}
 

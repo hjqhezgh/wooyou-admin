@@ -30,7 +30,7 @@
                     if(rowObject[6]=='0'){
                         value =  cellvalue + '&nbsp;';
                     }else{
-                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="/downloadAudio?id='+options.rowId+'">'+cellvalue+'</a>' + '&nbsp;';
+                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="http://117.29.168.34:8888/manage/audioDownload?filename='+rowObject[9]+'&centerId='+rowObject[10]+'&startTime='+rowObject[3]+'">'+cellvalue+'</a>' + '&nbsp;';
                     }
 
                     value += '<a style="color:green;text-decoration: underline;" target="_blank" title="点击添加备注信息" href="/web/audio/note?id='+options.rowId+'">备注</a>' ;
@@ -46,6 +46,8 @@
         <column field="is_upload_finish" desc="是否下载完成" hidden="true"/>
         <column field="note" desc="备注"/>
         <column field="cid" desc="客户id" hidden="true"/>
+        <column field="filename" desc="文件名" hidden="true"/>
+        <column field="centerId" desc="中心id" hidden="true"/>
 
         <!--<action desc="下载录音" url="/downloadAudio" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>-->
     </customgridpanel>
