@@ -222,6 +222,12 @@ jQuery.fn.form = function (opts) {
 
             $(element).find('textarea').attr('htmleditor',"true");
 
+            var uploadUrl = '/kindeditorImageUpload';
+
+            if($(element).attr('field-uploadUrl')){
+                uploadUrl = $(element).attr('field-uploadUrl');
+            }
+
             mythis.editor = KindEditor.create('textarea[name="' + $(element).find('textarea').attr('name') + '"]', {
                 items: [
                     'source', '|', 'undo', 'redo', '|', 'preview', 'cut', 'copy', 'paste',
@@ -233,7 +239,7 @@ jQuery.fn.form = function (opts) {
                     'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
                     'anchor', 'link', 'unlink'
                 ],
-                uploadJson: '/kindeditorImageUpload'
+                uploadJson: uploadUrl
             });
         });
 
