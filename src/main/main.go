@@ -101,4 +101,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/news/save.json":              wooyousite.NewsSaveAction,
 	"/web/news/update.json":            wooyousite.NewsUpdateAction,
 	"/newsImageUplaod":            		wooyousite.NewsImageUplaodAction,
+
+	//app开户数据读取
+	"/addAppAccountLoad.json": server.AddAppAccountLoadAction,
+	//app开户数据保存
+	"/addAppAccountSave.json": server.AddAppAccountSaveAction,
 }

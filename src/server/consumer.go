@@ -88,10 +88,11 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	mySort := r.FormValue("mySort-eq")
 	name := r.FormValue("name-like")
+	centerId := r.FormValue("cid-eq")
 
 	params := []interface{}{}
 
-	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime,c.contact_status from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
+	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime,c.contact_status,c.parent_id from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
 
 	if name != "" {
 		params = append(params, "%"+name+"%")
@@ -117,6 +118,11 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	if dataType == "self" {
 		params = append(params, employee.UserId)
 		sql += " and e.user_id=? "
+	}
+
+	if centerId!="" && dataType == "all"{
+		params = append(params, centerId)
+		sql += " and c.center_id=? "
 	}
 
 	countSql := ""
@@ -194,7 +200,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 11; i++ {
+		for i := 0; i < 12; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

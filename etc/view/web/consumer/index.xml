@@ -6,8 +6,9 @@
         <crumb text="客户管理" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="350" loadUrl="false">
+    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="400" loadUrl="false">
 
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="name" searchType="like" inputType="text" desc="客户姓名"/>
         <search field="mySort" searchType="eq" inputType="localSelect" desc="排序方式（默认按最后通话时间）" localData="[{desc:'按最后通话时间',value:'time'},{desc:'按频率',value:'frequency'}]"/>
 
@@ -40,7 +41,17 @@
                 ]]>
             </formatter>
         </column>
-
+        <column field="consumer_name" desc="是否APP用户">
+            <formatter>
+                <![CDATA[
+                if(cellvalue){
+                    return '是';
+                }else{
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="APP开户" href="/web/consumer/add_app_account?id='+options.rowId+'" data-action="openIframeWindow" window-width="800" window-height="600" window-title="">APP开户</a>';
+                }
+                ]]>
+            </formatter>
+        </column>
         <!--<action desc="添加" url="/web/consumer/add" linkType="newPage"/>-->
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]" width="800" height="600"/>
     </customgridpanel>
