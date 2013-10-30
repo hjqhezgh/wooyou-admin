@@ -24,6 +24,8 @@ import (
 	//"strings"
 )
 
+
+
 //顾问分页数据服务
 func VideoListAction(w http.ResponseWriter, r *http.Request) {
 
@@ -69,54 +71,83 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	//dataType := ""
+	dataType := ""
 
-	//	roleIds := strings.Split(employee.RoleId, ",")
-	//
-	//	for _, roleId := range roleIds {
-	//		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
-	//			dataType = "all"
-	//			break
-	//		} else if roleId == "2" {
-	//			dataType = "center"
-	//			break
-	//		} else{
-	//			dataType = "self"
-	//		}
-	//	}
+	roleIds := strings.Split(employee.RoleId, ",")
 
-	//	cid := r.FormValue("cid-eq")
-	//	name := r.FormValue("name-like")
-	//	year := r.FormValue("year-eq")
-	//	month := r.FormValue("month-eq")
-	//	week := r.FormValue("week-eq")
-	//	startTime := r.FormValue("start_time-eq")
-	//
-	//	st := ""
-	//	et := ""
-	//	flag := true
-	//
-	//	if startTime != "" {
-	//		st = startTime + " 00:00:00"
-	//		et = startTime + " 23:59:59"
-	//	} else {
-	//		if week != "" && month != "" && year != "" {
-	//			st, et, flag = lessgo.FindRangeTimeDim("", "", year+month+week)
-	//		} else if month != "" && year != "" {
-	//			st, et, flag = lessgo.FindRangeTimeDim("", year+month, "")
-	//		} else if year != "" {
-	//			st, et, flag = lessgo.FindRangeTimeDim(year, "", "")
-	//		}
-	//	}
+	for _, roleId := range roleIds {
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId=="10"{
+			dataType = "all"
+			break
+		} else if roleId == "2" {
+			dataType = "center"
+			break
+		} else{
+			dataType = "self"
+		}
+	}
+
+	//fmt.Println("dataType:" ,dataType, ",roleIds:", roleIds)
+	//r.FormValue("cid-eq")
+	//fmt.Println(r.Form)
+
+	sql := ""
 
 	params := []interface{}{}
 
-	sql := `select v.vid,v.start_time,v.end_time,c.class_id,co.name,c.teacher_id,e.really_name from
-				video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join employee e
-					on c.teacher_id=e.user_id left join course co on c.class_id=co.cid where data_rel_status=2`
-	countSql := ""
+	if dataType == "all" {
+		sql += `select v.vid,v.cid,ce.name as centername,r.name rname,c.course_id,co.name,c.teacher_id,e.really_name,v.start_time,v.end_time from
+				video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join room r on r.rid=v.rid left join employee e
+					on c.teacher_id=e.user_id left join course co on c.course_id=co.cid left join center ce on v.cid=ce.cid
+						where data_rel_status=2`
+	} else if dataType == "center" {
+		sql +=`select v.vid,v.cid,ce.name as centername,r.name rname,c.course_id,co.name,c.teacher_id,e.really_name,v.start_time,v.end_time from
+				video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join room r on r.rid=v.rid left join employee e
+					on c.teacher_id=e.user_id left join course co on c.course_id=co.cid left join center ce on v.cid=ce.cid
+						where v.cid=? and data_rel_status=2`
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
 
-	countSql = "select count(1) from (" + sql + ") num"
+		params = append(params,  _employee.CenterId)
+
+	} else if dataType == "self" {
+		sql +=`select v.vid,v.cid,ce.name as centername,r.name rname,c.course_id,co.name,c.teacher_id,e.really_name,v.start_time,v.end_time from
+			video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join room r on r.rid=v.rid left join employee e
+				on c.teacher_id=e.user_id left join course co on c.course_id=co.cid left join center ce on v.cid=ce.cid
+					where c.teacher_id=? and data_rel_status=2`
+
+		params = append(params, employee.UserId)
+	}
+
+	center_id := r.FormValue("cid-eq")
+	if center_id != "" {
+		sql += " and v.cid=?"
+		params = append(params, center_id)
+		lessgo.Log.Debug(sql)
+		lessgo.Log.Debug(params)
+	}
+
+	course_id := r.FormValue("courseId-eq")
+	if course_id != "" {
+		sql += " and c.course_id=?"
+		params = append(params, course_id)
+		lessgo.Log.Debug(params...)
+	}
+
+	name := r.FormValue("name-like")
+	if name != "" {
+		sql += " and e.really_name like ?"
+		params = append(params, "%"+name+"%")
+	}
+
+	countSql := "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
@@ -124,7 +155,6 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	rows, err := db.Query(countSql, params...)
-
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
 		m["success"] = false
@@ -157,11 +187,13 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	lessgo.Log.Debug(sql + " limit ?,?")
 
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
 
+	lessgo.Log.Debug(sql + " limit ?,?")
+	lessgo.Log.Debug(params...)
+	lessgo.Log.Debug(params[0], ":",params[1])
 	rows, err = db.Query(sql+" limit ?,?", params...)
 
 	if err != nil {
@@ -172,7 +204,8 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
-
+	colums, _ := rows.Columns()
+	column_len := len(colums) - 1
 	objects := []interface{}{}
 
 	for rows.Next() {
@@ -183,7 +216,7 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 6; i++ {
+		for i := 0; i < column_len; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
