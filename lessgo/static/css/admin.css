@@ -87,3 +87,5 @@ ul,li{ list-style:none;margin:0; padding:0;}
 
 /*2013.11.4，表格控件的多选框无法居中对齐*/
 .input-box .cbox{margin-right: 0;}
+.leftcon {z-index: 19900000;position:absolute;}/*使菜单栏可以高于弹窗的遮罩层*/
+.form-horizontal div.form-buttons{background: #fff;margin:0;padding-bottom:20px;}/*使表单弹窗的保存按钮可以固定位置*/

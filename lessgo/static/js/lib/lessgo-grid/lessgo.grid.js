@@ -218,9 +218,6 @@ jQuery.fn.grid = function (opts) {
             thisButton = $(this);
             event.preventDefault();
             $.openIframeWindow({
-                width : thisButton.attr('window-width') ,
-                height : thisButton.attr('window-height') ,
-                title : thisButton.attr('window-title'),
                 url : thisButton.attr('href'),
                 parentComponent : componentId
             },event);
