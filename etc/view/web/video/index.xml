@@ -17,7 +17,7 @@
         <column field="filename" desc="文件名">
             <formatter>
                 <![CDATA[
-                    return '<a style="color:blue;text-decoration: underline;" data-action="openIframeWindow" window-width="1000" window-height="650" window-title="" target="_blank" href="http://www.wooyou.com.cn:8888/manage/videoPlay?id='+options.rowId+'">'+cellvalue+'</a>';
+                    return '<a style="color:blue;text-decoration: underline;" data-action="openIframeWindow" href="http://www.wooyou.com.cn:8888/manage/videoPlay?id='+options.rowId+'">'+cellvalue+'</a>';
                 ]]>
             </formatter>
         </column>

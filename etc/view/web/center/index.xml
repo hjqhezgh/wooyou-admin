@@ -9,13 +9,13 @@
     <gridpanel entity="center" pageSize="15" title="中心数据" id="grid" width="1200" height="350">
         <search field="name" searchType="like" inputType="text" desc="中心名字"/>
 
-        <toolaction desc="添加中心" url="/web/center/add" colorClass="h-bg-green" linkType="iframeWindow" width="800" height="600"/>
+        <toolaction desc="添加中心" url="/web/center/add" colorClass="h-bg-green" linkType="iframeWindow"/>
 
         <column field="name" desc="名字"/>
         <column field="telephone" desc="联系电话"/>
         <column field="lan_ip" desc="局域网ip"/>
         <column field="domain_name" desc="公网域名"/>
 
-        <action desc="修改" url="/web/center/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]" width="800" height="600"/>
+        <action desc="修改" url="/web/center/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
     </gridpanel>
 </viewport>

@@ -14,9 +14,9 @@
             <formatter>
                 <![CDATA[
                     if(cellvalue==""){
-                        return '<a style="color:red;text-decoration: underline;" target="_blank" data-action="openIframeWindow" window-width="800" window-height="700" window-title="" href="/web/audio/sendToTmk?id='+options.rowId+'">未分配</a>';
+                        return '<a style="color:red;text-decoration: underline;" target="_blank" data-action="openIframeWindow" href="/web/audio/sendToTmk?id='+options.rowId+'">未分配</a>';
                     }else{
-                        return '<a style="color:green;text-decoration: underline;" target="_blank" data-action="openIframeWindow" window-width="800" window-height="700" window-title=""  href="/web/audio/sendToTmk?id='+options.rowId+'">'+cellvalue+'</a>';
+                        return '<a style="color:green;text-decoration: underline;" target="_blank" data-action="openIframeWindow" href="/web/audio/sendToTmk?id='+options.rowId+'">'+cellvalue+'</a>';
                     }
                 ]]>
             </formatter>

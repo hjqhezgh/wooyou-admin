@@ -16,9 +16,9 @@
             <formatter>
                 <![CDATA[
                 if(cellvalue=='未知客户'){
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add" data-action="openIframeWindow" window-width="800" window-height="600" window-title="">'+cellvalue+'</a>';
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add" data-action="openIframeWindow" >'+cellvalue+'</a>';
                 }else{
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'" data-action="openIframeWindow" window-width="800" window-height="600" window-title="">'+cellvalue+'</a>';
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'" data-action="openIframeWindow">'+cellvalue+'</a>';
                 }
                 ]]>
             </formatter>

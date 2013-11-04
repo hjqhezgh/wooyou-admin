@@ -5,7 +5,7 @@
         <crumb text="课程review" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/queryVedio.json" pageSize="15" title="通话报表" id="grid1" width="1200" height="350" loadUrl="true">
+    <customgridpanel url="/queryVedio.json" pageSize="15" title="课程review" id="grid1" width="1200" height="350" loadUrl="false">
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="name" searchType="like" inputType="text" desc="顾问姓名"/>
         <search field="year" searchType="eq" inputType="localSelect" desc="年" localData="[{desc:'2013年',value:'2013'},{desc:'2014年',value:'2014'},{desc:'2015年',value:'2015'},{desc:'2016年',value:'2016'},{desc:'2017年',value:'2017'}]"/>
@@ -19,5 +19,6 @@
         <column field="centerName" desc="课程"/>
         <column field="centerId" desc="员工ID" hidden="true"/>
         <column field="employeeId" desc="教师"/>
+        <action desc="修改" url="http://www.wooyou.com.cn:8888/manage/videoPlay" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
     </customgridpanel>
 </viewport>
