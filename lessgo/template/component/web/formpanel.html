@@ -48,8 +48,14 @@
                     {{end}}
                     <div class="control-group text-center navbar navbar-fixed-bottom form-buttons">
                         <div class="controls">
+                            {{if compareString .Formpanel.HideSaveButton "true"}}
+                            {{else}}
                             <a href="javascript:void(0);" data-action="save" class="btn btn-primary">保存</a>
+                            {{end}}
+                            {{if compareString .Formpanel.HideResetButton "true"}}
+                            {{else}}
                             <a href="javascript:void(0);" data-action="reset" class="btn">重置</a>
+                            {{end}}
                         </div>
                     </div>
                 </div>
@@ -61,8 +67,22 @@
 
 <script type="text/javascript">
     seajs.use('lessgo-form',function(){
+        var buttons = [];
+        {{if .Formpanel.FormButtons}}
+        {{range $index,$button := .Formpanel.FormButtons}}
+        buttons.push({
+            desc : '{{$button.Desc}}',
+            buttonClass : '{{$button.ButtonClass}}',
+            handler : function(){
+                {{$button.Handler}}
+            }
+        });
+        {{end}}
+        {{end}}
+
         $('#{{$id}}').form({
             saveUrl : '/{{.Terminal}}/{{.Entity.Id}}/save?componentId={{.Formpanel.Id}}',
+            buttons : buttons,
             {{if compareString .Formpanel.AfterSave ""}}
             successCallback : function(data){
                 {{if compareString .Formpanel.Inwindow "true"}}
