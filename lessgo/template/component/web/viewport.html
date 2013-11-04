@@ -96,7 +96,7 @@
 </script>
 <script type="text/javascript">
     var windowNum = 0;
-
+    window.name = "viewport";
     seajs.use(['jquery','juicer'],function(){
         $.get('/queryMenus',{username:'{{.Employee.UserName}}'},function(data){
             var menus = data.menus;

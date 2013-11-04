@@ -8,19 +8,19 @@ jQuery.openIframeWindow = function (opts,event) {
     var url = opts.url;
 
     if(url.lastIndexOf('?')>-1){
-        url = url + "&parentComponentId="+ opts.parentComponent;
+        url = url + "&parentComponentId="+ opts.parentComponent+"&parentWindowName="+opts.parentWindowName;
     }else{
-        url = url + "?parentComponentId="+ opts.parentComponent;
+        url = url + "?parentComponentId="+ opts.parentComponent+"&parentWindowName="+opts.parentWindowName;
     }
 
-    var windowWidth = document.documentElement.clientWidth - 230;
-    var windowHeight = document.documentElement.clientHeight - 85;
+    var windowWidth = top.document.documentElement.clientWidth - 230;
+    var windowHeight = top.document.documentElement.clientHeight - 85;
 
     top.jQuery.layer({
         type : 2,
         fix : true,
         moveOut : false,
-        move : false,
+        move : ['.xubox_title' , true],
         shade : false,
         closeBtn : [0 , true],
         title: '',
@@ -39,6 +39,6 @@ jQuery.openIframeWindow = function (opts,event) {
 }
 
 // tofix 这里应该是要获取最近的那个窗口。而不一定是parent
-jQuery.getParentComponentObject = function (id) {
-    return parent[id];
+jQuery.getParentComponentObject = function (windowName,id) {
+    return top[windowName][id]
 }

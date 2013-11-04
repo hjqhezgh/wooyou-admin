@@ -219,7 +219,8 @@ jQuery.fn.grid = function (opts) {
             event.preventDefault();
             $.openIframeWindow({
                 url : thisButton.attr('href'),
-                parentComponent : componentId
+                parentComponent : componentId,
+                parentWindowName : window.name
             },event);
         });
 
