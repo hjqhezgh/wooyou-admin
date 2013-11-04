@@ -44,6 +44,9 @@
                 {{if compareString $toolAction.LinkType "iframeWindow"}}
                 <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-action="openIframeWindow" window-width="{{$toolAction.Width}}"  window-height="{{$toolAction.Height}}"   window-title="{{$toolAction.Title}}">{{$toolAction.Desc}}</a>
                 {{end}}
+                {{if compareString $toolAction.LinkType "mutiSelect"}}
+                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-action="mutiSelect" confirmMsg="{{$toolAction.ConfirmMsg}}" params="{{$toolAction.Params}}">{{$toolAction.Desc}}</a>
+                {{end}}
                 {{end}}
             </div><!--E btn-box-->
 
@@ -127,6 +130,7 @@
             colNames:{{$id}}ColumnNames,
             width:{{$id}}Width,
             height:{{.Gridpanel.Height}},
+            mutiSelect : {{if .Gridpanel.MutiSelect}}{{.Gridpanel.MutiSelect}}{{else}}false{{end}},
             colModel:{{$id}}ColumnModels,
             rowNum:{{.Gridpanel.PageSize}},
             actions:{{$id}}Actions

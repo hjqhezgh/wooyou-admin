@@ -33,6 +33,8 @@ jQuery.fn.grid = function (opts) {
             height: opts.height,
             colModel: opts.colModel,
             rowNum: opts.rowNum,
+            multiselect: opts.mutiSelect,
+            rowList:[opts.rowNum,50,100,200,500,1000],
             pager: '#' + opts.pageId,
             viewrecords: true,
             onSelectRow: function (id) {
@@ -222,6 +224,33 @@ jQuery.fn.grid = function (opts) {
                 url : thisButton.attr('href'),
                 parentComponent : componentId
             },event);
+        });
+
+
+        _this.on('click','[data-action=mutiSelect]',function(event){
+            thisButton = $(this);
+            event.preventDefault();
+            var ids;
+            ids = _this.grid.jqGrid('getGridParam','selarrrow');
+
+            var params = {};
+
+            if(thisButton.attr('params')!=""){
+                params = eval('('+thisButton.attr('params')+')');
+            }
+
+            params["ids"] = ids.toString();
+
+            if(confirm(thisButton.attr('confirmMsg'))){
+                $.post(thisButton.attr('href'),params,function(data){
+                    if(data.success){
+                        _this.grid.trigger("reloadGrid");
+                        alert(data.msg);
+                    }else{
+                        alert(data.msg);
+                    }
+                },'json');
+            }
         });
     }
 
