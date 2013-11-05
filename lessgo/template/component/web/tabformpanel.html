@@ -1,0 +1,133 @@
+{{$model := .Model}}
+{{$id := getComponentId "tabformpanel" }}
+{{$tabFormPanel := .TabFormPanel }}
+<div class="block mutiformpanel" id="{{$id}}">
+    <h4 class="title">
+        <i class="icon-table"></i>{{.TabFormPanel.Title}}
+	 			<span class="iconright">
+	 				<!--点击收起的时候用这个<i class="icon-plus-sign"></i>-->
+	 				<i class="icon-minus-sign"></i>
+	 			</span>
+    </h4><!--E title-->
+    <div class="cont">
+        <div class="input-box">
+        <form class="form-horizontal">
+            <div class="tab-box">
+                <ul class="nav nav-tabs">
+                    {{range $tabIndex,$tab := .TabFormPanel.FormTabs}}
+                    <li><a href="#{{$id}}-tabs-{{$tabIndex}}">{{$tab.Desc}}</a></li>
+                    {{end}}
+                </ul>
+                <div class="tab-content">
+                    {{range $tabIndex,$tab := .TabFormPanel.FormTabs}}
+                    <div class="tab-pane" id="{{$id}}-tabs-{{$tabIndex}}">
+                        <div class="input-box">
+                            {{range $elementIndex,$element := $tab.Elements}}
+                            <div class="control-group form-field"
+                                 field-type="{{$element.Type}}"
+                                 field-desc="{{$element.Desc}}"
+                                 field-name="{{$element.Field}}"
+                                 field-value=""
+                                 field-localData="{{$element.LocalData}}"
+                                 field-url="{{$element.Url}}"
+                                 field-valueField="{{$element.ValueField}}"
+                                 field-descField="{{$element.DescField}}"
+                                 field-readonly="{{$element.Readonly}}"
+                                 field-defaultValue="{{$element.DefaultValue}}"
+                                 field-validate="{{$element.Validate}}"
+                                 field-refTable="{{$element.RefTable}}"
+                                 field-selfId="{{$element.SelfId}}"
+                                 field-refId="{{$element.RefId}}"
+                                 field-tip="{{$element.Tip}}"
+
+                                 field-imageType="{{$element.ImageType}}"
+                                 field-maxWidth="{{$element.MaxWidth}}"
+                                 field-maxHeight="{{$element.MaxHeight}}"
+                                 field-minWidth="{{$element.MinWidth}}"
+                                 field-minHeight="{{$element.MinHeight}}"
+                                 field-maxSize="{{$element.MaxSize}}"
+                                 field-resolution="{{$element.Resolution}}"
+                                 field-widths="{{$element.Widths}}"
+
+                                 field-uploadUrl="{{$element.UploadUrl}}"
+                                    >
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+                <div class="control-group text-center navbar navbar-fixed-bottom form-buttons">
+                    <div class="controls">
+                        {{if compareString .TabFormPanel.HideSaveButton "true"}}
+                        {{else}}
+                        <a href="javascript:void(0);" data-action="save" class="btn btn-primary">保存</a>
+                        {{end}}
+                        {{if compareString .TabFormPanel.HideResetButton "true"}}
+                        {{else}}
+                        <a href="javascript:void(0);" data-action="reset" class="btn">重置</a>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    seajs.use('lessgo-form',function(){
+        var buttons = [];
+        {{if .TabFormPanel.FormButtons}}
+        {{range $index,$button := .TabFormPanel.FormButtons}}
+        buttons.push({
+            desc : '{{$button.Desc}}',
+            buttonClass : '{{$button.ButtonClass}}',
+            handler : function(){
+                {{$button.Handler}}
+            }
+        });
+        {{end}}
+        {{end}}
+
+        $('#{{$id}}').form({
+            saveUrl : '{{.TabFormPanel.SaveUrl}}',
+            buttons : buttons,
+            {{if compareString .TabFormPanel.Load "true" }}
+            loadUrl : '{{.TabFormPanel.LoadUrl}}',
+            {{end}}
+            {{if compareString .TabFormPanel.AfterSave ""}}
+            successCallback : function(data){
+                alert('保存成功');
+                {{if compareString .TabFormPanel.Inwindow "true"}}
+                $.getParentComponentObject(parentWindowName,sourceComponentId).getGrid().trigger("reloadGrid");
+                top.layer.close(top.layer.getFrameIndex(window.name));
+                {{else}}
+                window.close();
+                {{end}}
+            },
+            {{else}}
+            successCallback : function(data){
+                {{.TabFormPanel.AfterSave}}
+            },
+            {{end}}
+
+            {{if compareString .TabFormPanel.BeforeSave ""}}
+            {{else}}
+            beforeSave : function(container){
+                {{.TabFormPanel.BeforeSave}}
+            },
+            {{end}}
+
+            {{if compareString .TabFormPanel.AfterRender ""}}
+            {{else}}
+            afterRender : function(container){
+                {{.TabFormPanel.AfterRender}}
+            },
+            {{end}}
+
+            failCallback : function(data){
+                alert(data.msg);
+            }
+        });
+    });
+</script>

@@ -118,7 +118,7 @@
         });
 
         $('.leftmenu').on('click','a',function(event){
-            if(windowNum>0){
+            if(window.frames.length>0){
                 if($(this).attr("href")=="#" || $(this).attr("href")=="" || $(this).attr("href")=="javascript:viod(0);"){
                 }else{
                     if (!confirm("是否舍弃当前弹窗进入其他模块？")){

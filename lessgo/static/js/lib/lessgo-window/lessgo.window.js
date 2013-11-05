@@ -26,19 +26,17 @@ jQuery.openIframeWindow = function (opts,event) {
         title: '',
         border : [5 , 0.7 , '#272822', true],
         offset : ['75px','220px'],
-        shade : [0.5 , '#000' , true],
+        shade : [0.2 , '#000' , true],
         area : [windowWidth+'px',windowHeight+'px'],
-        iframe : {src : url},
-        close : function(index){
-            top.windowNum--;
-            top.layer.close(index)
-        }
+        iframe : {src : url}
     });
-
-    top.windowNum++;
 }
 
 // tofix 这里应该是要获取最近的那个窗口。而不一定是parent
 jQuery.getParentComponentObject = function (windowName,id) {
-    return top[windowName][id]
+    if(windowName=="viewport"){
+        return parent[id];
+    }else{
+        return top[windowName][id]
+    }
 }

@@ -63,6 +63,7 @@ define(function (require, exports, module) {
             'lessgo-form':{
                 src: productUrl + '/lib/lessgo-form/lessgo.form.js',
                 deps: ['jquery',
+                       'bootstrap',
                        'jq-ui',
                        'juicer',
                        'imageuploader',

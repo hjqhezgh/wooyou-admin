@@ -313,6 +313,7 @@ jQuery.fn.form = function (opts) {
         this.find('a[data-action=save]').button();
 
         myform.find('.nav-tabs').find('li:first').addClass('active');
+        myform.find('.tab-content').find('.tab-pane:first').addClass('active');
 
         //需要渲染用户自定义的按钮
         if(opts.buttons.length>0){
