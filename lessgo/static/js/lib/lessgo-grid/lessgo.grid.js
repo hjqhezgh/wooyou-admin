@@ -231,6 +231,11 @@ jQuery.fn.grid = function (opts) {
             var ids;
             ids = _this.grid.jqGrid('getGridParam','selarrrow');
 
+            if(ids.length==0){
+                alert('请至少选择一项');
+                return;
+            }
+
             var params = {};
 
             if(thisButton.attr('params')!=""){
@@ -249,6 +254,40 @@ jQuery.fn.grid = function (opts) {
                     }
                 },'json');
             }
+        });
+
+        _this.on('click','[data-action=mutiSelectIframeWindow]',function(event){
+
+            thisButton = $(this);
+            event.preventDefault();
+
+            var ids;
+            ids = _this.grid.jqGrid('getGridParam','selarrrow');
+
+            if(ids.length==0){
+                alert('请至少选择一项');
+                return;
+            }
+
+            var url = thisButton.attr('href');
+
+            if(url.lastIndexOf('?')>-1){
+                url += "&ids="+ids.toString();
+            }else{
+                url += "?ids="+ids.toString();
+            }
+
+            var params = eval('('+thisButton.attr('params')+')');
+
+            for(var prop in params){
+                url += "&" + prop + "=" + params[prop];
+            }
+
+            $.openIframeWindow({
+                url : url,
+                parentComponent : componentId,
+                parentWindowName : window.name
+            },event);
         });
     }
 

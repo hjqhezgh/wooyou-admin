@@ -47,6 +47,9 @@
                 {{if compareString $toolAction.LinkType "mutiSelect"}}
                 <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-action="mutiSelect" confirmMsg="{{$toolAction.ConfirmMsg}}" params="{{$toolAction.Params}}">{{$toolAction.Desc}}</a>
                 {{end}}
+                {{if compareString $toolAction.LinkType "mutiSelectIframeWindow"}}
+                <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-action="mutiSelectIframeWindow" params="{{$toolAction.Params}}">{{$toolAction.Desc}}</a>
+                {{end}}
                 {{end}}
             </div><!--E btn-box-->
 

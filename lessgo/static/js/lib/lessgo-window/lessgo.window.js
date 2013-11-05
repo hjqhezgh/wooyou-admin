@@ -20,7 +20,7 @@ jQuery.openIframeWindow = function (opts,event) {
         type : 2,
         fix : true,
         moveOut : false,
-        move : ['.xubox_title' , true],
+        move : false,
         shade : false,
         closeBtn : [0 , true],
         title: '',
