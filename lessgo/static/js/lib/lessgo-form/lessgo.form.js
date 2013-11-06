@@ -319,7 +319,9 @@ jQuery.fn.form = function (opts) {
         if(opts.buttons.length>0){
             for(var i=0;i<opts.buttons.length;i++){
                 _this.find('.form-buttons').find('.controls').append('<a href="javascript:void(0);" class="btn '+opts.buttons[i].buttonClass+'">'+opts.buttons[i].desc+'</a>&nbsp;');
-                _this.find('.form-buttons').find('a:last').click(opts.buttons[i].handler).button();
+                _this.find('.form-buttons').find('a:last').bind('click',{'b':opts.buttons[i]},function(e){
+                    e.data.b.handler(mythis);
+                }).button();
             }
         }
 

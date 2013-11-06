@@ -41,7 +41,7 @@ var ImageUploader = function(dom,inputId){
 
 ImageUploader.prototype = {
 
-    fileInput : '<input id="${inputId}" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><input type="hidden" data-field name="${fieldName}_s" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" width="100" height="100" /></span><span>${fieldTip}</span>',
+    fileInput : '<input id="${inputId}" name="${fieldName}" type="file" data-desc="${fieldDesc}" /><input type="hidden" data-field name="${fieldName}" /><input type="hidden" data-field name="${fieldName}_s" /><span class="img-pre"><img src="{@if fieldValue==""}/lessgo/static/img/default_image.gif{@else}${fieldValue}{@/if}" style="width:100px;height:100px;" /></span><span>${fieldTip}</span>',
 
     init : function(){
 
