@@ -41,10 +41,16 @@
                             >
                     </div>
                     {{end}}
-                    <div class="control-group text-center">
+                    <div class="control-group text-center navbar navbar-fixed-bottom form-buttons">
                         <div class="controls">
+                            {{if compareString .CustomFormPanel.HideSaveButton "true"}}
+                            {{else}}
                             <a href="javascript:void(0);" data-action="save" class="btn btn-primary">保存</a>
+                            {{end}}
+                            {{if compareString .CustomFormPanel.HideResetButton "true"}}
+                            {{else}}
                             <a href="javascript:void(0);" data-action="reset" class="btn">重置</a>
+                            {{end}}
                         </div>
                     </div>
             </form>
@@ -55,8 +61,22 @@
 
 <script type="text/javascript">
     seajs.use('lessgo-form',function(){
+        var buttons = [];
+        {{if .CustomFormPanel.FormButtons}}
+        {{range $index,$button := .CustomFormPanel.FormButtons}}
+        buttons.push({
+            desc : '{{$button.Desc}}',
+            buttonClass : '{{$button.ButtonClass}}',
+            handler : function(container){
+                {{$button.Handler}}
+            }
+        });
+        {{end}}
+        {{end}}
+
         $('#{{$id}}').form({
             saveUrl : '{{.CustomFormPanel.SaveUrl}}',
+            buttons : buttons,
             {{if compareString .CustomFormPanel.Load "true" }}
             loadUrl : '{{.CustomFormPanel.LoadUrl}}',
             {{end}}
@@ -64,7 +84,7 @@
             successCallback : function(data){
                 alert('保存成功');
                 {{if compareString .CustomFormPanel.Inwindow "true"}}
-                $.getParentComponentObject(sourceComponentId).getGrid().trigger("reloadGrid");
+                $.getParentComponentObject(parentWindowName,sourceComponentId).getGrid().trigger("reloadGrid");
                 top.layer.close(top.layer.getFrameIndex(window.name));
                 {{else}}
                 window.close();

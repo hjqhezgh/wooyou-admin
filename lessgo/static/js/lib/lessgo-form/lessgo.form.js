@@ -313,6 +313,17 @@ jQuery.fn.form = function (opts) {
         this.find('a[data-action=save]').button();
 
         myform.find('.nav-tabs').find('li:first').addClass('active');
+        myform.find('.tab-content').find('.tab-pane:first').addClass('active');
+
+        //需要渲染用户自定义的按钮
+        if(opts.buttons.length>0){
+            for(var i=0;i<opts.buttons.length;i++){
+                _this.find('.form-buttons').find('.controls').append('<a href="javascript:void(0);" class="btn '+opts.buttons[i].buttonClass+'">'+opts.buttons[i].desc+'</a>&nbsp;');
+                _this.find('.form-buttons').find('a:last').bind('click',{'b':opts.buttons[i]},function(e){
+                    e.data.b.handler(mythis);
+                }).button();
+            }
+        }
 
         if(opts.afterRender){
             opts.afterRender(mythis);

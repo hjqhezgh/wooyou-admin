@@ -95,6 +95,8 @@
     </li>
 </script>
 <script type="text/javascript">
+    var windowNum = 0;
+    window.name = "viewport";
     seajs.use(['jquery','juicer'],function(){
         $.get('/queryMenus',{username:'{{.Employee.UserName}}'},function(data){
             var menus = data.menus;
@@ -114,6 +116,18 @@
                 }
             });
         });
+
+        $('.leftmenu').on('click','a',function(event){
+            if(window.frames.length>0){
+                if($(this).attr("href")=="#" || $(this).attr("href")=="" || $(this).attr("href")=="javascript:viod(0);"){
+                }else{
+                    if (!confirm("是否舍弃当前弹窗进入其他模块？")){
+                        event.preventDefault();
+                    }
+                }
+            }
+        });
+
     });
 
 </script>

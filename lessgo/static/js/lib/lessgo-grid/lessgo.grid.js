@@ -33,6 +33,8 @@ jQuery.fn.grid = function (opts) {
             height: opts.height,
             colModel: opts.colModel,
             rowNum: opts.rowNum,
+            multiselect: opts.mutiSelect,
+            rowList:[opts.rowNum,50,100,200,500,1000],
             pager: '#' + opts.pageId,
             viewrecords: true,
             onSelectRow: function (id) {
@@ -216,11 +218,75 @@ jQuery.fn.grid = function (opts) {
             thisButton = $(this);
             event.preventDefault();
             $.openIframeWindow({
-                width : thisButton.attr('window-width') ,
-                height : thisButton.attr('window-height') ,
-                title : thisButton.attr('window-title'),
                 url : thisButton.attr('href'),
-                parentComponent : componentId
+                parentComponent : componentId,
+                parentWindowName : window.name
+            },event);
+        });
+
+
+        _this.on('click','[data-action=mutiSelect]',function(event){
+            thisButton = $(this);
+            event.preventDefault();
+            var ids;
+            ids = _this.grid.jqGrid('getGridParam','selarrrow');
+
+            if(ids.length==0){
+                alert('请至少选择一项');
+                return;
+            }
+
+            var params = {};
+
+            if(thisButton.attr('params')!=""){
+                params = eval('('+thisButton.attr('params')+')');
+            }
+
+            params["ids"] = ids.toString();
+
+            if(confirm(thisButton.attr('confirmMsg'))){
+                $.post(thisButton.attr('href'),params,function(data){
+                    if(data.success){
+                        _this.grid.trigger("reloadGrid");
+                        alert(data.msg);
+                    }else{
+                        alert(data.msg);
+                    }
+                },'json');
+            }
+        });
+
+        _this.on('click','[data-action=mutiSelectIframeWindow]',function(event){
+
+            thisButton = $(this);
+            event.preventDefault();
+
+            var ids;
+            ids = _this.grid.jqGrid('getGridParam','selarrrow');
+
+            if(ids.length==0){
+                alert('请至少选择一项');
+                return;
+            }
+
+            var url = thisButton.attr('href');
+
+            if(url.lastIndexOf('?')>-1){
+                url += "&ids="+ids.toString();
+            }else{
+                url += "?ids="+ids.toString();
+            }
+
+            var params = eval('('+thisButton.attr('params')+')');
+
+            for(var prop in params){
+                url += "&" + prop + "=" + params[prop];
+            }
+
+            $.openIframeWindow({
+                url : url,
+                parentComponent : componentId,
+                parentWindowName : window.name
             },event);
         });
     }

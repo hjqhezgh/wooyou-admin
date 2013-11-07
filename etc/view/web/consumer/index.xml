@@ -12,7 +12,7 @@
         <search field="name" searchType="like" inputType="text" desc="客户姓名"/>
         <search field="mySort" searchType="eq" inputType="localSelect" desc="排序方式（默认按最后通话时间）" localData="[{desc:'按最后通话时间',value:'time'},{desc:'按频率',value:'frequency'}]"/>
 
-        <toolaction desc="添加客户" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green" width="800" height="600"/>
+        <toolaction desc="添加客户" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
 
         <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="所属顾问"/>
@@ -47,7 +47,7 @@
                 if(cellvalue){
                     return '是';
                 }else{
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="APP开户" href="/web/consumer/add_app_account?id='+options.rowId+'" data-action="openIframeWindow" window-width="800" window-height="600" window-title="">APP开户</a>';
+                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="APP开户" href="/web/consumer/add_app_account?id='+options.rowId+'" data-action="openIframeWindow">APP开户</a>';
                 }
                 ]]>
             </formatter>

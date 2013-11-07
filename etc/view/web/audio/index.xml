@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="电话录音精确查询" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel entity="audio" pageSize="20" title="电话录音" id="video-center" width="1200" height="400">
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="start_time" searchType="ge" inputType="datetime" desc="视频起始时间"/>
+        <search field="end_time" searchType="le" inputType="datetime" desc="视频结束时间"/>
+
+        <column field="center.name" desc="所属中心"/>
+        <column field="start_time" desc="起始时间"/>
+        <column field="is_upload_finish" desc="是否下载完成" hidden="true"/>
+        <column field="filename" desc="文件名">
+            <formatter>
+                <![CDATA[
+                    var value = '';
+                    if(rowObject[2]=='0'){
+                        value =  cellvalue + '&nbsp;';
+                    }else{
+                        value =  '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="http://117.29.168.34:8888/manage/audioDownload?filename='+cellvalue+'&centerId='+rowObject[6]+'&startTime='+rowObject[1]+'">'+cellvalue+'</a>' + '&nbsp;';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="seconds" desc="通话时长"/>
+        <column field="inout" desc="电话方向"/>
+        <column field="center.cid" desc="中心id" hidden="true"/>
+    </gridpanel>
+</viewport>

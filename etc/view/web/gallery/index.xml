@@ -54,8 +54,8 @@
             </formatter>
         </column>
 
-        <toolaction desc="添加" url="/web/gallery/add" linkType="iframeWindow" colorClass="h-bg-green" width="800" height="700"/>
-        <action desc="修改" url="/web/gallery/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]" width="800" height="700"/>
+        <toolaction desc="添加" url="/web/gallery/add" linkType="iframeWindow" colorClass="h-bg-green"/>
+        <action desc="修改" url="/web/gallery/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
         <action desc="删除" url="/web/gallery/delete.json" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>
     </customgridpanel>
 </viewport>

@@ -25,8 +25,8 @@
             </formatter>
         </column>
         <column field="phone_in_center" desc="联系电话"/>
-        <toolaction desc="添加" url="/web/employee/add" colorClass="h-bg-green" linkType="iframeWindow" width="800" height="530"/>
-        <action desc="修改" url="/web/employee/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow" width="800" height="530"/>
+        <toolaction desc="添加" url="/web/employee/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/employee/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
     </gridpanel>
 
 </viewport>

@@ -41,6 +41,23 @@
         <field name="filename" />
     </entity>
 
+    <!--电话录音-->
+    <entity id="audio">
+        <pk>aid</pk>
+        <field name="cid" />
+        <ref entity="center" field="cid" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="start_time" />
+        <field name="end_time" />
+        <field name="filename" />
+        <field name="localphone" />
+        <field name="remotephone" />
+        <field name="seconds" />
+        <field name="inout" />
+    </entity>
+
     <!--客户来源-->
     <entity id="come_from">
         <pk>id</pk>
