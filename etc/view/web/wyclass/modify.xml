@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport    window="true">
+    <formpanel entity="wyclass" id="form" title="修改班级" load="true"  inwindow="true">
+        <element field="assistant_id" type="remoteSelect" url="/web/employee/alldata" valueField="user_id" descField="really_name" desc="助手" />
+        <element field="name" type="text" desc="课程名" />
+        <element field="create_time" type="datetime" desc="创建时间"/>
+        <element field="course_id"  type="remoteSelect" url="/web/course/alldata" valueField="cid" descField="name" desc="课程" />
+        <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" />
+        <element field="end_time"  type="datetime" desc="班级结束日期" />
+        <element field="deadline"  type="datetime" desc="截止日期" />
+        <element field="max_child_num"  type="text" desc="小孩最大数目" />
+        <element field="teacher_id"  type="remoteSelect" url="/web/employee/alldata" valueField="user_id" descField="really_name" desc="老师" />
+    </formpanel>
+</viewport>

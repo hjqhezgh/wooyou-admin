@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="班级管理" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel  entity="wyclass" pageSize="15" title="班级信息" id="grid1" width="1200" height="350" mutiSelect="true">
+
+        <column field="a.really_name" desc="助手"/>
+        <column field="name" desc="班级名"/>
+        <column field="course.name" desc="课程名"/>
+        <column field="center.name" desc="中心"/>
+        <column field="end_time" desc="结束日期"/>
+        <column field="deadline" desc="截止日期"/>
+        <column field="max_child_num" desc="最多小孩个数"/>
+        <column field="b.really_name" desc="老师"/>
+        <toolaction desc="添加" url="/web/wyclass/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <toolaction desc="添加中心" url="/web/wyclass/add" colorClass="h-bg-green" linkType="mutiSelectIframeWindow" confirmMsg="确认呵呵吗？" params="{name:'hjq'}"/>
+        <action desc="修改" url="/web/wyclass/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+    </gridpanel>
+
+</viewport>

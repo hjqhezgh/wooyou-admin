@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="班级管理" currentPage="true"/>
+    </crumbs>
+
+    <gridpanel  entity="course" pageSize="15" title="课程信息" id="grid1" width="1200" height="350">
+
+        <column field="name" desc="助手"/>
+        <column field="center.name" desc="中心"/>
+        <column field="price" desc="价格"/>
+        <column field="is_probation" desc="是否促销">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue == 0) {
+                            return "否";
+                        } else if(cellvalue == 1){
+                            return '<span style="color:red">是</span>';
+                        }
+                ]]>
+             </formatter>
+        </column>
+
+
+        <column field="type" desc="课程类别">
+            <formatter>
+                <![CDATA[
+                            if(cellvalue == 1) {
+                                return "音乐类";
+                            } else if(cellvalue == 2){
+                                return "体育类"
+                            } else if(cellvalue == 3){
+                                return "英语类"
+                            } else if(cellvalue == 4){
+                                return "艺术类"
+                            }
+                ]]>
+            </formatter>
+        </column>
+
+        <column field="begin_age" desc="开始年龄(月)"/>
+        <column field="end_age" desc="结束年龄(月)"/>
+        <column field="intro" desc="课程介绍"/>
+        <column field="app_display_level" desc="APP显示优先级"/>
+        <column field="create_time" desc="创建时间"/>
+        <column field="lesson_num" desc="课节数目"/>
+
+        <toolaction desc="添加" url="/web/course/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/course/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+    </gridpanel>
+
+</viewport>
