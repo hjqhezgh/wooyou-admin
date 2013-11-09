@@ -22,6 +22,7 @@ import (
 	"strconv"
 )
 
+
 func main() {
 
 	r := lessgo.ConfigLessgo()
@@ -34,6 +35,8 @@ func main() {
 		r.HandleFunc(url, handler)
 	}
 
+	go server.ReportSend()
+
 	http.Handle("/", r)
 
 	http.Handle("/js/", http.FileServer(http.Dir("../static")))
@@ -43,6 +46,7 @@ func main() {
 	http.Handle("/artimg/", http.FileServer(http.Dir("../")))
 
 	fmt.Println("服务器监听", portString, "端口")
+	go server.UpdateVideoStatus()
 
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 

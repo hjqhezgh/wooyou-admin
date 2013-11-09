@@ -232,4 +232,53 @@
         <field name="is_carousel"/>
         <field name="carousel_image"/>
     </entity>
+
+    <entity id="wyclass">
+        <pk>class_id</pk>
+        <field name="assistant_id"/>
+        <ref entity="employee" alias="a" field="assistant_id" refEntityField="user_id">
+            <field name="user_id"/>
+            <field name="really_name"/>
+        </ref>
+        <field name="name"/>
+        <field name="create_time"/>
+        <field name="course_id"/>
+        <ref entity="course" field="course_id" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="center_id"/>
+        <ref entity="center" field="center_id" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="child_num"/>
+        <field name="end_time"/>
+        <field name="deadline"/>
+        <field name="max_child_num"/>
+        <field name="teacher_id"/>
+        <ref entity="employee" alias="b" field="teacher_id" refEntityField="user_id">
+            <field name="user_id"/>
+            <field name="really_name"/>
+        </ref>
+    </entity>
+
+    <!--中心-->
+    <entity id="course">
+        <pk>cid</pk>
+        <field name="name"/>
+        <ref entity="center" field="center_id" refEntityField="cid">
+            <field name="cid"/>
+            <field name="name"/>
+        </ref>
+        <field name="price"/>
+        <field name="is_probation"/>
+        <field name="type"/>
+        <field name="begin_age"/>
+        <field name="end_age"/>
+        <field name="intro"/>
+        <field name="app_display_level"/>
+        <field name="create_time"/>
+        <field name="lesson_num"/>
+    </entity>
 </entitys>
