@@ -152,7 +152,7 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " order by a.start_time desc  limit ?,?"
+	sql += " order by a.aid desc limit ?,?"
 
 	lessgo.Log.Debug(sql)
 
