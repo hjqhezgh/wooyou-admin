@@ -76,7 +76,7 @@ jQuery.fn.grid = function (opts) {
 
         _this.find('.checkbox-container').html('');
 
-        $.post(checkBoxLoadUrl,{},function(data){
+        $.get(checkBoxLoadUrl,{},function(data){
             if(data.success){
                 for(var i=0;i<data.datas.length;i++){
                     _this.find('.checkbox-container').append('<input type="checkbox" checked="checked" value="'+data.datas[i].value+'"/>'+data.datas[i].desc+'&nbsp;');
@@ -256,6 +256,8 @@ jQuery.fn.grid = function (opts) {
             _this.find('[data-field]').each(function(index,search){
                 if($(search).parent().attr("field-char14")=="true"){//清除时间格式为14位char入20130101121212
                     url+='&'+$(search).attr('name')+'-'+$(search).attr('data-searchType')+'='+$(search).val().replace(" ","").replace(new RegExp("-","gm"),"").replace(new RegExp(":","gm"),"");
+                }else if($(search).parent().attr("field-char8")=="true"){//清除时间格式为8位char入20130101
+                    url+='&'+$(search).attr('name')+'-'+$(search).attr('data-searchType')+'='+$(search).val().replace(" ","").replace(new RegExp("-","gm"),"").replace(new RegExp(":","gm"),"");
                 }else{
                     url+='&'+$(search).attr('name')+'-'+$(search).attr('data-searchType')+'='+$(search).val();
                 }
@@ -291,10 +293,13 @@ jQuery.fn.grid = function (opts) {
             }
 
             var cids = '';
+            var noids = '';
 
             _this.find('.checkbox-box').find(':checkbox').each(function(){
                 if($(this).prop('checked')){
                     cids += $(this).val()+",";
+                }else{
+                    noids += $(this).val()+",";
                 }
             });
 
@@ -302,7 +307,11 @@ jQuery.fn.grid = function (opts) {
                 cids = cids.substr(0,cids.length-1);
             }
 
-            $.post(checkBoxSaveUrl,{cids : cids},function(data){
+            if(noids){
+                noids = noids.substr(0,noids.length-1);
+            }
+
+            $.post(checkBoxSaveUrl,{cids : cids,noids : noids},function(data){
                 if(data.success){
                     alert(data.msg);
                     _this.loadCheckboxContainer();
@@ -482,4 +491,12 @@ String.prototype.formatChar14Time = function(){
     var second = this.substr(12,4);
 
     return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+}
+
+String.prototype.formatChar8Time = function(){
+    var year = this.substr(0,4);
+    var month = this.substr(4,2);
+    var day = this.substr(6,2);
+
+    return year+"-"+month+"-"+day;
 }

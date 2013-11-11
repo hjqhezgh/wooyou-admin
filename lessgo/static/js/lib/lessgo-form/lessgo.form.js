@@ -64,9 +64,23 @@ jQuery.fn.form = function (opts) {
 
         //日期域
         myform.find('[field-type=date]').each(function(index,element){
+            var displayValue = "";
+
+            if($(element).attr('field-char8')=="true"){
+                if($(element).attr('field-value')){
+                    var year = $(element).attr('field-value').substr(0,4);
+                    var month = $(element).attr('field-value').substr(4,2);
+                    var day = $(element).attr('field-value').substr(6,2);
+
+                    displayValue = year+"-"+month+"-"+day;
+                }
+            }else{
+                displayValue =  $(element).attr('field-value');
+            }
+
             $(element).append(juicer(textFieldTemp,{
                 fieldName:$(element).attr('field-name'),
-                fieldValue:$(element).attr('field-value'),
+                fieldValue:displayValue,
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
                 fieldTip:$(element).attr('field-tip'),
@@ -466,6 +480,8 @@ jQuery.fn.form = function (opts) {
                 if(_this.validate($(field))){
 
                     if($(field).parent().parent().attr("field-char14")=="true"){//清楚时间格式为14位char入20130101121212
+                        params[$(field).attr('name')] = $(field).val().replace(" ","").replace(new RegExp("-","gm"),"").replace(new RegExp(":","gm"),"");
+                    }else if($(field).parent().parent().attr("field-char8")=="true"){//清楚时间格式为8位char入20130101
                         params[$(field).attr('name')] = $(field).val().replace(" ","").replace(new RegExp("-","gm"),"").replace(new RegExp(":","gm"),"");
                     }else{
                         params[$(field).attr('name')] = $(field).val();
