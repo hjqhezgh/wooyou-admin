@@ -26,6 +26,9 @@
                      field-url="{{$search.Url}}"
                      field-valueField="{{$search.ValueField}}"
                      field-descField="{{$search.DescField}}"
+
+                     field-char14="{{$search.Char14}}"
+                     field-parentSelect="{{$search.ParentSelect}}"
                         >
                 </div>
                 {{end}}
@@ -34,6 +37,18 @@
                     <a href="javascript:void(0)" data-action="reset"  class="btn">重置</a>
                 </div>
             </form>
+            {{end}}
+
+            {{if compareString .Gridpanel.Checkboxtool.Desc ""}}
+            {{else}}
+            <fieldset class="checkbox-box" data-loadUrl="{{.Gridpanel.Checkboxtool.LoadUrl}}" data-saveUrl="{{.Gridpanel.Checkboxtool.SaveUrl}}">
+                <legend>{{.Gridpanel.Checkboxtool.Desc}}</legend>
+                <div class="checkbox-container">
+                </div>
+                <div class="inline">
+                    <a href="javascript:void(0)" data-action="checkboxSave" class="btn btn-primary">保存</a>
+                </div>
+            </fieldset>
             {{end}}
 
             <div class="btn-box">
@@ -49,6 +64,10 @@
                 {{end}}
                 {{if compareString $toolAction.LinkType "mutiSelectIframeWindow"}}
                 <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-action="mutiSelectIframeWindow" params="{{$toolAction.Params}}">{{$toolAction.Desc}}</a>
+                {{end}}
+
+                {{if compareString $toolAction.LinkType "addToCheckBox"}}
+                <a href="#" class="{{$toolAction.ColorClass}}" data-action="addToCheckBox" checkboxDesc="{{$toolAction.CheckboxDesc}}">{{$toolAction.Desc}}</a>
                 {{end}}
                 {{end}}
             </div><!--E btn-box-->
@@ -109,24 +128,24 @@
                     url : '{{$action.Url}}',
                     actionParams : "{{$action.ActionParams}}"
                 }
-                value += gridActionRender(cellvalue, options, rowObject,action);
+                value += gridActionRender(cellvalue, options, rowObject,action,'{{$id}}');
                 {{end}}
                 return value;
             }
         });
         {{$id}}ColumnNames.push('操作');
 
-        var dataUrl = '/{{.Terminal}}/{{$entity.Id}}/page?componentId={{.Gridpanel.Id}}'
+        var {{$id}}DataUrl = '/{{.Terminal}}/{{$entity.Id}}/page?componentId={{.Gridpanel.Id}}'
         {{if compareString .Gridpanel.LoadUrl "true"}}
         if(document.URL.lastIndexOf('?')>-1){
-            dataUrl = dataUrl + "&"+ document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+            {{$id}}DataUrl = {{$id}}DataUrl + "&"+ document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
         }
         {{end}}
 
         $('#{{$id}}').grid({
             tableId : '{{$tableId}}',
             pageId : '{{$pageId}}',
-            dataurl: dataUrl,
+            dataurl: {{$id}}DataUrl,
             colNames:{{$id}}ColumnNames,
             width:{{$id}}Width,
             height:{{.Gridpanel.Height}},

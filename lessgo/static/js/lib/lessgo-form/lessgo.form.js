@@ -83,9 +83,26 @@ jQuery.fn.form = function (opts) {
 
         //时间域
         myform.find('[field-type=datetime]').each(function(index,element){
+            var displayValue = "";
+
+            if($(element).attr('field-char14')=="true"){
+                if($(element).attr('field-value')){
+                    var year = $(element).attr('field-value').substr(0,4);
+                    var month = $(element).attr('field-value').substr(4,2);
+                    var day = $(element).attr('field-value').substr(6,2);
+                    var hour = $(element).attr('field-value').substr(8,2);
+                    var minute = $(element).attr('field-value').substr(10,2);
+                    var second = $(element).attr('field-value').substr(12,4);
+
+                    displayValue = year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+                }
+            }else{
+                displayValue =  $(element).attr('field-value');
+            }
+
             $(element).append(juicer(textFieldTemp,{
                 fieldName:$(element).attr('field-name'),
-                fieldValue:$(element).attr('field-value'),
+                fieldValue:displayValue,
                 fieldDesc:$(element).attr('field-desc'),
                 fieldReadOnly:$(element).attr('field-readonly'),
                 fieldTip:$(element).attr('field-tip'),
@@ -116,6 +133,14 @@ jQuery.fn.form = function (opts) {
                 $(element).find('input').timepicker();
             }
 
+        });
+
+        //本地下拉框
+        myform.find('[field-type=currentTime]').each(function(index,element){
+            $(element).append(juicer(hiddenFieldTemp,{
+                fieldName:$(element).attr('field-name'),
+                fieldValue:""
+            }));
         });
 
         //本地下拉框
@@ -173,25 +198,109 @@ jQuery.fn.form = function (opts) {
                 desc:'全部'
             }));
 
-            $.get(url,{},function(data){
-                if(data.success){
-                    var objects = data.datas;
+            if($(element).attr('field-parentSelect')){
 
-                    for(var i=0;i<objects.length;i++){
-                        select.append(juicer(optionTemp,{
-                            value:objects[i][valueField],
-                            desc:objects[i][descField]
-                        }));
-                    }
+                if(value){
+                    var parentValue = value.split(',')[0];
+                    var thisValue = value.split(',')[1];
 
-                    if(value){
-                        select.find("option[value="+value+"]").attr("selected","selected");
-                    }
+                    $.get(url,{id :parentValue},function(data){
+                        if(data.success){
+                            var objects = data.datas;
 
-                } else{
-                    alert(data.msg);
+                            for(var i=0;i<objects.length;i++){
+                                select.append(juicer(optionTemp,{
+                                    value:objects[i][valueField],
+                                    desc:objects[i][descField]
+                                }));
+                            }
+
+                            if(value){
+                                select.find("option[value="+thisValue+"]").attr("selected","selected");
+                            }
+
+                            myform.find('[name='+$(element).attr('field-parentSelect')+']').change(function(){
+                                var parentValue = $(this).val();
+                                if(!parentValue){//父级下拉框没有值，则清空子级下拉框
+                                    select.html('<option value="">全部</option>');
+                                }else{
+                                    select.html('<option value="">全部</option>');
+                                    $.get(url,{id :parentValue },function(data){
+                                        if(data.success){
+                                            var objects = data.datas;
+
+                                            for(var i=0;i<objects.length;i++){
+                                                select.append(juicer(optionTemp,{
+                                                    value:objects[i][valueField],
+                                                    desc:objects[i][descField]
+                                                }));
+                                            }
+
+                                            if(value){
+                                                select.find("option[value="+value+"]").attr("selected","selected");
+                                            }
+
+                                        } else{
+                                            alert(data.msg);
+                                        }
+                                    },'json');
+                                }
+                            });
+
+                        } else{
+                            alert(data.msg);
+                        }
+                    },'json');
+                }else{
+                    myform.find('[name='+$(element).attr('field-parentSelect')+']').change(function(){
+                        var parentValue = $(this).val();
+                        if(!parentValue){//父级下拉框没有值，则清空子级下拉框
+                            select.html('<option value="">全部</option>');
+                        }else{
+                            select.html('<option value="">全部</option>');
+                            $.get(url,{id :parentValue },function(data){
+                                if(data.success){
+                                    var objects = data.datas;
+
+                                    for(var i=0;i<objects.length;i++){
+                                        select.append(juicer(optionTemp,{
+                                            value:objects[i][valueField],
+                                            desc:objects[i][descField]
+                                        }));
+                                    }
+
+                                    if(value){
+                                        select.find("option[value="+value+"]").attr("selected","selected");
+                                    }
+
+                                } else{
+                                    alert(data.msg);
+                                }
+                            },'json');
+                        }
+                    });
                 }
-            },'json');
+            }else{
+                $.get(url,{},function(data){
+                    if(data.success){
+                        var objects = data.datas;
+
+                        for(var i=0;i<objects.length;i++){
+                            select.append(juicer(optionTemp,{
+                                value:objects[i][valueField],
+                                desc:objects[i][descField]
+                            }));
+                        }
+
+                        if(value){
+                            select.find("option[value="+value+"]").attr("selected","selected");
+                        }
+
+                    } else{
+                        alert(data.msg);
+                    }
+                },'json');
+            }
 
         });
 
@@ -355,7 +464,12 @@ jQuery.fn.form = function (opts) {
 
             myform.find('[data-field]').each(function(index,field){
                 if(_this.validate($(field))){
-                    params[$(field).attr('name')] = $(field).val();
+
+                    if($(field).parent().parent().attr("field-char14")=="true"){//清楚时间格式为14位char入20130101121212
+                        params[$(field).attr('name')] = $(field).val().replace(" ","").replace(new RegExp("-","gm"),"").replace(new RegExp(":","gm"),"");
+                    }else{
+                        params[$(field).attr('name')] = $(field).val();
+                    }
                 }else{
                     flag = false;
                     return false;

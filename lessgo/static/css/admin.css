@@ -89,3 +89,8 @@ ul,li{ list-style:none;margin:0; padding:0;}
 .input-box .cbox{margin-right: 0;}
 .leftcon {z-index: 19900000;position:absolute;}/*使菜单栏可以高于弹窗的遮罩层*/
 .form-horizontal div.form-buttons{background: #fff;margin:0;padding-bottom:20px;}/*使表单弹窗的保存按钮可以固定位置*/
+/*2013.11.9，表格添加复选工具栏*/
+.checkbox-box{text-align: left;margin-bottom:10px; width:97%;padding: 10px;}
+.checkbox-box input{margin:0;}
+.checkbox-box legend{font-size: 14px;border: 0;margin: 0px;line-height:20px;width:auto;}
+.checkbox-box .checkbox-container{padding: 5px;}

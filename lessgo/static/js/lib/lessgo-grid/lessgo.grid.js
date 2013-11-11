@@ -50,17 +50,41 @@ jQuery.fn.grid = function (opts) {
             }
         }).navGrid('#' + opts.pageId, {edit: false, add: false, del: false, search: false});
 
-        //todo 表格多选框效果，有空了再做吧
-        /*
-        $('#' + opts.tableId).on('click','input[data-action=gird-checkbox]',function(){
-            if($(this).prop('checked')){
-                jQuery('#' + opts.tableId).jqGrid('setSelection',$(this).val(),false)
-            }
-        });*/
+        //渲染多选框区域
+        if(_this.find('.checkbox-box').size()>0){
+            this.loadCheckboxContainer();
+        }
 
         this.renderSearchForm();
 
         this.bindButtonEvent();
+    }
+
+    this.loadCheckboxContainer = function(){
+        var checkBoxLoadUrl = _this.find('.checkbox-box').attr('data-loadUrl');
+
+        if(document.URL.lastIndexOf('?')>-1){
+
+            if(checkBoxLoadUrl.lastIndexOf('?')>-1){
+                checkBoxLoadUrl += "&"
+            }else{
+                checkBoxLoadUrl += "?"
+            }
+
+            checkBoxLoadUrl += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+        }
+
+        _this.find('.checkbox-container').html('');
+
+        $.post(checkBoxLoadUrl,{},function(data){
+            if(data.success){
+                for(var i=0;i<data.datas.length;i++){
+                    _this.find('.checkbox-container').append('<input type="checkbox" checked="checked" value="'+data.datas[i].value+'"/>'+data.datas[i].desc+'&nbsp;');
+                }
+            }else{
+                alert(data.msg);
+            }
+        },'json');
     }
 
     this.renderSearchForm = function(){
@@ -146,25 +170,55 @@ jQuery.fn.grid = function (opts) {
                 desc:'全部'
             }));
 
-            $.get(url,{},function(data){
-                if(data.success){
-                    var objects = data.datas;
+            if($(element).attr('field-parentSelect')){
+                myform.find('[name='+$(element).attr('field-parentSelect')+']').change(function(){
+                    var parentValue = $(this).val();
+                    if(!parentValue){//父级下拉框没有值，则清空子级下拉框
+                        select.html('<option value="">全部</option>');
+                    }else{
+                        select.html('<option value="">全部</option>');
+                        $.get(url,{id :parentValue },function(data){
+                            if(data.success){
+                                var objects = data.datas;
 
-                    for(var i=0;i<objects.length;i++){
-                        select.append(juicer(optionTemp,{
-                            value:objects[i][valueField],
-                            desc:objects[i][descField]
-                        }));
+                                for(var i=0;i<objects.length;i++){
+                                    select.append(juicer(optionTemp,{
+                                        value:objects[i][valueField],
+                                        desc:objects[i][descField]
+                                    }));
+                                }
+
+                                if(value){
+                                    select.find("option[value="+value+"]").attr("selected","selected");
+                                }
+
+                            } else{
+                                alert(data.msg);
+                            }
+                        },'json');
                     }
+                });
+            }else{
+                $.get(url,{},function(data){
+                    if(data.success){
+                        var objects = data.datas;
 
-                    if(value){
-                        select.find("option[value="+value+"]").attr("selected","selected");
+                        for(var i=0;i<objects.length;i++){
+                            select.append(juicer(optionTemp,{
+                                value:objects[i][valueField],
+                                desc:objects[i][descField]
+                            }));
+                        }
+
+                        if(value){
+                            select.find("option[value="+value+"]").attr("selected","selected");
+                        }
+
+                    } else{
+                        alert(data.msg);
                     }
-
-                } else{
-                    alert(data.msg);
-                }
-            },'json');
+                },'json');
+            }
 
         });
 
@@ -200,7 +254,11 @@ jQuery.fn.grid = function (opts) {
             var url = opts.dataurl;
 
             _this.find('[data-field]').each(function(index,search){
-                url+='&'+$(search).attr('name')+'-'+$(search).attr('data-searchType')+'='+$(search).val();
+                if($(search).parent().attr("field-char14")=="true"){//清除时间格式为14位char入20130101121212
+                    url+='&'+$(search).attr('name')+'-'+$(search).attr('data-searchType')+'='+$(search).val().replace(" ","").replace(new RegExp("-","gm"),"").replace(new RegExp(":","gm"),"");
+                }else{
+                    url+='&'+$(search).attr('name')+'-'+$(search).attr('data-searchType')+'='+$(search).val();
+                }
             });
 
             $('#' + opts.tableId).jqGrid('setGridParam',{url:url,page:1}).trigger("reloadGrid");
@@ -208,12 +266,53 @@ jQuery.fn.grid = function (opts) {
         });
 
         this.find('a[data-action=reset]').click(function(){
+            _this.find('form').find('[field-parentSelect!=""]').find('select').html('<option value="">全部</option>');
             _this.find('form')[0].reset();
         });
 
     }
 
     this.bindButtonEvent = function(){
+
+        _this.on('click','[data-action=checkboxSave]',function(event){
+            thisButton = $(this);
+            event.preventDefault();
+            var checkBoxSaveUrl = _this.find('.checkbox-box').attr('data-saveUrl');
+
+            if(document.URL.lastIndexOf('?')>-1){
+
+                if(checkBoxSaveUrl.lastIndexOf('?')>-1){
+                    checkBoxSaveUrl += "&"
+                }else{
+                    checkBoxSaveUrl += "?"
+                }
+
+                checkBoxSaveUrl += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+            }
+
+            var cids = '';
+
+            _this.find('.checkbox-box').find(':checkbox').each(function(){
+                if($(this).prop('checked')){
+                    cids += $(this).val()+",";
+                }
+            });
+
+            if(cids){
+                cids = cids.substr(0,cids.length-1);
+            }
+
+            $.post(checkBoxSaveUrl,{cids : cids},function(data){
+                if(data.success){
+                    alert(data.msg);
+                    _this.loadCheckboxContainer();
+                }else{
+                    alert(data.msg);
+                }
+            },'json');
+        });
+
+
         _this.on('click','[data-action=openIframeWindow]',function(event){
             thisButton = $(this);
             event.preventDefault();
@@ -289,6 +388,27 @@ jQuery.fn.grid = function (opts) {
                 parentWindowName : window.name
             },event);
         });
+
+
+        _this.on('click','[data-action=addToCheckBox]',function(event){
+            thisButton = $(this);
+            event.preventDefault();
+
+            var ids;
+            ids = _this.grid.jqGrid('getGridParam','selarrrow');
+
+            if(ids.length==0){
+                alert('请至少选择一项');
+                return;
+            }
+
+            for(var i=0;i<ids.length;i++){
+                if(_this.find('.checkbox-container').find(':checkbox[value='+ids[i]+']').size()<=0){
+                    _this.find('.checkbox-container').append('<input type="checkbox" checked="checked" value="'+ids[i]+'"/>'+_this.grid.jqGrid('getRowData',ids[i])[thisButton.attr('checkboxDesc')]+'&nbsp;');
+                }
+            }
+
+        });
     }
 
     this.render();
@@ -299,7 +419,7 @@ jQuery.fn.grid = function (opts) {
 /*****
  * 表格操作列渲染器
  **/
-function gridActionRender(cellvalue, options, rowObject,action) {
+function gridActionRender(cellvalue, options, rowObject,action,componentId) {
 
     var params = "";
 
@@ -315,7 +435,17 @@ function gridActionRender(cellvalue, options, rowObject,action) {
             if(action.actionParams[i].value=="id"){
                 params += options.rowId;
             }else{
-                params += rowObject[action.actionParams[i].value];
+                var reg = new RegExp("^[0-9]*$");
+                if(!reg.test(action.actionParams[i].value)){//支持列名形式
+                    //todo 发现行不通。控件还没加载到相应数据
+                    /*
+                    for (var j in rowObject){
+                        alert(j)
+                    }
+                    params += window[componentId].grid.jqGrid('getRowData',10)['name'];*/
+                }else{//支持索引形式
+                    params += rowObject[action.actionParams[i].value];
+                }
             }
         }
 
@@ -341,4 +471,15 @@ function gridActionRender(cellvalue, options, rowObject,action) {
             title : action.title
         });
     }
+}
+
+String.prototype.formatChar14Time = function(){
+    var year = this.substr(0,4);
+    var month = this.substr(4,2);
+    var day = this.substr(6,2);
+    var hour = this.substr(8,2);
+    var minute = this.substr(10,2);
+    var second = this.substr(12,4);
+
+    return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
 }
