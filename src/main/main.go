@@ -115,6 +115,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//课程信息相关服务
 	"/course.json": server.CourseListAction,
+	"/web/course/save.json": server.CourseSaveAction,
+	"/web/course/load.json": server.CourseLoadAction,
 	"/courseByCenterId.json": server.CourseByCenterIdListAction,
 	"/time_section.json": server.TimeSectionListAction,
 	"/class_schedule_detail.json": server.ClassScheduleDetailListAction,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
-    <formpanel entity="course" id="form" title="添加课程" inwindow="true">
+    <customformpanel id="form" title="添加课程" saveUrl="/web/course/save.json" load="false" loadUrl="" inwindow="true">
         <element field="name"  type="text" desc="课程名" validate="notNull"/>
         <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
         <element field="price"  type="text" desc="价格" validate="notNull"/>
@@ -12,5 +12,6 @@
         <element field="app_display_level"  type="hidden" defaultValue="0" />
         <element field="create_time"  type="currentTime" desc="创建时间" char14="true"/>
         <element field="lesson_num"  type="text" desc="课节数目" validate="notNull"/>
-    </formpanel>
+        <element field="courseImg" type="image" imageType="png" desc="课程图片" tip="大小：480*230"/>
+    </customformpanel>
 </viewport>

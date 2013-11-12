@@ -22,6 +22,9 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
+	"os"
+	"io"
 )
 
 func CourseListAction(w http.ResponseWriter, r *http.Request) {
@@ -275,4 +278,312 @@ func CourseByCenterIdListAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.OutputJson(w, m, " ")
 	return
+}
+
+func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("id")
+	name := r.FormValue("name")
+	center_id := r.FormValue("center_id")
+	price := r.FormValue("price")
+	is_probation := r.FormValue("is_probation")
+	typeString := r.FormValue("type")
+	begin_age := r.FormValue("begin_age")
+	end_age := r.FormValue("end_age")
+	intro := r.FormValue("intro")
+	app_display_level := r.FormValue("app_display_level")
+	lesson_num := r.FormValue("lesson_num")
+	courseTmpImg := r.FormValue("courseImg")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	if id == "" {
+		sql := "insert into course(name,center_id,price,is_probation,type,begin_age,end_age,intro,app_display_level,create_time,lesson_num) values(?,?,?,?,?,?,?,?,?,?,?)"
+
+		lessgo.Log.Debug(sql)
+
+		stmt, err := db.Prepare(sql)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		res, err := stmt.Exec(name, center_id, price, is_probation, typeString, begin_age, end_age, intro,app_display_level,time.Now().Format("20060102150405"),lesson_num)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		courseId ,err := res.LastInsertId()
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		tmpFile, err := os.OpenFile(".."+courseTmpImg, os.O_RDWR, 0777)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		courseImgDir ,err := lessgo.Config.GetValue("wooyou", "courseImgDir")
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		err = os.MkdirAll(fmt.Sprint(courseImgDir+"/",courseId), 0777)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		disFile, err := os.Create(fmt.Sprint(courseImgDir+"/",courseId,"/480_230.png"))
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		io.Copy(disFile, tmpFile)
+
+		os.Remove(".."+courseTmpImg)
+
+		m["success"] = true
+		commonlib.OutputJson(w, m, " ")
+	} else {
+
+		sql := "update course set name=?,center_id=?,price=?,is_probation=?,type=?,begin_age=?,end_age=?,intro=?,lesson_num=? where cid=? "
+
+		lessgo.Log.Debug(sql)
+
+		stmt, err := db.Prepare(sql)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(name, center_id, price, is_probation, typeString, begin_age, end_age, intro,lesson_num,id)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+
+		if courseTmpImg != "" {
+			tmpFile, err := os.OpenFile(".."+courseTmpImg, os.O_RDWR, 0777)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			courseImgDir ,err := lessgo.Config.GetValue("wooyou", "courseImgDir")
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			err = os.MkdirAll(fmt.Sprint(courseImgDir+"/",id), 0777)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			disFile, err := os.Create(fmt.Sprint(courseImgDir+"/",id,"/480_230.png"))
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			io.Copy(disFile, tmpFile)
+
+			os.Remove(".."+courseTmpImg)
+		}
+
+
+		m["success"] = true
+		commonlib.OutputJson(w, m, " ")
+	}
+
+}
+
+
+func CourseLoadAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("id")
+
+	sql := "select name,center_id,price,is_probation,type,begin_age,end_age,intro,lesson_num from course where cid=? "
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, id)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	var name, centerId, price, isProbation, typeString, beginAge, endAge,intro,lessonNum string
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &name, &centerId, &price, &isProbation, &typeString, &beginAge, &endAge, &intro, &lessonNum)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	m["success"] = true
+
+	loadFormObjects := []lessgo.LoadFormObject{}
+
+	h1 := lessgo.LoadFormObject{"id", id}
+	h2 := lessgo.LoadFormObject{"name", name}
+	h3 := lessgo.LoadFormObject{"center_id", centerId}
+	h4 := lessgo.LoadFormObject{"price", price}
+	h5 := lessgo.LoadFormObject{"is_probation", isProbation}
+	h6 := lessgo.LoadFormObject{"type", typeString}
+	h7 := lessgo.LoadFormObject{"begin_age", beginAge}
+	h8 := lessgo.LoadFormObject{"end_age", endAge}
+	h9 := lessgo.LoadFormObject{"intro", intro}
+	h10 := lessgo.LoadFormObject{"lesson_num", lessonNum}
+	h11 := lessgo.LoadFormObject{"courseImg", "http://tp4.sinaimg.cn/1684491115/180/5668832909/1"}
+
+	loadFormObjects = append(loadFormObjects, h1)
+	loadFormObjects = append(loadFormObjects, h2)
+	loadFormObjects = append(loadFormObjects, h3)
+	loadFormObjects = append(loadFormObjects, h4)
+	loadFormObjects = append(loadFormObjects, h5)
+	loadFormObjects = append(loadFormObjects, h6)
+	loadFormObjects = append(loadFormObjects, h7)
+	loadFormObjects = append(loadFormObjects, h8)
+	loadFormObjects = append(loadFormObjects, h9)
+	loadFormObjects = append(loadFormObjects, h10)
+	loadFormObjects = append(loadFormObjects, h11)
+
+	m["datas"] = loadFormObjects
+	commonlib.OutputJson(w, m, " ")
 }
