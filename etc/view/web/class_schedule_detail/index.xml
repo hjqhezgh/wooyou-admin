@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="课程管理" url="javascript:void(0);"/>
+        <crumb text="课表管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/class_schedule_detail.json" pageSize="15" title="课表管理" id="grid1" width="1200" height="350" loadUrl="false">
+
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="day_date" searchType="ge" inputType="date" desc="起始时间" char8="true" />
+        <search field="day_date" searchType="le" inputType="date" desc="结束时间" char8="true" />
+
+        <column field="center.name" desc="所属中心"/>
+        <column field="class_id" desc="班级名"/>
+        <column field="teacher_id" desc="老师名"/>
+        <column field="assistant_id" desc="助教名"/>
+        <column field="course_id" desc="课程名"/>
+        <column field="lesson_id" desc="课节标题"/>
+        <column field="room_id" desc="上课教室"/>
+        <column field="start_time" desc="上课时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        } else{
+                            return '';
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="end_time" desc="下课时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        } else{
+                            return '';
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="week" desc="星期">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue =="1") {
+                            return "星期一";
+                        } else if(cellvalue =="2") {
+                             return "星期二";
+                        }else if(cellvalue =="3") {
+                             return "星期三";
+                        }else if(cellvalue =="4") {
+                             return "星期四";
+                        }else if(cellvalue =="5") {
+                             return "星期五";
+                        }else if(cellvalue =="6") {
+                             return "星期六";
+                        }else if(cellvalue =="7") {
+                             return "星期天";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="capacity" desc="课程容量"/>
+        <column field="status" desc="状态">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue =="1") {
+                            return "未上课";
+                        } else if(cellvalue =="2") {
+                             return "正在上课";
+                        }else if(cellvalue =="3") {
+                             return "课程回顾";
+                        }
+                ]]>
+            </formatter>
+        </column>
+
+        <toolaction desc="添加" url="/web/class_schedule_detail/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/class_schedule_detail/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+    </customgridpanel>
+
+</viewport>

@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"strings"
 )
 
 /*****
@@ -63,7 +64,9 @@ func NewsImageUplaodAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newFileName := findRandomFileName(header.Filename)
+	suffix := commonlib.Substr(header.Filename, strings.LastIndex(header.Filename, ".")+1, len(header.Filename))
+
+	newFileName := findRandomFileName(header.Filename)+"."+suffix
 
 	f, err := os.Create(newsImgDir+"/" + newFileName)
 

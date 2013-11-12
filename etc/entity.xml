@@ -233,6 +233,7 @@
         <field name="carousel_image"/>
     </entity>
 
+    <!--班级-->
     <entity id="wyclass">
         <pk>class_id</pk>
         <field name="assistant_id"/>
@@ -263,7 +264,7 @@
         </ref>
     </entity>
 
-    <!--中心-->
+    <!--课程-->
     <entity id="course">
         <pk>cid</pk>
         <field name="name"/>
@@ -280,5 +281,63 @@
         <field name="app_display_level"/>
         <field name="create_time"/>
         <field name="lesson_num"/>
+    </entity>
+
+
+    <entity id="child">
+        <pk>cid</pk>
+        <field name="name" />
+        <field name="card_id" />
+        <field name="pid" />
+        <field name="sex" />
+        <field name="birthday" />
+        <field name="hobby" />
+        <field name="center_id" />
+        <field name="avatar" />
+    </entity>
+
+    <entity id="lesson">
+        <pk>lid</pk>
+        <field name="course_id" />
+        <field name="caption" />
+        <field name="teacher_id" />
+        <ref entity="employee" field="teacher_id" refEntityField="user_id">
+            <field name="user_id"/>
+            <field name="really_name"/>
+        </ref>
+        <field name="keystone" />
+        <field name="lesson_time" />
+        <field name="order_no" />
+        <field name="is_last" />
+    </entity>
+
+    <entity id="time_section">
+        <pk>id</pk>
+        <field name="center_id" />
+        <field name="start_time" />
+        <field name="end_time" />
+        <field name="lesson_no" />
+    </entity>
+
+    <entity id="class_schedule_detail">
+        <pk>id</pk>
+        <field name="center_id" />
+        <field name="class_id" />
+        <field name="teacher_id" />
+        <field name="assistant_id" />
+        <field name="course_id" />
+        <field name="lesson_id" />
+        <field name="center_id" />
+        <field name="time_id" />
+        <field name="room_id" />
+        <field name="day_date" />
+        <field name="week" />
+        <field name="capacity" />
+        <field name="start_time" />
+        <field name="end_time" />
+        <field name="end_time" />
+        <field name="status" />
+        <field name="real_start_time" />
+        <field name="real_end_time" />
     </entity>
 </entitys>

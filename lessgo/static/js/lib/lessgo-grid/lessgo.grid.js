@@ -325,8 +325,25 @@ jQuery.fn.grid = function (opts) {
         _this.on('click','[data-action=openIframeWindow]',function(event){
             thisButton = $(this);
             event.preventDefault();
+
+            var url = thisButton.attr('href');
+
+            if(document.URL.lastIndexOf('?')>-1){
+
+                if(url.lastIndexOf('?')>-1){
+                    url += "&"
+                }else{
+                    url += "?"
+                }
+
+                url += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+            }
+
+            url = url.replace(new RegExp("parentComponent","gm"),"pastComponent");
+            url = url.replace(new RegExp("parentWindowName","gm"),"pastWindowName");
+
             $.openIframeWindow({
-                url : thisButton.attr('href'),
+                url : url,
                 parentComponent : componentId,
                 parentWindowName : window.name
             },event);
@@ -352,8 +369,21 @@ jQuery.fn.grid = function (opts) {
 
             params["ids"] = ids.toString();
 
+            var url = thisButton.attr('href');
+
+            if(document.URL.lastIndexOf('?')>-1){
+
+                if(url.lastIndexOf('?')>-1){
+                    url += "&"
+                }else{
+                    url += "?"
+                }
+
+                url += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+            }
+
             if(confirm(thisButton.attr('confirmMsg'))){
-                $.post(thisButton.attr('href'),params,function(data){
+                $.get(url,params,function(data){
                     if(data.success){
                         _this.grid.trigger("reloadGrid");
                         alert(data.msg);

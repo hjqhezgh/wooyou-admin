@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="课程管理" url="javascript:void(0);"/>
+        <crumb text="时间段管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/time_section.json" pageSize="15" title="时间段管理" id="grid1" width="1200" height="350" loadUrl="false">
+
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+
+        <column field="center.name" desc="所属中心"/>
+        <column field="start_time" desc="起始时间"/>
+        <column field="end_time" desc="结束时间" />
+        <column field="lesson_no" desc="课节号"/>
+
+        <toolaction desc="添加" url="/web/time_section/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/time_section/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+    </customgridpanel>
+
+</viewport>

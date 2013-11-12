@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="添加课表" saveUrl="/class_schedule_detail/save.json" load="false" loadUrl="" inwindow="true">
+        <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
+        <element field="class_id"  type="remoteSelect" url="/classByCenterId.json" valueField="classId" descField="name" desc="班级" validate="notNull" parentSelect="center_id"/>
+        <element field="lesson_id"  type="remoteSelect" url="/lessonByClassId.json" valueField="value" descField="desc" desc="课节" validate="notNull" parentSelect="class_id"/>
+        <element field="day_date"  type="date" desc="上课日期" char8="true" validate="notNull"/>
+        <element field="time_id"  type="remoteSelect" url="/timeSectionByCenterId.json" valueField="value" descField="desc" desc="时间段" validate="notNull" parentSelect="center_id"/>
+        <element field="room_id"  type="remoteSelect" url="/roomByCenterId.json" valueField="value" descField="desc" desc="教室" validate="notNull" parentSelect="center_id"/>
+        <element field="status"  type="hidden" defaultValue="1"/>
+        <element field="teacher_id"  type="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="老师" validate="notNull" parentSelect="center_id"/>
+        <element field="assistant_id"  type="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="助手" validate="notNull" parentSelect="center_id"/>
+        <element field="capacity"  type="text" desc="人数容量"/>
+    </customformpanel>
+</viewport>

@@ -1,16 +1,16 @@
-// Title：客户列表数据
+// Title：
 //
 // Description:
 //
 // Author:black
 //
-// Createtime:2013-09-26 15:50
+// Createtime:2013-11-12 09:25
 //
 // Version:1.0
 //
 // 修改历史:版本号 修改日期 修改人 修改说明
 //
-// 1.0 2013-09-26 15:50 black 创建文档
+// 1.0 2013-11-12 09:25 black 创建文档
 package server
 
 import (
@@ -25,8 +25,7 @@ import (
 	"time"
 )
 
-//客户分页数据服务
-func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
+func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -49,11 +48,8 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
 			dataType = "all"
 			break
-		} else if roleId == "2" {
+		} else {
 			dataType = "center"
-			break
-		} else if roleId == "" {
-			dataType = "self"
 		}
 	}
 
@@ -86,20 +82,15 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	mySort := r.FormValue("mySort-eq")
-	name := r.FormValue("name-like")
 	centerId := r.FormValue("cid-eq")
+	st := r.FormValue("day_date-ge")
+	et := r.FormValue("day_date-le")
 
 	params := []interface{}{}
 
-	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime,c.contact_status,c.parent_id from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
-
-	if name != "" {
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		sql += " and c.mother like ? or c.father like ? or c.child like ? "
-	}
+	sql := "select csd.id,ce.name as centerName,wy.name as className,teacher.really_name as teacherName,assistant.really_name as assistantName,cour.name as courseName,les.caption,r.name,csd.start_time,csd.end_time,csd.week,csd.capacity,csd.status "
+	sql += " from class_schedule_detail csd left join center ce on ce.cid=csd.center_id left join employee teacher on teacher.user_id=csd.teacher_id left join employee assistant on assistant.user_id=csd.assistant_id "
+	sql += " left join course cour on cour.cid=csd.course_id left join lesson les on les.lid=csd.lesson_id left join room r on r.rid=csd.room_id left join wyclass wy on wy.class_id=csd.class_id where 1=1 "
 
 	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
@@ -115,14 +106,19 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and ce.cid=? "
 	}
 
-	if dataType == "self" {
-		params = append(params, employee.UserId)
-		sql += " and e.user_id=? "
-	}
-
 	if centerId != "" && dataType == "all" {
 		params = append(params, centerId)
-		sql += " and c.center_id=? "
+		sql += " and csd.center_id=? "
+	}
+
+	if st != "" {
+		params = append(params, st)
+		sql += " and csd.day_date>=? "
+	}
+
+	if et != "" {
+		params = append(params, st)
+		sql += " and csd.day_date<=? "
 	}
 
 	countSql := ""
@@ -168,11 +164,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	if mySort == "" || mySort == "time" {
-		sql += " order by a.maxtime desc,c.id desc  limit ?,?"
-	} else if mySort == "frequency" {
-		sql += " order by a.num desc,c.id desc  limit ?,?"
-	}
+	sql += " order by csd.start_time desc,csd.id desc limit ?,?"
 
 	lessgo.Log.Debug(sql)
 
@@ -231,11 +223,9 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
-
 }
 
-//客户保存服务
-func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
+func ClassScheduleDetailSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -253,6 +243,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 
 	if err != nil {
+		lessgo.Log.Error(err.Error())
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -261,19 +252,66 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.FormValue("id")
-	mother := r.FormValue("mother")
-	motherPhone := r.FormValue("motherPhone")
-	father := r.FormValue("father")
-	fatherPhone := r.FormValue("fatherPhone")
-	homePhone := r.FormValue("homePhone")
-	child := r.FormValue("child")
-	comeFromId := r.FormValue("come_from_id")
+	centerId := r.FormValue("center_id")
+	classId := r.FormValue("class_id")
+	lessonId := r.FormValue("lesson_id")
+	dayDate := r.FormValue("day_date")
+	timeId := r.FormValue("time_id")
+	roomId := r.FormValue("room_id")
+	status := r.FormValue("status")
+	teacherId := r.FormValue("teacher_id")
+	assistantId := r.FormValue("assistant_id")
+	capacity := r.FormValue("capacity")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
+	timeSection, err := FindTimeSectionById(timeId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	lesson, err := FindLessonById(lessonId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	startTime := dayDate + strings.Replace(timeSection.StartTime, ":", "", -1)+"00"
+	endTime := dayDate + strings.Replace(timeSection.EndTime, ":", "", -1)+"00"
+
+	week := ""
+
+	st, _ := time.ParseInLocation("20060102150405", startTime, time.Local)
+	if st.Weekday() == time.Monday {
+		week = "1"
+	} else if st.Weekday() == time.Tuesday {
+		week = "2"
+	} else if st.Weekday() == time.Wednesday {
+		week = "3"
+	} else if st.Weekday() == time.Thursday {
+		week = "4"
+	} else if st.Weekday() == time.Friday {
+		week = "5"
+	} else if st.Weekday() == time.Saturday {
+		week = "6"
+	} else if st.Weekday() == time.Sunday {
+		week = "7"
+	}
+
 	if id == "" {
-		sql := "insert into consumer(father,father_phone,mother,mother_phone,home_phone,employee_id,child,come_from_id,center_id) values(?,?,?,?,?,?,?,?,?)"
+		sql := "insert into class_schedule_detail(class_id,teacher_id,assistant_id,course_id,lesson_id,center_id,time_id,room_id,day_date,week,capacity,start_time,end_time,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 		lessgo.Log.Debug(sql)
 
@@ -288,10 +326,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		userId, _ := strconv.Atoi(employee.UserId)
-		_employee, err := FindEmployeeById(userId)
-
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId, child, comeFromId, _employee.CenterId)
+		_, err = stmt.Exec(classId, teacherId, assistantId, lesson.CourseId, lessonId, centerId, timeId, roomId, dayDate,week,capacity,startTime,endTime,status)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -305,40 +340,41 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
 	} else {
-		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=?,child=?,come_from_id=? where id=? "
 
-		lessgo.Log.Debug(sql)
+			sql := "update class_schedule_detail set class_id=?,teacher_id=?,assistant_id=?,course_id=?,lesson_id=?,center_id=?,time_id=?,room_id=?,day_date=?,week=?,capacity=?,start_time=?,end_time=? where id=? "
 
-		stmt, err := db.Prepare(sql)
+			lessgo.Log.Debug(sql)
 
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			stmt, err := db.Prepare(sql)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(classId, teacherId, assistantId, lesson.CourseId, lessonId, centerId, timeId, roomId,dayDate,week,capacity,startTime,endTime,id)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			m["success"] = true
 			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, child, comeFromId, id)
-
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		m["success"] = true
-		commonlib.OutputJson(w, m, " ")
 	}
 
 }
 
 //客户读取服务
-func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
+func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -365,7 +401,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	sql := "select father,father_phone,mother,mother_phone,home_phone,child,come_from_id from consumer where id=? "
+	sql := "select id,class_id,teacher_id,assistant_id,course_id,lesson_id,center_id,time_id,room_id,day_date,capacity,status from class_schedule_detail where id=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -382,10 +418,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var father, fatherPhone, mother, motherPhone, homePhone, child, comeFrom string
+	var classId, teacherId, assistantId, courseId, lessonId, centerId,timeId,roomId,dayDate,capacity,status string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone, &child, &comeFrom)
+		err = commonlib.PutRecord(rows, &id,&classId, &teacherId, &assistantId, &courseId, &lessonId, &centerId, &timeId, &roomId, &dayDate, &capacity, &status)
 
 		if err != nil {
 			m["success"] = false
@@ -401,13 +437,17 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects := []lessgo.LoadFormObject{}
 
 	h1 := lessgo.LoadFormObject{"id", id}
-	h2 := lessgo.LoadFormObject{"father", father}
-	h3 := lessgo.LoadFormObject{"fatherPhone", fatherPhone}
-	h4 := lessgo.LoadFormObject{"mother", mother}
-	h5 := lessgo.LoadFormObject{"motherPhone", motherPhone}
-	h6 := lessgo.LoadFormObject{"homePhone", homePhone}
-	h7 := lessgo.LoadFormObject{"child", child}
-	h8 := lessgo.LoadFormObject{"come_from_id", comeFrom}
+	h2 := lessgo.LoadFormObject{"center_id", centerId}
+	h3 := lessgo.LoadFormObject{"class_id", centerId+","+classId}
+	h4 := lessgo.LoadFormObject{"lesson_id", classId+","+lessonId}
+	h5 := lessgo.LoadFormObject{"day_date", dayDate}
+	h6 := lessgo.LoadFormObject{"time_id", centerId+","+timeId}
+	h7 := lessgo.LoadFormObject{"room_id", centerId+","+roomId}
+	h8 := lessgo.LoadFormObject{"status", status}
+	h9 := lessgo.LoadFormObject{"teacher_id", centerId+","+teacherId}
+	h10 := lessgo.LoadFormObject{"assistant_id", centerId+","+assistantId}
+	h11 := lessgo.LoadFormObject{"capacity", capacity}
+
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -417,131 +457,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects = append(loadFormObjects, h6)
 	loadFormObjects = append(loadFormObjects, h7)
 	loadFormObjects = append(loadFormObjects, h8)
+	loadFormObjects = append(loadFormObjects, h9)
+	loadFormObjects = append(loadFormObjects, h10)
+	loadFormObjects = append(loadFormObjects, h11)
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
-}
-
-func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]interface{})
-
-	employee := lessgo.GetCurrentEmployee(r)
-
-	if employee.UserId == "" {
-		lessgo.Log.Warn("用户未登陆")
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "用户未登陆"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	err := r.ParseForm()
-
-	if err != nil {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	id := r.FormValue("id")
-	status := r.FormValue("status")
-
-	sql := "select contact_status from consumer where id=?"
-
-	lessgo.Log.Debug(sql)
-
-	db := lessgo.GetMySQL()
-	defer db.Close()
-
-	rows, err := db.Query(sql, id)
-
-	var oldStatus string
-
-	if rows.Next() {
-		err := commonlib.PutRecord(rows, &oldStatus)
-
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-	}
-
-	tx, err := db.Begin()
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	sql = "update consumer set contact_status=? where id=? "
-
-	lessgo.Log.Debug(sql)
-
-	stmt, err := tx.Prepare(sql)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	_, err = stmt.Exec(status, id)
-
-	if err != nil {
-		tx.Rollback()
-
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	sql = "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
-
-	lessgo.Log.Debug(sql)
-
-	stmt, err = tx.Prepare(sql)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	_, err = stmt.Exec(id, employee.UserId, time.Now().Format("20060102150405"), oldStatus, status)
-
-	if err != nil {
-		tx.Rollback()
-
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	tx.Commit()
-
-	m["success"] = "客户状态更改成功"
-	commonlib.OutputJson(w, m, " ")
-
 }

@@ -27,6 +27,17 @@ jQuery.fn.form = function (opts) {
 
             var defaultValue = $(element).attr('field-defaultValue');
 
+            if(defaultValue && defaultValue.indexOf('$')==0){//从url地址中获取参数
+                var paramName = defaultValue.substr(1,defaultValue.length);
+                var reg = new RegExp("(^|&)"+ paramName +"=([^&]*)(&|$)");
+                var r = document.URL.substr(document.URL.indexOf("\?")+1).match(reg);
+                if (r!=null) {
+                    defaultValue = unescape(r[2]);
+                }else{
+                    defaultValue = "";
+                }
+            }
+
             if($(element).attr('field-value')){
                 defaultValue = $(element).attr('field-value');
             }

@@ -2,22 +2,47 @@
 <viewport>
     <!--面包屑-->
     <crumbs>
+        <crumb text="课程管理" url="javascript:void(0);"/>
         <crumb text="班级管理" currentPage="true"/>
     </crumbs>
 
-    <gridpanel  entity="wyclass" pageSize="15" title="班级信息" id="grid1" width="1200" height="350" mutiSelect="true">
+    <customgridpanel url="/wyclass.json" pageSize="15" title="班级管理" id="grid1" width="1200" height="350" loadUrl="false">
 
-        <column field="a.really_name" desc="助手"/>
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+
         <column field="name" desc="班级名"/>
+        <column field="center.name" desc="所属中心"/>
         <column field="course.name" desc="课程名"/>
-        <column field="center.name" desc="中心"/>
-        <column field="end_time" desc="结束日期"/>
-        <column field="deadline" desc="截止日期"/>
-        <column field="max_child_num" desc="最多小孩个数"/>
+        <column field="end_time" desc="计划结束日期">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="deadline" desc="报名截止日期">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="max_child_num" desc="能容纳的小孩子数"/>
         <column field="b.really_name" desc="老师"/>
+        <column field="a.really_name" desc="助手"/>
+        <column field="centerid" hidden="true" desc="班级名"/>
+
         <toolaction desc="添加" url="/web/wyclass/add" colorClass="h-bg-green" linkType="iframeWindow"/>
-        <toolaction desc="添加中心" url="/web/wyclass/add" colorClass="h-bg-green" linkType="mutiSelectIframeWindow" confirmMsg="确认呵呵吗？" params="{name:'hjq'}"/>
         <action desc="修改" url="/web/wyclass/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
-    </gridpanel>
+        <action desc="分配小朋友" url="/web/wyclass/manageChild" actionParams="[{name:'id',value:'id'},{name:'center_id-eq',value:'8'}]" linkType="iframeWindow"/>
+    </customgridpanel>
 
 </viewport>

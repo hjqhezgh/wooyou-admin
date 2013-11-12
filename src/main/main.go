@@ -35,18 +35,19 @@ func main() {
 		r.HandleFunc(url, handler)
 	}
 
-	go server.ReportSend()
+//	go server.ReportSend()
 
 	http.Handle("/", r)
 
 	http.Handle("/js/", http.FileServer(http.Dir("../static")))
 	http.Handle("/img/", http.FileServer(http.Dir("../static")))
 	http.Handle("/css/", http.FileServer(http.Dir("../static")))
+	http.Handle("/json/", http.FileServer(http.Dir("../static")))
 	http.Handle("/newsimg/", http.FileServer(http.Dir("../")))
 	http.Handle("/artimg/", http.FileServer(http.Dir("../")))
 
 	fmt.Println("服务器监听", portString, "端口")
-	go server.UpdateVideoStatus()
+//	go server.UpdateVideoStatus()
 
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
@@ -58,6 +59,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//根据角色ID获取员工列表
 	"/employeeListByRoleId.json": server.EmployeeListByRoleIdAction,
+	"/employeeByCenterId.json": server.EmployeeListByCenterIdAction,
 
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
@@ -110,4 +112,25 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/addAppAccountLoad.json": server.AddAppAccountLoadAction,
 	//app开户数据保存
 	"/addAppAccountSave.json": server.AddAppAccountSaveAction,
+
+	//课程信息相关服务
+	"/course.json": server.CourseListAction,
+	"/courseByCenterId.json": server.CourseByCenterIdListAction,
+	"/time_section.json": server.TimeSectionListAction,
+	"/class_schedule_detail.json": server.ClassScheduleDetailListAction,
+	"/class_schedule_detail/save.json": server.ClassScheduleDetailSaveAction,
+	"/class_schedule_detail/load.json": server.ClassScheduleDetailLoadAction,
+	"/lessonByClassId.json": server.LessonByClassIdAction,
+	"/timeSectionByCenterId.json": server.TimeSectionByCenterIdAction,
+
+
+	//班级相关服务
+	"/wyclass.json": server.WyClassListAction,
+	"/web/wyclass/update.json": server.WyClassUpdateAction,
+	"/web/wyclass/load.json": server.WyClassLoadAction,
+	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
+	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
+	"/classByCenterId.json": server.ClassByCenterIdAction,
+
+	"/roomByCenterId.json": server.RoomByCenterIdListAction,
 }

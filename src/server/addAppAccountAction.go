@@ -64,10 +64,10 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var father, fatherPhone, mother, motherPhone, child,centerId string
+	var father, fatherPhone, mother, motherPhone, child, centerId string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &child,&centerId)
+		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &child, &centerId)
 
 		if err != nil {
 			m["success"] = false
@@ -93,10 +93,10 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 	h9 := lessgo.LoadFormObject{"userName", ""}
 	h10 := lessgo.LoadFormObject{"centerId", centerId}
 
-	if motherPhone!="" {
+	if motherPhone != "" {
 		h8 = lessgo.LoadFormObject{"account", motherPhone}
 		h9 = lessgo.LoadFormObject{"userName", mother}
-	}else if fatherPhone!= ""{
+	} else if fatherPhone != "" {
 		h8 = lessgo.LoadFormObject{"account", fatherPhone}
 		h9 = lessgo.LoadFormObject{"userName", father}
 	}
@@ -184,7 +184,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if totalNum>0{
+	if totalNum > 0 {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "该手机号已经被注册，请更换一个注册手机号"
@@ -219,7 +219,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := stmt1.Exec(userName, pwd,account, time.Now().Format("20060102150405"))
+	res, err := stmt1.Exec(userName, pwd, account, time.Now().Format("20060102150405"))
 
 	if err != nil {
 		tx.Rollback()
@@ -259,7 +259,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt2.Exec(parentId,id)
+	_, err = stmt2.Exec(parentId, id)
 
 	if err != nil {
 		tx.Rollback()
@@ -287,7 +287,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	childBirthdayDate,err :=  time.ParseInLocation("2006-01-02", childBirthday, time.Local)
+	childBirthdayDate, err := time.ParseInLocation("2006-01-02", childBirthday, time.Local)
 
 	if err != nil {
 		tx.Rollback()
@@ -299,7 +299,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt3.Exec(childName,parentId,childSex,childBirthdayDate.Format("20060102"),centerId)
+	_, err = stmt3.Exec(childName, parentId, childSex, childBirthdayDate.Format("20060102"), centerId)
 
 	if err != nil {
 		tx.Rollback()

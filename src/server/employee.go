@@ -157,3 +157,52 @@ func EmployeeListByRoleIdAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.OutputJson(w, m, " ")
 }
+
+//获取中心下面没有离职的员工列表
+func EmployeeListByCenterIdAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	id := r.FormValue("id")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select e.user_id,e.really_name from employee e where e.center_id=? and e.is_leave=0 "
+
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, id)
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	employees := []lessgo.Employee{}
+
+	for rows.Next() {
+		employee := lessgo.Employee{}
+
+		err := commonlib.PutRecord(rows, &employee.UserId, &employee.ReallyName)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		employees = append(employees, employee)
+	}
+
+	m["success"] = true
+	m["code"] = 200
+	m["datas"] = employees
+
+	commonlib.OutputJson(w, m, " ")
+}

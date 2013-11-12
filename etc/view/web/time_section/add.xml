@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <formpanel entity="time_section" id="form" title="添加时间段" inwindow="true">
+        <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
+        <element field="start_time" type="time" validate="notNull" desc="起始时间"/>
+        <element field="end_time" type="time" validate="notNull" desc="结束时间"/>
+        <element field="lesson_no" type="text" validate="notNull" desc="课节号"/>
+    </formpanel>
+</viewport>

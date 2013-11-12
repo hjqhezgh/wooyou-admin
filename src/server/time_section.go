@@ -1,16 +1,16 @@
-// Title：顾问通话详情列表
+// Title：
 //
 // Description:
 //
 // Author:black
 //
-// Createtime:2013-09-26 15:50
+// Createtime:2013-11-12 00:25
 //
 // Version:1.0
 //
 // 修改历史:版本号 修改日期 修改人 修改说明
 //
-// 1.0 2013-09-26 15:50 black 创建文档
+// 1.0 2013-11-12 00:25 black 创建文档
 package server
 
 import (
@@ -24,8 +24,15 @@ import (
 	"text/template"
 )
 
-//顾问分页数据服务
-func VideoListAction(w http.ResponseWriter, r *http.Request) {
+type TimeSection struct {
+	Id        int
+	CenterId  int
+	StartTime string
+	EndTime   string
+	LessonNo  int
+}
+
+func TimeSectionListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -38,6 +45,19 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		m["msg"] = "用户未登陆"
 		commonlib.OutputJson(w, m, " ")
 		return
+	}
+
+	dataType := ""
+
+	roleIds := strings.Split(employee.RoleId, ",")
+
+	for _, roleId := range roleIds {
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
+			dataType = "all"
+			break
+		} else {
+			dataType = "center"
+		}
 	}
 
 	err := r.ParseForm()
@@ -69,40 +89,13 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	dataType := ""
-
-	roleIds := strings.Split(employee.RoleId, ",")
-
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
-			dataType = "all"
-			break
-		} else if roleId == "2" {
-			dataType = "center"
-			break
-		} else {
-			dataType = "self"
-		}
-	}
-
-	//fmt.Println("dataType:" ,dataType, ",roleIds:", roleIds)
-	//r.FormValue("cid-eq")
-	//fmt.Println(r.Form)
-
-	sql := ""
+	centerId := r.FormValue("cid-eq")
 
 	params := []interface{}{}
 
-	if dataType == "all" {
-		sql += `select v.vid,v.cid,ce.name as centername,r.name rname,c.course_id,co.name,c.teacher_id,e.really_name,v.start_time,v.end_time from
-				video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join room r on r.rid=v.rid left join employee e
-					on c.teacher_id=e.user_id left join course co on c.course_id=co.cid left join center ce on v.cid=ce.cid
-						where data_rel_status=2`
-	} else if dataType == "center" {
-		sql += `select v.vid,v.cid,ce.name as centername,r.name rname,c.course_id,co.name,c.teacher_id,e.really_name,v.start_time,v.end_time from
-				video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join room r on r.rid=v.rid left join employee e
-					on c.teacher_id=e.user_id left join course co on c.course_id=co.cid left join center ce on v.cid=ce.cid
-						where v.cid=? and data_rel_status=2`
+	sql := "select  t.id,ce.name,t.start_time,t.end_time,t.lesson_no from time_section t left join center ce on ce.cid=t.center_id where 1=1 "
+
+	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
@@ -112,40 +105,18 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-
 		params = append(params, _employee.CenterId)
-
-	} else if dataType == "self" {
-		sql += `select v.vid,v.cid,ce.name as centername,r.name rname,c.course_id,co.name,c.teacher_id,e.really_name,v.start_time,v.end_time from
-			video v left join class_schedule_detail c on v.schedule_detail_id=c.id left join room r on r.rid=v.rid left join employee e
-				on c.teacher_id=e.user_id left join course co on c.course_id=co.cid left join center ce on v.cid=ce.cid
-					where c.teacher_id=? and data_rel_status=2`
-
-		params = append(params, employee.UserId)
+		sql += " and ce.cid=? "
 	}
 
-	center_id := r.FormValue("cid-eq")
-	if center_id != "" {
-		sql += " and v.cid=?"
-		params = append(params, center_id)
-		lessgo.Log.Debug(sql)
-		lessgo.Log.Debug(params)
+	if centerId != "" && dataType == "all" {
+		params = append(params, centerId)
+		sql += " and c.center_id=? "
 	}
 
-	course_id := r.FormValue("courseId-eq")
-	if course_id != "" {
-		sql += " and c.course_id=?"
-		params = append(params, course_id)
-		lessgo.Log.Debug(params...)
-	}
+	countSql := ""
 
-	name := r.FormValue("name-like")
-	if name != "" {
-		sql += " and e.really_name like ?"
-		params = append(params, "%"+name+"%")
-	}
-
-	countSql := "select count(1) from (" + sql + ") num"
+	countSql = "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
@@ -153,6 +124,7 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	rows, err := db.Query(countSql, params...)
+
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
 		m["success"] = false
@@ -185,13 +157,14 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
+	sql += " order by t.lesson_no limit ?,?"
+
+	lessgo.Log.Debug(sql)
+
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
 
-	lessgo.Log.Debug(sql + " limit ?,?")
-	lessgo.Log.Debug(params...)
-	lessgo.Log.Debug(params[0], ":", params[1])
-	rows, err = db.Query(sql+" limit ?,?", params...)
+	rows, err = db.Query(sql, params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -201,8 +174,7 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
-	colums, _ := rows.Columns()
-	column_len := len(colums) - 1
+
 	objects := []interface{}{}
 
 	for rows.Next() {
@@ -213,7 +185,7 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < column_len; i++ {
+		for i := 0; i < 4; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -245,4 +217,102 @@ func VideoListAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
+}
+
+func TimeSectionByCenterIdAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	centerId := r.FormValue("id")
+
+	sql := "select id,start_time,end_time from time_section where center_id=? "
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, centerId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	type Result struct {
+		Value string `json:"value"`
+		Desc  string `json:"desc"`
+	}
+
+	objects := []*Result{}
+
+	for rows.Next() {
+
+		model := new(Result)
+		var st, et string
+
+		err = commonlib.PutRecord(rows, &model.Value, &st, &et)
+
+		model.Desc = st + "-" + et
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+	m["success"] = true
+	m["datas"] = objects
+
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+func FindTimeSectionById(id string) (TimeSection, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select id,center_id,start_time,end_time,lesson_no from time_section where id=? "
+
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, id)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		return TimeSection{}, err
+	}
+
+	timeSection := TimeSection{}
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &timeSection.Id, &timeSection.CenterId, &timeSection.StartTime, &timeSection.EndTime,&timeSection.LessonNo)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			return TimeSection{}, err
+		}
+	}
+
+	return timeSection, nil
 }

@@ -6,12 +6,6 @@
         <crumb text="新闻信息管理" currentPage="true"/>
     </crumbs>
 
-    <!--面包屑-->
-    <crumbs>
-        <crumb text="试听课程" url="javascript:void(0);"/>
-        <crumb text="新闻信息管理" currentPage="true"/>
-    </crumbs>
-
     <gridpanel entity="news" pageSize="10" title="新闻信息管理" id="news" width="1200" height="540">
         <search field="title" searchType="like" inputType="text" desc="标题"/>
         <search field="news_content" searchType="like" inputType="text" desc="新闻内容"/>

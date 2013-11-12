@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+
+    <gridpanel entity="child" pageSize="15" title="小孩子信息" id="grid1" width="1200" height="350" loadUrl="true" mutiSelect="true">
+
+        <search field="name" searchType="like" inputType="text" desc="小孩子姓名" />
+
+        <checkboxtool loadUrl="/wyclass/loadChildInClass.json" saveUrl="/wyclass/saveChildToClass.json" desc="已分配孩子" />
+
+        <column field="name" desc="小孩子名"/>
+        <column field="sex" desc="性别">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return '男';
+                        }else{
+                            return "女";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="birthday" desc="生日">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar8Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+
+        <toolaction desc="添加至当前班级" colorClass="h-bg-green" linkType="addToCheckBox" checkboxDesc="name" />
+    </gridpanel>
+
+</viewport>

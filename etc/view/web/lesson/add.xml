@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <formpanel entity="lesson" id="form" title="添加课节" inwindow="true">
+        <element field="caption" type="text" validate="notNull" desc="课节标题"/>
+        <element field="lesson_time" type="text" validate="notNull" desc="课程时间" tip="单位：分钟"/>
+        <element field="order_no" type="text" validate="notNull" desc="课节排序"/>
+        <element field="is_last"  type="localSelect" validate="notNull" localData="[{desc:'是',value:'1'},{desc:'否',value:'2'}]" desc="是否最后一节" />
+        <element field="teacher_id" type="remoteSelect" url="/web/employee/alldata" valueField="user_id" descField="really_name" desc="老师"/>
+        <element field="course_id" type="hidden" validate="" desc="联系电话" defaultValue="$course_id-eq"/>
+        <element field="keystone"  type="textarea" desc="课节重点" />
+    </formpanel>
+</viewport>

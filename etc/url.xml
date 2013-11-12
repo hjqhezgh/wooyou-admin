@@ -55,4 +55,7 @@
 
     <!--app开户-->
     <url path="/web/consumer/add_app_account" view="web/consumer/add_app_account.xml" />
+
+    <!--班级小孩子分配界面-->
+    <url path="/web/wyclass/manageChild" view="web/wyclass/manageChild.xml" />
 </urls>
