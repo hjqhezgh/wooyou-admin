@@ -5,8 +5,8 @@
         <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"  readonly="true"/>
         <element field="class_id"  type="remoteSelect" url="/classByCenterId.json" valueField="classId" descField="name" desc="班级" validate="notNull" parentSelect="center_id"/>
         <element field="lesson_id"  type="remoteSelect" url="/lessonByClassId.json" valueField="value" descField="desc" desc="课节" validate="notNull" parentSelect="class_id"/>
-        <element field="day_date"  type="date" desc="上课日期" char8="true" validate="notNull"/>
-        <element field="time_id"  type="remoteSelect" url="/timeSectionByCenterId.json" valueField="value" descField="desc" desc="时间段" validate="notNull" parentSelect="center_id"/>
+        <element field="day_date"  readonly="true" type="date" desc="上课日期" char8="true" validate="notNull"/>
+        <element field="time_id"  readonly="true" type="remoteSelect" url="/timeSectionByCenterId.json" valueField="value" descField="desc" desc="时间段" validate="notNull" parentSelect="center_id"/>
         <element field="room_id"  type="remoteSelect" url="/roomByCenterId.json" valueField="value" descField="desc" desc="教室" validate="notNull" parentSelect="center_id"/>
         <element field="teacher_id"  type="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="老师" validate="notNull" parentSelect="center_id"/>
         <element field="assistant_id"  type="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="助手" validate="notNull" parentSelect="center_id"/>

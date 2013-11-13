@@ -30,6 +30,8 @@
                 ]]>
             </formatter>
         </column>
+        <column field="parent.name" desc="App姓名"/>
+        <column field="parent.telephone" desc="App账号"/>
 
         <toolaction desc="添加至当前班级" colorClass="h-bg-green" linkType="addToCheckBox" checkboxDesc="name" />
     </gridpanel>

@@ -289,6 +289,11 @@
         <field name="name" />
         <field name="card_id" />
         <field name="pid" />
+        <ref entity="parent" field="pid" refEntityField="pid">
+            <field name="pid"/>
+            <field name="name"/>
+            <field name="telephone"/>
+        </ref>
         <field name="sex" />
         <field name="birthday" />
         <field name="hobby" />

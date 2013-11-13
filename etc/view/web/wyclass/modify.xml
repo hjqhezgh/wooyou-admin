@@ -3,7 +3,7 @@
     <customformpanel id="news" saveUrl="/web/wyclass/update.json" load="true" loadUrl="/web/wyclass/load.json" title="修改班级" inwindow="true">
         <element field="name" type="text" desc="班级名" validate="notNull"/>
         <element field="class_id" type="hidden" desc="主键"/>
-        <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
+        <element field="center_id"  type="remoteSelect" readonly="true" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
         <element field="course_id"  url="/courseByCenterId.json" valueField="value" descField="desc" type="remoteSelect" desc="课程" parentSelect="center_id" validate="notNull"/>
         <element field="end_time"  type="datetime" desc="计划结束日期" validate="notNull" char14="true"/>
         <element field="deadline"  type="datetime" desc="报名截止日期" tip="试用于免费课" validate="notNull" char14="true"/>

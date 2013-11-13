@@ -570,7 +570,7 @@ func CourseLoadAction(w http.ResponseWriter, r *http.Request) {
 	h8 := lessgo.LoadFormObject{"end_age", endAge}
 	h9 := lessgo.LoadFormObject{"intro", intro}
 	h10 := lessgo.LoadFormObject{"lesson_num", lessonNum}
-	h11 := lessgo.LoadFormObject{"courseImg", "http://tp4.sinaimg.cn/1684491115/180/5668832909/1"}
+	h11 := lessgo.LoadFormObject{"courseImg", fmt.Sprint("http://app.wooyou.com.cn:9100/pic/course/",id,"/480_230.png")}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
