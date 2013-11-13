@@ -513,20 +513,29 @@ function gridActionRender(cellvalue, options, rowObject,action,componentId) {
 }
 
 String.prototype.formatChar14Time = function(){
-    var year = this.substr(0,4);
-    var month = this.substr(4,2);
-    var day = this.substr(6,2);
-    var hour = this.substr(8,2);
-    var minute = this.substr(10,2);
-    var second = this.substr(12,4);
+    if(this && this!=""){
+        var year = this.substr(0,4);
+        var month = this.substr(4,2);
+        var day = this.substr(6,2);
+        var hour = this.substr(8,2);
+        var minute = this.substr(10,2);
+        var second = this.substr(12,4);
 
-    return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+        return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+    }else{
+        return "";
+    }
+
 }
 
 String.prototype.formatChar8Time = function(){
-    var year = this.substr(0,4);
-    var month = this.substr(4,2);
-    var day = this.substr(6,2);
+    if(this && this!=""){
+        var year = this.substr(0,4);
+        var month = this.substr(4,2);
+        var day = this.substr(6,2);
 
-    return year+"-"+month+"-"+day;
+        return year+"-"+month+"-"+day;
+    }else{
+        return "";
+    }
 }

@@ -4,13 +4,13 @@
 //
 // Author:black
 //
-// Createtime:2013-10-16 14:24
+// Createtime:2013-11-13 13:55
 //
 // Version:1.0
 //
 // 修改历史:版本号 修改日期 修改人 修改说明
 //
-// 1.0 2013-10-16 14:24 black 创建文档
+// 1.0 2013-11-13 13:55 black 创建文档
 package server
 
 import (
@@ -24,7 +24,7 @@ import (
 	"text/template"
 )
 
-func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
+func EmployeeSignInListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -37,6 +37,22 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 		m["msg"] = "用户未登陆"
 		commonlib.OutputJson(w, m, " ")
 		return
+	}
+
+	dataType := ""
+
+	roleIds := strings.Split(employee.RoleId, ",")
+
+	for _, roleId := range roleIds {
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
+			dataType = "all"
+			break
+		} else if roleId == "2" {
+			dataType = "center"
+			break
+		} else {
+			dataType = "self"
+		}
 	}
 
 	err := r.ParseForm()
@@ -68,46 +84,15 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	status := r.FormValue("status-eq")
-	name := r.FormValue("name-eq")
-	centerId := r.FormValue("id")
-
-	dataType := ""
-
-	roleIds := strings.Split(employee.RoleId, ",")
-
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
-			dataType = "all"
-			break
-		} else if roleId == "2" {
-			dataType = "center"
-			break
-		} else {
-			dataType = "self"
-		}
-	}
+	centerId := r.FormValue("cid-eq")
+	st := r.FormValue("st-ge")
+	et := r.FormValue("et-le")
 
 	params := []interface{}{}
 
-	sql := ""
-	countSql := ""
+	sql := "select  esi.id,e.really_name,esi.sign_time from employee_sign_in esi left join employee e on esi.employee_id=e.user_id where 1=1 "
 
-	sql += "select tc.id,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,c.contact_status,c.id as 'cid',c.parent_id from tmk_consumer tc left join consumer c on tc.consumer_id=c.id left join employee e on e.user_id = tc.employee_id where tc.center_id=? "
-
-	if dataType == "all" {
-		params = append(params, centerId)
-
-		if status != "" {
-			if status == "no employee" {
-				sql += " and tc.employee_id is null or tc.employee_id=0 "
-			} else {
-				sql += " and c.contact_status=? "
-				params = append(params, status)
-			}
-		}
-
-	} else if dataType == "center" {
+	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
@@ -118,38 +103,30 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		params = append(params, _employee.CenterId)
+		sql += " and e.center_id=? "
+	}
 
-		if status != "" {
-			if status == "no employee" {
-				sql += " and tc.employee_id is null or tc.employee_id=0 "
-			} else {
-				sql += " and c.contact_status=? "
-				params = append(params, status)
-			}
-		}
-
-	} else {
-
+	if centerId != "" && dataType == "all" {
 		params = append(params, centerId)
+		sql += " and e.center_id=? "
+	}
 
-		sql += " and tc.employee_id=? "
+	if dataType == "self" {
 		params = append(params, employee.UserId)
-
-		if status != "" && status != "no employee" {
-			sql += " and c.contact_status=? "
-			params = append(params, status)
-		}
+		sql += " and esi.employee_id=? "
 	}
 
-	if name != ""{
-		sql += " and (c.mother like ? or c.mother_phone like ? or c.father like ? or c.father_phone like ? or c.home_phone like ? or c.child like ? )"
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
+	if st != ""{
+		params = append(params, st)
+		sql += " and esi.sign_time >= ? "
 	}
+
+	if et != ""{
+		params = append(params, et)
+		sql += " and esi.sign_time <= ? "
+	}
+
+	countSql := ""
 
 	countSql = "select count(1) from (" + sql + ") num"
 
@@ -192,7 +169,7 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " order by tc.cd_create_time desc  limit ?,?"
+	sql += " order by esi.id desc limit ?,?"
 
 	lessgo.Log.Debug(sql)
 
@@ -220,7 +197,7 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 2; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -253,3 +230,4 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
 }
+

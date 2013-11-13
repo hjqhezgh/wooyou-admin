@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customgridpanel url="/consumer/contact_record.json" pageSize="15" title="通话记录" id="grid1" width="1200" height="400" loadUrl="true" inwindow="true">
+
+        <column field="centerName" desc="顾问所属中心"/>
+        <column field="employeeName" desc="顾问姓名">
+            <formatter>
+                <![CDATA[
+                if(cellvalue){
+                    return cellvalue;
+                }else{
+                    return rowObject[6]+'(该号码未进行员工关联)';
+                }
+                ]]>
+            </formatter>
+        </column>
+        <column field="calltime" desc="通话时间"/>
+        <column field="seconds" desc="通话时长"/>
+        <column field="inout" desc="电话方向"/>
+        <column field="remark" desc="备注"/>
+
+        <column field="localphone" desc="本地电话" hidden="true"/>
+        <column field="filename" desc="文件名" hidden="true"/>
+        <column field="is_upload_finish" desc="是否上次成功" hidden="true"/>
+
+        <action desc="备注" url="/web/audio/note" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

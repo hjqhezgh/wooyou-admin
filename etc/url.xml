@@ -58,4 +58,10 @@
 
     <!--班级小孩子分配界面-->
     <url path="/web/wyclass/manageChild" view="web/wyclass/manageChild.xml" />
+
+    <!--签到管理-->
+    <url path="/web/employee_sign_in" view="web/employee_sign_in/index.xml" />
+
+    <!--查看与顾客的通话记录-->
+    <url path="/web/consumer/contact_record" view="web/consumer/contact_record.xml" />
 </urls>

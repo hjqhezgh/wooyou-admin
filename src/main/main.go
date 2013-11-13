@@ -73,6 +73,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consumer.json":     server.ConsumerListAction,
 	"/consumerSave.json": server.ConsumerSaveAction,
 	"/consumerLoad.json": server.ConsumerLoadAction,
+	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
@@ -135,4 +136,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/classByCenterId.json": server.ClassByCenterIdAction,
 
 	"/roomByCenterId.json": server.RoomByCenterIdListAction,
+
+	//员工签到表
+	"/employee_sign_in.json": server.EmployeeSignInListAction,
 }

@@ -46,7 +46,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleIds := strings.Split(employee.RoleId, ",")
 
 	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
+		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" || roleId == "11" {
 			dataType = "all"
 			break
 		} else if roleId == "2" {
@@ -268,6 +268,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	homePhone := r.FormValue("homePhone")
 	child := r.FormValue("child")
 	comeFromId := r.FormValue("come_from_id")
+	centerId := r.FormValue("center_id")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -288,10 +289,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		userId, _ := strconv.Atoi(employee.UserId)
-		_employee, err := FindEmployeeById(userId)
-
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId, child, comeFromId, _employee.CenterId)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, employee.UserId, child, comeFromId, centerId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -305,7 +303,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
 	} else {
-		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=?,child=?,come_from_id=? where id=? "
+		sql := "update consumer set father=?,father_phone=?,mother=?,mother_phone=?,home_phone=?,child=?,come_from_id=?,center_id=? where id=? "
 
 		lessgo.Log.Debug(sql)
 
@@ -320,7 +318,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, child, comeFromId, id)
+		_, err = stmt.Exec(father, fatherPhone, mother, motherPhone, homePhone, child, comeFromId,centerId, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -365,7 +363,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	sql := "select father,father_phone,mother,mother_phone,home_phone,child,come_from_id from consumer where id=? "
+	sql := "select father,father_phone,mother,mother_phone,home_phone,child,come_from_id,center_id from consumer where id=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -382,10 +380,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var father, fatherPhone, mother, motherPhone, homePhone, child, comeFrom string
+	var father, fatherPhone, mother, motherPhone, homePhone, child, comeFrom,centerId string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone, &child, &comeFrom)
+		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &homePhone, &child, &comeFrom,&centerId)
 
 		if err != nil {
 			m["success"] = false
@@ -408,6 +406,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	h6 := lessgo.LoadFormObject{"homePhone", homePhone}
 	h7 := lessgo.LoadFormObject{"child", child}
 	h8 := lessgo.LoadFormObject{"come_from_id", comeFrom}
+	h9 := lessgo.LoadFormObject{"center_id", centerId}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -417,6 +416,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects = append(loadFormObjects, h6)
 	loadFormObjects = append(loadFormObjects, h7)
 	loadFormObjects = append(loadFormObjects, h8)
+	loadFormObjects = append(loadFormObjects, h9)
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
@@ -543,5 +543,184 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 
 	m["success"] = "客户状态更改成功"
 	commonlib.OutputJson(w, m, " ")
+
+}
+
+//查看通话记录
+/*
+select ce.name,e.really_name,a.start_time,a.seconds,a.inout,a.localphone,a.filename,a.is_upload_finish
+from audio a
+left join consumer c on
+(c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null)
+or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null)
+left join employee e on
+a.localphone=e.phone_in_center
+left join center ce on
+ce.cid=e.center_id
+where c.id=1
+*/
+func ConsumerContactRecordListAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	pageNoString := r.FormValue("page")
+	pageNo := 1
+	if pageNoString != "" {
+		pageNo, err = strconv.Atoi(pageNoString)
+		if err != nil {
+			pageNo = 1
+			lessgo.Log.Warn("错误的pageNo:", pageNo)
+		}
+	}
+
+	pageSizeString := r.FormValue("rows")
+	pageSize := 10
+	if pageSizeString != "" {
+		pageSize, err = strconv.Atoi(pageSizeString)
+		if err != nil {
+			lessgo.Log.Warn("错误的pageSize:", pageSize)
+		}
+	}
+
+	id := r.FormValue("id")
+
+	params := []interface{}{}
+
+	sql := " select a.aid,ce.name,e.really_name,a.start_time,a.seconds,a.inout,a.note,a.localphone,a.filename,a.is_upload_finish from audio a "
+	sql += " left join consumer c on  "
+	sql += " (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) "
+	sql += " or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) "
+	sql += " or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) "
+	sql += " left join employee e on "
+	sql += " a.localphone=e.phone_in_center "
+	sql += " left join center ce on "
+	sql += " ce.cid=e.center_id "
+	sql += " where c.id=? "
+
+	params = append(params, id)
+
+	countSql := ""
+
+	countSql = "select count(1) from (" + sql + ") num"
+
+	lessgo.Log.Debug(countSql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(countSql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	totalPage := int(math.Ceil(float64(totalNum) / float64(pageSize)))
+
+	currPageNo := pageNo
+
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	sql += " order by a.aid desc limit ?,?"
+
+	lessgo.Log.Debug(sql)
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	rows, err = db.Query(sql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	objects := []interface{}{}
+
+	for rows.Next() {
+
+		model := new(lessgo.Model)
+
+		fillObjects := []interface{}{}
+
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 9; i++ {
+			prop := new(lessgo.Prop)
+			prop.Name = fmt.Sprint(i)
+			prop.Value = ""
+			fillObjects = append(fillObjects, &prop.Value)
+			model.Props = append(model.Props, prop)
+		}
+
+		err = commonlib.PutRecord(rows, fillObjects...)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	pageData := commonlib.BulidTraditionPage(currPageNo, pageSize, totalNum, objects)
+
+	m["PageData"] = pageData
+	m["DataLength"] = len(pageData.Datas) - 1
+	if len(pageData.Datas) > 0 {
+		m["FieldLength"] = len(pageData.Datas[0].(*lessgo.Model).Props) - 1
+	}
+
+	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
 }

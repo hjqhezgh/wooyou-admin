@@ -9,30 +9,17 @@
     <customgridpanel url="/employee_sign_in.json" pageSize="15" title="员工签到记录" id="grid1" width="1200" height="350" loadUrl="false">
 
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="st" searchType="ge" inputType="datetime" desc="起始时间" char14="true"/>
+        <search field="et" searchType="le" inputType="datetime" desc="结束时间" char14="true"/>
 
-        <column field="name" desc="课程名"/>
-        <column field="center.name" desc="所属中心"/>
-        <column field="price" desc="价格"/>
-        <column field="type" desc="课程类别" />
-        <column field="is_probation" desc="是否促销">
+        <column field="employeeName" desc="员工姓名"/>
+        <column field="signTime" desc="签到时间">
             <formatter>
                 <![CDATA[
-                        if(cellvalue == 0) {
-                            return "否";
-                        } else if(cellvalue == 1){
-                            return '<span style="color:red">是</span>';
-                        }
+                        return cellvalue.formatChar14Time();
                 ]]>
-             </formatter>
+            </formatter>
         </column>
-        <column field="begin_age" desc="开始年龄(月)"/>
-        <column field="end_age" desc="结束年龄(月)"/>
-        <column field="intro" desc="课程介绍"/>
-        <column field="lesson_num" desc="课节数目"/>
-
-        <toolaction desc="添加" url="/web/course/add" colorClass="h-bg-green" linkType="iframeWindow"/>
-        <action desc="修改" url="/web/course/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
-        <action desc="配置课节" url="/web/lesson" actionParams="[{name:'course_id-eq',value:'id'}]" linkType="iframeWindow"/>
     </customgridpanel>
 
 </viewport>

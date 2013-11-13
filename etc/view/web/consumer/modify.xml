@@ -10,7 +10,7 @@
         <element field="homePhone" type="text" validate="" desc="家庭电话"/>
         <element field="child" type="text" validate="" desc="小孩姓名"/>
         <element field="come_from_id" type="remoteSelect" validate="notNull" url="/web/come_from/alldata" valueField="id" descField="name" desc="来源"/>
-
+        <element field="center_id" type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
         <beforeSave>
             <![CDATA[
                 var mother = container.find('form').find('[name=mother]').val()

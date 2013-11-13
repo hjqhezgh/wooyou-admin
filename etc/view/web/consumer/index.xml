@@ -22,7 +22,17 @@
         <column field="consumer_name" desc="父亲电话"/>
         <column field="consumer_name" desc="家庭电话"/>
         <column field="consumer_name" desc="孩子姓名"/>
-        <column field="consumer_name" desc="通话数"/>
+        <column field="consumer_name" desc="通话数">
+            <formatter>
+                <![CDATA[
+                if(parseInt(cellvalue)>0){
+                    return cellvalue +'&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="查看通话记录" href="/web/consumer/contact_record?id='+options.rowId+'" data-action="openIframeWindow">查看通话记录</a>';
+                }else {
+                    return cellvalue;
+                }
+                ]]>
+            </formatter>
+        </column>
         <column field="consumer_name" desc="最后通话时间"/>
         <column field="consumer_name" desc="状态">
             <formatter>
@@ -53,6 +63,6 @@
             </formatter>
         </column>
         <!--<action desc="添加" url="/web/consumer/add" linkType="newPage"/>-->
-        <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]" width="800" height="600"/>
+        <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
     </customgridpanel>
 </viewport>

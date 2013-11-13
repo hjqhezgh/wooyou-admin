@@ -13,12 +13,17 @@
         <search field="week" searchType="eq" inputType="localSelect" desc="周" localData="[{desc:'第1周',value:'1'},{desc:'第2周',value:'2'},{desc:'第3周',value:'3'},{desc:'第4周',value:'4'},{desc:'第5周',value:'5'},{desc:'第6周',value:'6'}]"/>
         <search field="start_time" searchType="eq" inputType="date" desc="日期"/>
 
-        <column field="centerName" desc="开始时间"/>
-        <column field="centerId" desc="结束时间"/>
-        <column field="employeeId" desc="课程ID" hidden="true"/>
-        <column field="centerName" desc="课程"/>
-        <column field="centerId" desc="员工ID" hidden="true"/>
-        <column field="employeeId" desc="教师"/>
-        <action desc="修改" url="http://www.wooyou.com.cn:8888/manage/videoPlay" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+
+        <column field="centerId" desc="中心ID" hidden="true"/>
+        <column field="centerName" desc="中心名字"/>
+        <column field="roomName" desc="教室名字"/>
+        <column field="courseId" desc="课程Id" hidden="true"/>
+        <column field="courseName" desc="课程名称"/>
+        <column field="employeeId" desc="员工ID" hidden="true"/>
+        <column field="employeeName" desc="教师"/>
+        <column field="st" desc="开始时间"/>
+        <column field="et" desc="结束时间"/>
+
+        <action desc="查看视频" url="http://www.wooyou.com.cn:8888/manage/videoPlay" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
     </customgridpanel>
 </viewport>

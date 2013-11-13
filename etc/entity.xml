@@ -9,6 +9,7 @@
         <field name="intro"/>
         <field name="lan_ip"/>
         <field name="domain_name"/>
+        <field name="is_show"/>
     </entity>
 
     <!--教室-->

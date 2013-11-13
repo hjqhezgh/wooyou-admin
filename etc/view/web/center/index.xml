@@ -15,6 +15,17 @@
         <column field="telephone" desc="联系电话"/>
         <column field="lan_ip" desc="局域网ip"/>
         <column field="domain_name" desc="公网域名"/>
+        <column field="is_show" desc="是否APP上展示">
+            <formatter>
+                <![CDATA[
+                if(cellvalue=="1"){
+                    return '是';
+                }else{
+                    return '否';
+                }
+                ]]>
+            </formatter>
+        </column>
 
         <action desc="修改" url="/web/center/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
     </gridpanel>
