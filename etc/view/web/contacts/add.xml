@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <formpanel entity="contacts" id="form" title="添加联系人" inwindow="true">
+        <element field="name" type="text" validate="" desc="联系人名字"/>
+        <element field="phone" type="text" validate="notNull" desc="联系电话"/>
+        <element field="is_default"  type="localSelect" localData="[{desc:'是', value:'1'},{desc:'否', value:'2'}]" desc="是否默认联系人"/>
+        <element field="consumer_id" type="hidden" validate="" desc="客户Id" defaultValue="$consumerId"/>
+    </formpanel>
+</viewport>

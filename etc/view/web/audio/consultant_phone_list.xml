@@ -8,7 +8,7 @@
 
     <customgridpanel url="/consultant_phone_list.json" pageSize="15" title="通话报表" id="grid1" width="1200" height="350" loadUrl="true">
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
-        <search field="name" searchType="like" inputType="text" desc="顾问姓名"/>
+        <search field="employee_id"  searchType="eq" inputType="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="员工" validate="notNull" parentSelect="cid"/>
         <search field="year" searchType="eq" inputType="localSelect" desc="年" localData="[{desc:'2013年',value:'2013'},{desc:'2014年',value:'2014'},{desc:'2015年',value:'2015'},{desc:'2016年',value:'2016'},{desc:'2017年',value:'2017'}]"/>
         <search field="month" searchType="eq" inputType="localSelect" desc="月" localData="[{desc:'1月',value:'01'},{desc:'2月',value:'02'},{desc:'3月',value:'03'},{desc:'4月',value:'04'},{desc:'5月',value:'05'},{desc:'6月',value:'06'},{desc:'7月',value:'07'},{desc:'8月',value:'08'},{desc:'9月',value:'09'},{desc:'10月',value:'10'},{desc:'11月',value:'11'},{desc:'12月',value:'12'}]"/>
         <search field="week" searchType="eq" inputType="localSelect" desc="周" localData="[{desc:'第1周',value:'1'},{desc:'第2周',value:'2'},{desc:'第3周',value:'3'},{desc:'第4周',value:'4'},{desc:'第5周',value:'5'},{desc:'第6周',value:'6'}]"/>
@@ -20,14 +20,12 @@
         <column field="employeeName" desc="员工名称">
             <formatter>
                 <![CDATA[
-                return '<a style="color:blue;text-decoration: underline;" title="查看顾问通话详情" href="/web/audio/consultant_phone_detail_list?eid='+rowObject[2]+'">'+cellvalue+'</a>' + '('+rowObject[8]+')';
+                return '<a style="color:blue;text-decoration: underline;" title="查看顾问通话详情" href="/web/audio/consultant_phone_detail_list?eid='+rowObject[2]+'">'+cellvalue+'</a>' + '('+rowObject[6]+')';
                 ]]>
             </formatter>
         </column>
         <column field="validPhoneNum" desc="总电话数"/>
         <column field="rank" desc="所有门店的通话总排名"/>
-        <column field="newPhoneNum" desc="新增电话数（未实现）"/>
-        <column field="oldPhoneNum" desc="跟踪电话数（未实现)"/>
         <column field="localphone" desc="本地电话" hidden="true"/>
     </customgridpanel>
 </viewport>

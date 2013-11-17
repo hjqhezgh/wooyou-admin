@@ -2,34 +2,42 @@
 <viewport window="true">
 
     <customformpanel id="form" title="修改客户" saveUrl="/consumerSave.json" load="true" loadUrl="/consumerLoad.json" inwindow="true">
-        <element field="id" type="hidden" validate="" desc=""/>
-        <element field="mother" type="text" validate="" desc="母亲姓名"/>
-        <element field="motherPhone" type="text" validate="" desc="母亲电话"/>
-        <element field="father" type="text" validate="" desc="父亲姓名"/>
-        <element field="fatherPhone" type="text" validate="" desc="父亲电话"/>
+        <element field="remark" type="textarea" validate="" desc="备注"/>
+        <element field="id" type="hidden" validate="" desc="id"/>
         <element field="homePhone" type="text" validate="" desc="家庭电话"/>
-        <element field="child" type="text" validate="" desc="小孩姓名"/>
+        <element field="child" type="text" validate="notNull" desc="小孩姓名"/>
+        <element field="year" type="text" desc="出生年份" tip="格式：2013,2014,1987，四位数年份"/>
+        <element field="month"  type="localSelect" localData="[{desc:'1月', value:'1'},{desc:'2月', value:'2'},{desc:'3月', value:'3'},{desc:'4月', value:'4'},{desc:'5月', value:'5'},{desc:'6月', value:'6'},{desc:'7月', value:'7'},{desc:'8月', value:'8'},{desc:'9月', value:'9'},{desc:'10月', value:'10'},{desc:'11月', value:'11'},{desc:'12月', value:'12'}]" desc="出生月份"/>
+        <element field="birthday" type="date" desc="出生日期" tip="如果填写此项，则年月无需填写" char8="true"/>
         <element field="come_from_id" type="remoteSelect" validate="notNull" url="/web/come_from/alldata" valueField="id" descField="name" desc="来源"/>
-        <element field="center_id" type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
+        <element field="center_id" type="remoteSelect" validate="notNull" readonly="true" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
         <beforeSave>
             <![CDATA[
-                var mother = container.find('form').find('[name=mother]').val()
-                var motherPhone = container.find('form').find('[name=motherPhone]').val()
-                var father = container.find('form').find('[name=father]').val()
-                var fatherPhone = container.find('form').find('[name=fatherPhone]').val()
+                var year = container.find('form').find('[name=year]').val()
+                var month = container.find('form').find('[name=month]').val()
+                var birthday = container.find('form').find('[name=birthday]').val()
 
-                if(motherPhone=='' && fatherPhone=='' ){
-                    alert('母亲电话和父亲电话请至少填写一个');
+                if((year=='' && month=='') && birthday==''){
+                    alert('请填写小孩子的年龄信息');
                     return false;
                 }
 
-                if(motherPhone!='' && mother==''){
-                    alert('请填写母亲姓名');
+                if(birthday!=''){
+                    return true;
+                }
+
+                if(year==''){
+                    alert('请填写小孩子出生年份');
                     return false;
                 }
 
-                if(fatherPhone!='' && father==''){
-                    alert('请填写父亲姓名');
+                if(month==''){
+                    alert('请选择小孩子出生月份');
+                    return false;
+                }
+
+                if(year.length!=4){
+                    alert('出生年份格式错误');
                     return false;
                 }
 
@@ -40,4 +48,50 @@
         <afterRender>
         </afterRender>
     </customformpanel>
+
+    <customgridpanel url="/contacts/page" pageSize="15" title="联系人列表" id="grid1" height="50" loadUrl="true">
+        <toolaction desc="添加联系人" url="/web/contacts/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+
+        <column field="name" desc="名字"/>
+        <column field="telephone" desc="联系电话"/>
+        <column field="是否默认联系人" hidden="true" />
+        <action desc="修改" url="/web/contacts/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+
+
+    <customgridpanel url="/consumer/contact_record.json" pageSize="100" title="通话记录" id="grid2" height="50" loadUrl="true">
+
+        <column field="centerName" desc="顾问所属中心"/>
+        <column field="employeeName" desc="顾问姓名">
+            <formatter>
+                <![CDATA[
+                if(cellvalue){
+                    return cellvalue;
+                }else{
+                    return rowObject[5]+'(该号码未进行员工关联)';
+                }
+                ]]>
+            </formatter>
+        </column>
+        <column field="calltime" desc="通话时间"/>
+        <column field="seconds" desc="通话时长"/>
+        <column field="inout" desc="电话方向"/>
+        <column field="localphone" desc="本地电话" hidden="true"/>
+        <column field="filename" desc="文件名" hidden="true"/>
+        <column field="is_upload_finish" desc="是否上次成功" hidden="true"/>
+        <column field="contractsName" desc="联系人">
+            <formatter>
+                <![CDATA[
+                    var value = cellvalue;
+                    if(rowObject[7]=='1'){
+                        value +=  '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="http://117.29.168.34:8888/manage/audioDownload?filename='+rowObject[6]+'&centerId='+rowObject[10]+'&startTime='+rowObject[2]+'">下载</a>';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="note" desc="备注"/>
+        <column field="audioCenterId" desc="备注" hidden="true"/>
+    </customgridpanel>
 </viewport>

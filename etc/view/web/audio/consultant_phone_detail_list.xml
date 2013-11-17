@@ -12,14 +12,90 @@
         <search field="month" searchType="eq" inputType="localSelect" desc="月" localData="[{desc:'1月',value:'01'},{desc:'2月',value:'02'},{desc:'3月',value:'03'},{desc:'4月',value:'04'},{desc:'5月',value:'05'},{desc:'6月',value:'06'},{desc:'7月',value:'07'},{desc:'8月',value:'08'},{desc:'9月',value:'09'},{desc:'10月',value:'10'},{desc:'11月',value:'11'},{desc:'12月',value:'12'}]"/>
         <search field="week" searchType="eq" inputType="localSelect" desc="周" localData="[{desc:'第1周',value:'1'},{desc:'第2周',value:'2'},{desc:'第3周',value:'3'},{desc:'第4周',value:'4'},{desc:'第5周',value:'5'},{desc:'第6周',value:'6'}]"/>
         <search field="start_time" searchType="eq" inputType="date" desc="日期"/>
+
+        <column field="child" desc="客户">
+            <formatter>
+                <![CDATA[
+                var value = '';
+
+                if(cellvalue){
+                    value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击查看详情" href="/web/consumer/modify?consumerId='+rowObject[9]+'" data-action="openIframeWindow">'+cellvalue+'</a>';
+                    if(rowObject[6]==""){
+                        value += '&nbsp;<span style="color:red;">通话中!!!</span>'
+                    }
+                }else{
+                    if(rowObject[9]){
+                        if(rowObject[2]){
+                            value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击查看详情" href="/web/consumer/modify?consumerId='+rowObject[9]+'" data-action="openIframeWindow" >'+rowObject[2]+'</a>';
+                        }else{
+                            value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击查看详情" href="/web/consumer/modify?consumerId='+rowObject[9]+'" data-action="openIframeWindow" >无名</a>';
+                        }
+
+
+                        if(rowObject[5]==""){
+                            value += '&nbsp;<span style="color:red;">通话中!!!</span>'
+                        }
+                    }else{
+                        value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add?aid='+options.rowId+'" data-action="openIframeWindow">未知客户</a>';
+                        if(rowObject[6]==""){
+                            value += '&nbsp;<span style="color:red;">通话中!!!</span>'
+                        }
+                    }
+                }
+
+                return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="consumerRemark" desc="备注"/>
+        <column field="parentName" desc="家长姓名" hidden="true"/>
+        <column field="consumerPhone" desc="客户电话" >
+            <formatter>
+                <![CDATA[
+                    var value = cellvalue;
+                    if(rowObject[8]=='1'){
+                        value +=  '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="点击下载录音" href="http://117.29.168.34:8888/manage/audioDownload?filename='+rowObject[10]+'&centerId='+rowObject[11]+'&startTime='+rowObject[5]+'">下载</a>';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="consumerCenterName" desc="客户所属中心"/>
+        <column field="startTime" desc="通话时间"/>
+        <column field="seconds" desc="通话时长"/>
+        <column field="inout" desc="电话方向"/>
+        <column field="is_upload_finish" desc="是否下载完成" hidden="true"/>
+        <column field="consumerId" desc="客户id" hidden="true"/>
+        <column field="filename" desc="文件名" hidden="true"/>
+        <column field="audioCenterId" desc="录音归属中心ID" hidden="true"/>
+
+        <!--
         <column field="cName" desc="客户姓名">
             <formatter>
                 <![CDATA[
-                if(cellvalue=='未知客户'){
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add" data-action="openIframeWindow" >'+cellvalue+'</a>';
+                var value = '';
+
+                if(rowObject[11]!=''){
+                    value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'" data-action="openIframeWindow">'+rowObject[11]+'</a>';
+                    if(rowObject[4]==""){
+                        value += '&nbsp;<span style="color:red;">通话中!!!</span>'
+                    }
                 }else{
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'" data-action="openIframeWindow">'+cellvalue+'</a>';
+                    if(cellvalue=='未知客户'){
+                        value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/add?phone='+rowObject[1]+'" data-action="openIframeWindow" >'+cellvalue+'</a>';
+                        if(rowObject[4]==""){
+                            value += '&nbsp;<span style="color:red;">通话中!!!</span>'
+                        }
+                    }else{
+                        value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击添加客户" href="/web/consumer/modify?id='+rowObject[8]+'" data-action="openIframeWindow">'+cellvalue+'</a>';
+                        if(rowObject[4]==""){
+                            value += '&nbsp;<span style="color:red;">通话中!!!</span>'
+                        }
+                    }
                 }
+
+                return value;
                 ]]>
             </formatter>
         </column>
@@ -48,7 +124,8 @@
         <column field="cid" desc="客户id" hidden="true"/>
         <column field="filename" desc="文件名" hidden="true"/>
         <column field="centerId" desc="中心id" hidden="true"/>
-
+        <column field="child" desc="孩子姓名" hidden="true"/>
+        -->
         <!--<action desc="下载录音" url="/downloadAudio" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>-->
     </customgridpanel>
 </viewport>

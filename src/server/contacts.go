@@ -1,16 +1,16 @@
-// Title：顾问通话详情列表
+// Title：客户联系人
 //
 // Description:
 //
 // Author:black
 //
-// Createtime:2013-09-26 15:50
+// Createtime:2013-11-16 17:29
 //
 // Version:1.0
 //
 // 修改历史:版本号 修改日期 修改人 修改说明
 //
-// 1.0 2013-09-26 15:50 black 创建文档
+// 1.0 2013-11-16 17:29 black 创建文档
 package server
 
 import (
@@ -23,28 +23,9 @@ import (
 	"text/template"
 )
 
-/*
-select a.aid,cons.child,cont.name contName,a.remotephone,,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.remark,cons.id,a.filename,a.cid  from audio a
-left join contacts cont on a.remotephone=cont.phone
-left join consumer_new cons on cont.consumer_id=cons.id
-left join employee e on e.phone_in_center=a.localphone and e.center_id=a.cid
-left join center ce on ce.cid=cons.center_id
-where e.user_id=1 and a.remotephone != '' and  a.remotephone is not null
-*/
-func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
+func ContractsListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
-
-	employee := lessgo.GetCurrentEmployee(r)
-
-	if employee.UserId == "" {
-		lessgo.Log.Warn("用户未登陆")
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "用户未登陆"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
 
 	err := r.ParseForm()
 
@@ -75,51 +56,13 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	eid := r.FormValue("eid")
-	year := r.FormValue("year-eq")
-	month := r.FormValue("month-eq")
-	week := r.FormValue("week-eq")
-	startTime := r.FormValue("start_time-eq")
-
-	st := ""
-	et := ""
-	flag := true
-
-	if startTime != "" {
-		st = startTime + " 00:00:00"
-		et = startTime + " 23:59:59"
-	} else {
-		if week != "" && month != "" && year != "" {
-			st, et, flag = lessgo.FindRangeTimeDim("", "", year+month+week)
-		} else if month != "" && year != "" {
-			st, et, flag = lessgo.FindRangeTimeDim("", year+month, "")
-		} else if year != "" {
-			st, et, flag = lessgo.FindRangeTimeDim(year, "", "")
-		}
-	}
+	consumerId := r.FormValue("consumerId")
 
 	params := []interface{}{}
 
-	sql := "select a.aid,cons.child,cons.remark,cont.name contName,a.remotephone,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.id,a.filename,a.cid  from audio a "
-	sql += " left join contacts cont on a.remotephone=cont.phone "
-	sql += " left join consumer_new cons on cont.consumer_id=cons.id "
-	sql += " left join employee e on e.phone_in_center=a.localphone and e.center_id=a.cid "
-	sql += " left join center ce on ce.cid=cons.center_id "
-	sql += " where e.user_id=? and a.remotephone != '' and  a.remotephone is not null "
+	sql := " select id,name,phone,is_default from contacts where consumer_id=? "
 
-	params = append(params, eid)
-
-	if flag {
-		if st != "" && et != "" {
-			sql += " and a.start_time >= ? and a.start_time<= ?"
-			params = append(params, st)
-			params = append(params, et)
-		}
-	} else { //找不到相应的时间区间
-		sql += " and a.start_time >= ? and a.start_time<= ?"
-		params = append(params, "2000-01-01 00:00:00")
-		params = append(params, "2000-01-01 00:00:01")
-	}
+	params = append(params, consumerId)
 
 	countSql := ""
 
@@ -130,7 +73,7 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql, params...)
+	rows, err := db.Query(countSql, consumerId)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -164,7 +107,7 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " order by a.start_time desc,aid desc limit ?,?"
+	sql += " order by is_default,id desc limit ?,?"
 
 	lessgo.Log.Debug(sql)
 
@@ -192,7 +135,7 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 12; i++ {
+		for i := 0; i < 3; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -223,5 +166,5 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
-
 }
+

@@ -45,20 +45,22 @@ func CheckPwd(username, password string) (bool, lessgo.Employee, string) {
 		return false, employee, "密码错误"
 	}
 
-	sql = "select distinct(role_id) from employee_role where user_id=?"
+	sql = "select r.role_id,r.level,r.code from employee_role er left join role r on r.role_id=er.user_id where user_id=?"
 	rows, err = db.Query(sql, employee.UserId)
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, employee, " 数据库异常!"
 	}
-	var tmp_id string
+	var roleId,roleCode,roleLevel string
 	for rows.Next() {
-		err := rows.Scan(&tmp_id)
+		err := rows.Scan(&roleId,&roleLevel,&roleCode)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, employee, " 数据库异常!"
 		}
-		employee.RoleId = employee.RoleId + tmp_id + ","
+		employee.RoleId = employee.RoleId + roleId + ","
+		employee.RoleCode = employee.RoleCode + roleCode + ","
+		employee.RoleLevel = employee.RoleLevel + roleLevel + ","
 	}
 	lessgo.Log.Info(employee)
 	return true, employee, ""

@@ -73,13 +73,15 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId, ",")
+	roleCodes := strings.Split(employee.RoleCode, ",")
 
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
+	fmt.Println(employee.RoleCode)
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
 			dataType = "all"
 			break
-		} else if roleId == "2" {
+		} else if roleCode == "cd" {
 			dataType = "center"
 			break
 		} else {
@@ -88,7 +90,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cid := r.FormValue("cid-eq")
-	name := r.FormValue("name-like")
+	employeeId := r.FormValue("employee_id-eq")
 	year := r.FormValue("year-eq")
 	month := r.FormValue("month-eq")
 	week := r.FormValue("week-eq")
@@ -118,7 +120,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	if dataType == "all" {
 
-		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d,phone_count.localphone from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.localphone from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if cid != "" {
 			sql += " and cid=? "
@@ -137,7 +139,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 			params = append(params, "2000-01-01 00:00:01")
 		}
 
-		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone from audio where remotephone!='' and remotephone is not null "
+		sql += " group by  localphone,cid) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone and e.center_id=phone_count.cid left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
 			if st != "" && et != "" {
@@ -151,18 +153,18 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 			params = append(params, "2000-01-01 00:00:01")
 		}
 
-		sql += " group by  localphone order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone "
+		sql += " group by  localphone,cid order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone and rank.cid=phone_count.cid"
 
-		if name != "" {
-			sql += " where e.really_name like ? "
-			params = append(params, "%"+name+"%")
+		if employeeId != "" {
+			sql += " where e.user_id = ? "
+			params = append(params, employeeId)
 		}
 
 		sql += " order by rank.rowNo "
 
 	} else if dataType == "center" {
 
-		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d,phone_count.localphone from (select count(*) num,localphone,cid from audio  where cid=? and remotephone!='' and remotephone is not null "
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.localphone from (select count(*) num,localphone,cid from audio  where cid=? and remotephone!='' and remotephone is not null "
 
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
@@ -187,7 +189,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 			params = append(params, "2000-01-01 00:00:01")
 		}
 
-		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone  left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone from audio where remotephone!='' and remotephone is not null "
+		sql += " group by  localphone,cid) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone and e.center_id=phone_count.cid  left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
 			if st != "" && et != "" {
@@ -201,18 +203,18 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 			params = append(params, "2000-01-01 00:00:01")
 		}
 
-		sql += " group by  localphone order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone "
+		sql += " group by  localphone,cid order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone and rank.cid=phone_count.cid "
 
-		if name != "" {
-			sql += " where e.really_name like ? "
-			params = append(params, "%"+name+"%")
+		if employeeId != "" {
+			sql += " where e.user_id = ? "
+			params = append(params, employeeId)
 		}
 
 		sql += " order by rank.rowNo "
 
 	} else if dataType == "self" {
 
-		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.num c,phone_count.num d,phone_count.localphone from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
+		sql += "select c.name,c.cid,e.user_id,e.really_name,phone_count.num a,rank.rowNo b,phone_count.localphone from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
 			if st != "" && et != "" {
@@ -226,7 +228,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 			params = append(params, "2000-01-01 00:00:01")
 		}
 
-		sql += " group by  localphone) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone  left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone from audio where remotephone!='' and remotephone is not null "
+		sql += " group by  localphone,cid) phone_count left join center c on c.cid=phone_count.cid left join employee e on e.phone_in_center=phone_count.localphone and e.center_id=phone_count.cid left join (select a.*,(@rowNum:=@rowNum+1) as rowNo from (select count(*) num,localphone,cid from audio where remotephone!='' and remotephone is not null "
 
 		if flag {
 			if st != "" && et != "" {
@@ -240,7 +242,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 			params = append(params, "2000-01-01 00:00:01")
 		}
 
-		sql += " group by  localphone order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone "
+		sql += " group by  localphone,cid order by num desc) a,(Select (@rowNum :=0) ) b)rank on rank.localphone=phone_count.localphone and rank.cid=phone_count.cid "
 
 		sql += " where e.user_id=? "
 
@@ -317,7 +319,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects := []interface{}{}
 
-		for i := 0; i < 9; i++ {
+		for i := 0; i < 7; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
