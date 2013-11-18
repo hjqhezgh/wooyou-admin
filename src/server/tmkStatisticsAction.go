@@ -27,16 +27,13 @@ import (
 
 //tmk运营报表
 /*
-select tc.employee_id,e.really_name,count(tc.employee_id) as '名单总数',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到'
-from tmk_consumer tc  left join employee e on e.user_id=tc.employee_id
-left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0
-where tc.employee_id is not null
-group by tc.employee_id
-limit 0,100;
+select tc.tmk_id,e.really_name,count(tc.tmk_id) as '名单总数',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到'
+from tmk_consumer tc  left join employee e on e.user_id=tc.tmk_id
+left join (select * from consumer_new where contact_status=2)bb on tc.consumer_id=bb.id
+left join (select * from consumer_new where contact_status=3)cc on tc.consumer_id=cc.id
+left join (select * from consumer_new where contact_status=4)dd on tc.consumer_id=dd.id
+left join (select * from consumer_new where contact_status=5)ee on tc.consumer_id=ee.id
+group by tc.tmk_id
 */
 func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
@@ -84,18 +81,16 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select tc.employee_id,e.really_name,count(tc.employee_id) as '名单总数',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' "
-	sql += " from tmk_consumer tc left join employee e on e.user_id=tc.employee_id "
-	sql += " left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " where tc.employee_id is not null "
+	sql := "select tc.tmk_id,e.really_name,count(tc.tmk_id) as '名单总数',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' "
+	sql += " from tmk_consumer tc  left join employee e on e.user_id=tc.tmk_id "
+	sql += " left join (select * from consumer_new where contact_status=2)bb on tc.consumer_id=bb.id "
+	sql += " left join (select * from consumer_new where contact_status=3)cc on tc.consumer_id=cc.id "
+	sql += " left join (select * from consumer_new where contact_status=4)dd on tc.consumer_id=dd.id "
+	sql += " left join (select * from consumer_new where contact_status=5)ee on tc.consumer_id=ee.id "
+	sql += " group by tc.tmk_id "
 
-	sql += " group by tc.employee_id "
 
-	countSql := "select count(distinct(employee_id)) from tmk_consumer where employee_id is not null"
+	countSql := "select count(distinct(tmk_id)) from tmk_consumer"
 
 	lessgo.Log.Debug(countSql)
 
@@ -159,13 +154,12 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 
 		model := new(lessgo.Model)
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		model.Id = r.Intn(1000)
-		model.Props = []*lessgo.Prop{}
 
 		fillObjects := []interface{}{}
 
-		for i := 0; i < 8; i++ {
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 6; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

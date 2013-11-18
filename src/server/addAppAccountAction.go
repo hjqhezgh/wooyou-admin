@@ -47,7 +47,7 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	sql := "select father,father_phone,mother,mother_phone,child,center_id from consumer where id=? "
+	sql := "select cont.name,cont.phone,cons.child,cons.center_id,cons.birthday from contacts cont left join consumer_new cons on cons.id=cont.consumer_id where cont.consumer_id=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -57,6 +57,7 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Query(sql, id)
 
 	if err != nil {
+		lessgo.Log.Error(err.Error())
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -64,12 +65,13 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var father, fatherPhone, mother, motherPhone, child, centerId string
+	var contactName,phone,child,centerId,birthday string
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &father, &fatherPhone, &mother, &motherPhone, &child, &centerId)
+		err = commonlib.PutRecord(rows, &contactName, &phone, &child, &centerId, &birthday)
 
 		if err != nil {
+			lessgo.Log.Error(err.Error())
 			m["success"] = false
 			m["code"] = 100
 			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -83,23 +85,11 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects := []lessgo.LoadFormObject{}
 
 	h1 := lessgo.LoadFormObject{"id", id}
-	h2 := lessgo.LoadFormObject{"father", father}
-	h3 := lessgo.LoadFormObject{"fatherPhone", fatherPhone}
-	h4 := lessgo.LoadFormObject{"mother", mother}
-	h5 := lessgo.LoadFormObject{"motherPhone", motherPhone}
-	h6 := lessgo.LoadFormObject{"child", child}
-	h7 := lessgo.LoadFormObject{"childName", child}
-	h8 := lessgo.LoadFormObject{"account", ""}
-	h9 := lessgo.LoadFormObject{"userName", ""}
-	h10 := lessgo.LoadFormObject{"centerId", centerId}
-
-	if motherPhone != "" {
-		h8 = lessgo.LoadFormObject{"account", motherPhone}
-		h9 = lessgo.LoadFormObject{"userName", mother}
-	} else if fatherPhone != "" {
-		h8 = lessgo.LoadFormObject{"account", fatherPhone}
-		h9 = lessgo.LoadFormObject{"userName", father}
-	}
+	h2 := lessgo.LoadFormObject{"userName", contactName}
+	h3 := lessgo.LoadFormObject{"account", phone}
+	h4 := lessgo.LoadFormObject{"childName", child}
+	h5 := lessgo.LoadFormObject{"centerId", centerId}
+	h6 := lessgo.LoadFormObject{"childBirthday", birthday}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -107,10 +97,6 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects = append(loadFormObjects, h4)
 	loadFormObjects = append(loadFormObjects, h5)
 	loadFormObjects = append(loadFormObjects, h6)
-	loadFormObjects = append(loadFormObjects, h7)
-	loadFormObjects = append(loadFormObjects, h8)
-	loadFormObjects = append(loadFormObjects, h9)
-	loadFormObjects = append(loadFormObjects, h10)
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
@@ -243,7 +229,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateConsumerSql := "update consumer set parent_id=? where id=?"
+	updateConsumerSql := "update consumer_new set parent_id=? where id=?"
 
 	lessgo.Log.Debug(updateConsumerSql)
 
@@ -287,19 +273,7 @@ func AddAppAccountSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	childBirthdayDate, err := time.ParseInLocation("2006-01-02", childBirthday, time.Local)
-
-	if err != nil {
-		tx.Rollback()
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "小孩子生日格式错误"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	_, err = stmt3.Exec(childName, parentId, childSex, childBirthdayDate.Format("20060102"), centerId)
+	_, err = stmt3.Exec(childName, parentId, childSex, childBirthday, centerId)
 
 	if err != nil {
 		tx.Rollback()

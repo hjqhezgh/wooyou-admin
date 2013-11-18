@@ -1,49 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
     <customformpanel id="form" title="APP开户" saveUrl="/addAppAccountSave.json" load="true" loadUrl="/addAppAccountLoad.json" inwindow="true">
-        <element field="mother" type="text" validate="" desc="母亲姓名" readonly="true"/>
-        <element field="motherPhone" type="text" validate="" desc="母亲电话" readonly="true"/>
-        <element field="father" type="text" validate="" desc="父亲姓名" readonly="true"/>
-        <element field="fatherPhone" type="text" validate="" desc="父亲电话" readonly="true"/>
-        <element field="homePhone" type="text" validate="" desc="家庭电话" readonly="true"/>
-        <element field="child" type="text" validate="" desc="小孩姓名" readonly="true"/>
-
         <element field="id" type="hidden" validate="" desc=""/>
         <element field="centerId" type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="挂靠中心"/>
         <element field="account" type="text" validate="notNull" desc="注册手机号"/>
         <element field="pwd" type="text" validate="notNull" desc="注册密码"/>
         <element field="userName" type="text" validate="notNull" desc="用户名称"/>
         <element field="childName" type="text" validate="notNull" desc="小孩子姓名"/>
-        <element field="childBirthday" type="date" validate="notNull" desc="小孩子生日"/>
+        <element field="childBirthday" type="date" validate="notNull" char8="true" desc="小孩子生日"/>
         <element field="childSex"  type="localSelect" validate="notNull" localData="[{desc:'男',value:'1'},{desc:'女',value:'2'}]" desc="小孩子性别" />
-
-        <beforeSave>
-            <![CDATA[
-                var mother = container.find('form').find('[name=mother]').val()
-                var motherPhone = container.find('form').find('[name=motherPhone]').val()
-                var father = container.find('form').find('[name=father]').val()
-                var fatherPhone = container.find('form').find('[name=fatherPhone]').val()
-
-                if(motherPhone=='' && fatherPhone=='' ){
-                    alert('母亲电话和父亲电话请至少填写一个');
-                    return false;
-                }
-
-                if(motherPhone!='' && mother==''){
-                    alert('请填写母亲姓名');
-                    return false;
-                }
-
-                if(fatherPhone!='' && father==''){
-                    alert('请填写父亲姓名');
-                    return false;
-                }
-
-                return true;
-            ]]>
-        </beforeSave>
-
-        <afterRender>
-        </afterRender>
     </customformpanel>
 </viewport>

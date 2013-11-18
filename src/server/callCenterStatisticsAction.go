@@ -18,25 +18,27 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"math"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
 	"text/template"
-	"time"
 )
 
 //CallCenter 统计报表
 /*
-select c.cid,c.name,count(tc.id) as '全部名单',count(tc.employee_id) as '已分配',count(tc.id)-count(tc.employee_id) as '未分配',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' from center c
-left join tmk_consumer tc on c.cid=tc.center_id
-left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0
-left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0
-group by c.cid
-limit 0,100;
+select ce.cid,ce.name,a.num as '全部名单', b.num as '未联系', c.num as '待确认', d.num as '已废弃', e.num as '已邀约',f.num as '已签到'  from center ce
+left join
+(select count(1) num,center_id from consumer_new group by center_id )a on a.center_id=ce.cid
+left join
+(select count(1) num,center_id from consumer_new where contact_status=1 group by center_id )b on a.center_id=ce.cid
+left join
+(select count(1) num,center_id from consumer_new where contact_status=2 group by center_id )c on b.center_id=ce.cid
+left join
+(select count(1) num,center_id from consumer_new where contact_status=3 group by center_id )d on c.center_id=ce.cid
+left join
+(select count(1) num,center_id from consumer_new where contact_status=4 group by center_id )e on d.center_id=ce.cid
+left join
+(select count(1) num,center_id from consumer_new where contact_status=5 group by center_id )f on e.center_id=ce.cid
 */
 func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
@@ -84,32 +86,36 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId, ",")
+	roleCodes := strings.Split(employee.RoleCode, ",")
 
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
 			dataType = "all"
 			break
-		} else if roleId == "2" {
+		} else {
 			dataType = "center"
 			break
-		} else {
-			dataType = "self"
 		}
 	}
 
 	params := []interface{}{}
 
-	sql := "select c.cid,c.name,count(tc.id) as '全部名单',count(tc.employee_id) as '已分配',count(tc.id)-count(tc.employee_id) as '未分配',count(aa.id) as '未联系',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' from center c "
-	sql += " left join tmk_consumer tc on c.cid=tc.center_id "
-	sql += " left join (select * from consumer where contact_status=1)aa on tc.consumer_id=aa.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=2)bb on tc.consumer_id=bb.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=3)cc on tc.consumer_id=cc.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=4)dd on tc.consumer_id=dd.id and tc.employee_id is not null and tc.employee_id!=0 "
-	sql += " left join (select * from consumer where contact_status=5)ee on tc.consumer_id=ee.id and tc.employee_id is not null and tc.employee_id!=0 where c.cid!=9 " //将总部过滤掉
+	sql := " select ce.cid,ce.name,a.num as '全部名单', b.num as '未联系', c.num as '待确认', d.num as '已废弃', e.num as '已邀约',f.num as '已签到'  from center ce "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new group by center_id )a on a.center_id=ce.cid "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new where contact_status=1 group by center_id )b on b.center_id=ce.cid "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new where contact_status=2 group by center_id )c on c.center_id=ce.cid "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new where contact_status=3 group by center_id )d on d.center_id=ce.cid "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new where contact_status=4 group by center_id )e on e.center_id=ce.cid "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new where contact_status=5 group by center_id )f on f.center_id=ce.cid where ce.cid!=9 "//将总部过滤掉
 
 	if dataType == "center" {
-		sql += " and c.cid=? "
+		sql += " and ce.cid=? "
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 
@@ -122,12 +128,7 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		params = append(params, _employee.CenterId)
-	} else if dataType == "self" {
-		// fix
-		sql += " and tc.employee_id=" + employee.UserId
 	}
-
-	sql += " group by c.cid "
 
 	countSql := "select count(1) from center where cid!=9 "
 
@@ -197,13 +198,12 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 
 		model := new(lessgo.Model)
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		model.Id = r.Intn(1000)
-		model.Props = []*lessgo.Prop{}
 
 		fillObjects := []interface{}{}
 
-		for i := 0; i < 10; i++ {
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 7; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

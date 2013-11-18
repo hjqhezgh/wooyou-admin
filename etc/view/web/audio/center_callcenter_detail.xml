@@ -7,27 +7,26 @@
         <crumb text="Call Center详情" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/centerCallCenterDetail.json" pageSize="15" title="中心CallCenter详情" id="grid1" width="1200" height="350" loadUrl="true">
-        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未分配',value:'no employee'},{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
+    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="400" loadUrl="true" mutiSelect="true">
 
-        <column field="employee_name" desc="所属TMK">
-            <formatter>
-                <![CDATA[
-                    if(cellvalue==""){
-                        return '<a style="color:red;text-decoration: underline;" target="_blank" data-action="openIframeWindow" href="/web/audio/sendToTmk?id='+options.rowId+'">未分配</a>';
-                    }else{
-                        return '<a style="color:green;text-decoration: underline;" target="_blank" data-action="openIframeWindow" href="/web/audio/sendToTmk?id='+options.rowId+'">'+cellvalue+'</a>';
-                    }
-                ]]>
-            </formatter>
-        </column>
+        <search field="tmkId" searchType="eq" inputType="remoteSelect" url="/employeeListByRoleId.json?id=11" valueField="userId" descField="reallyName" desc="所属TMK"/>
+        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
+        <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="联系起始时间"/>
+        <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="联系结束时间"/>
+        <search field="kw" searchType="like" inputType="text" desc="关键字"/>
+        <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
 
-        <column field="mother" desc="母亲"/>
-        <column field="mother_phone" desc="母亲电话"/>
-        <column field="father" desc="父亲"/>
-        <column field="father_name" desc="父亲电话"/>
-        <column field="home_phone" desc="家庭电话"/>
-        <column field="childname" desc="孩子姓名"/>
+        <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
+        <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
+        <toolaction desc="待确认" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认将该客户重置为待确认吗？" colorClass="h-bg-green" params="{status:'2'}"/>
+        <toolaction desc="签到" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认签到该客户吗？" colorClass="h-bg-green" params="{status:'5'}"/>
+
+        <column field="centerName" desc="所属门店"/>
+        <column field="employeeName" desc="TMK"/>
+        <column field="contactName" desc="联系人"/>
+        <column field="contactPhone" desc="联系电话"/>
+        <column field="homePhone" desc="家庭电话"/>
+        <column field="child" desc="孩子姓名"/>
         <column field="status" desc="状态">
             <formatter>
                 <![CDATA[
@@ -38,13 +37,25 @@
                 }else if(cellvalue==3){
                     return '<span style="color:#ccc;">已废弃</span>';
                 }else if(cellvalue==4){
-                    return '<span>已邀约至中心</span>'+'&nbsp;'+'<a href="/consumerStatusChange?status=5&id='+rowObject[8]+'" target="_blank" style="color:blue;text-decoration: underline;">确认签到</a>';
+                    return '<span style="color:blue;">已邀约至中心</span>';
                 }else if(cellvalue==5){
                     return '<span style="color:green;">签到成功</span>';
                 }
+            ]]>
+            </formatter>
+        </column>
+        <column field="isAPP" desc="是否APP用户">
+            <formatter>
+                <![CDATA[
+                    if(cellvalue){
+                        return '是' + '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="排课" href="/web/class_schedule_detail">排课</a>';
+                    }else{
+                        return '<a style="color:blue;text-decoration: underline;" target="_blank" title="APP开户" href="/web/consumer/add_app_account?id='+options.rowId+'" data-action="openIframeWindow">开户</a>';
+                    }
                 ]]>
             </formatter>
         </column>
-        <column field="consume_id" desc="客户id" hidden="true"/>
+        <column field="remark" desc="备注"/>
+        <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>
 </viewport>

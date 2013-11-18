@@ -322,6 +322,43 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	if id == "" {
+		checkCourseExistSql := "select count(1) from course where center_id=? and name=? "
+		lessgo.Log.Debug(checkCourseExistSql)
+
+		rows, err := db.Query(checkCourseExistSql, center_id,name)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		totalNum := 0
+
+		for rows.Next() {
+			err = commonlib.PutRecord(rows, &totalNum)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if totalNum > 0 {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "课程名重复，请更换一个课程名重复"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
 		sql := "insert into course(name,center_id,price,is_probation,type,begin_age,end_age,intro,app_display_level,create_time,lesson_num) values(?,?,?,?,?,?,?,?,?,?,?)"
 
 		lessgo.Log.Debug(sql)
@@ -359,53 +396,56 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tmpFile, err := os.OpenFile(".."+courseTmpImg, os.O_RDWR, 0777)
+		if courseTmpImg!="" {
+			tmpFile, err := os.OpenFile(".."+courseTmpImg, os.O_RDWR, 0777)
 
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			courseImgDir ,err := lessgo.Config.GetValue("wooyou", "courseImgDir")
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			err = os.MkdirAll(fmt.Sprint(courseImgDir+"/",courseId), 0777)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			disFile, err := os.Create(fmt.Sprint(courseImgDir+"/",courseId,"/480_230.png"))
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			io.Copy(disFile, tmpFile)
+
+			os.Remove(".."+courseTmpImg)
 		}
 
-		courseImgDir ,err := lessgo.Config.GetValue("wooyou", "courseImgDir")
-
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		err = os.MkdirAll(fmt.Sprint(courseImgDir+"/",courseId), 0777)
-
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		disFile, err := os.Create(fmt.Sprint(courseImgDir+"/",courseId,"/480_230.png"))
-
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		io.Copy(disFile, tmpFile)
-
-		os.Remove(".."+courseTmpImg)
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")

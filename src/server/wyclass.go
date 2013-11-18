@@ -56,14 +56,15 @@ func WyClassListAction(w http.ResponseWriter, r *http.Request) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId, ",")
+	roleCodes := strings.Split(employee.RoleCode, ",")
 
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" || roleId == "11" {
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" || roleCode == "tmk"{
 			dataType = "all"
 			break
 		} else {
 			dataType = "center"
+			break
 		}
 	}
 
@@ -381,6 +382,113 @@ func WyClassUpdateAction(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func WyClassInsertAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	name := r.FormValue("name")
+	center_id := r.FormValue("center_id")
+	course_id := r.FormValue("course_id")
+	end_time := r.FormValue("end_time")
+	deadline := r.FormValue("deadline")
+	max_child_num := r.FormValue("max_child_num")
+	child_num := r.FormValue("child_num")
+	teacher_id := r.FormValue("teacher_id")
+	assistant_id := r.FormValue("assistant_id")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkClassExistSql := "select count(1) from wyclass where center_id=? and name=? "
+	lessgo.Log.Debug(checkClassExistSql)
+
+	rows, err := db.Query(checkClassExistSql, center_id,name)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	for rows.Next() {
+		err = commonlib.PutRecord(rows, &totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if totalNum > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "班级名重复，请更换一个班级名重复"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+
+	sql := "insert into wyclass(assistant_id,name,create_time,course_id,center_id,child_num,end_time,deadline,max_child_num,teacher_id) values(?,?,?,?,?,?,?,?,?,?)"
+
+	lessgo.Log.Debug(sql)
+
+	stmt, err := db.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(assistant_id,name,time.Now().Format("20060102150405"), course_id, center_id,child_num, end_time, deadline, max_child_num, teacher_id)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	m["success"] = true
+	commonlib.OutputJson(w, m, " ")
+
+}
+
 func LoadChildInClassAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
@@ -617,6 +725,64 @@ func SaveChildToClassAction(w http.ResponseWriter, r *http.Request) {
 					commonlib.OutputJson(w, m, " ")
 					return
 				}
+
+				getConsumerIdSql := "select cons.id from consumer_new cons left join parent p on p.pid=cons.parent_id left join child c on c.pid=p.pid where c.cid=? "
+				lessgo.Log.Debug(getConsumerIdSql)
+
+				getConsumerRow, err := db.Query(getConsumerIdSql, child.Cid)
+
+				if err != nil {
+					tx.Rollback()
+					lessgo.Log.Warn(err.Error())
+					m["success"] = false
+					m["code"] = 100
+					m["msg"] = "系统发生错误，请联系IT部门" + err.Error()
+					commonlib.OutputJson(w, m, " ")
+					return
+				}
+
+				consumerId := 0
+
+				if getConsumerRow.Next() {
+					err = commonlib.PutRecord(getConsumerRow, &consumerId)
+
+					if err != nil {
+						tx.Rollback()
+						lessgo.Log.Warn(err.Error())
+						m["success"] = false
+						m["code"] = 100
+						m["msg"] = "系统发生错误，请联系IT部门" + err.Error()
+						commonlib.OutputJson(w, m, " ")
+						return
+					}
+				}
+
+				updateConsumerStatusSql := "update consumer_new set contact_status=4 where id=? "
+				lessgo.Log.Debug(insertContractSql)
+
+				updateConsumerStatusSqlStmt, err := tx.Prepare(updateConsumerStatusSql)
+				if err != nil {
+					tx.Rollback()
+					lessgo.Log.Warn(err.Error())
+					m["success"] = false
+					m["code"] = 100
+					m["msg"] = "系统发生错误，请联系IT部门" + err.Error()
+					commonlib.OutputJson(w, m, " ")
+					return
+				}
+
+				_, err = updateConsumerStatusSqlStmt.Exec(consumerId)
+
+				if err != nil {
+					tx.Rollback()
+					lessgo.Log.Warn(err.Error())
+					m["success"] = false
+					m["code"] = 100
+					m["msg"] = "系统发生错误，请联系IT部门" + err.Error()
+					commonlib.OutputJson(w, m, " ")
+					return
+				}
+
 
 			} else {
 				continue

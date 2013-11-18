@@ -75,8 +75,6 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 	roleCodes := strings.Split(employee.RoleCode, ",")
 
-	fmt.Println(employee.RoleCode)
-
 	for _, roleCode := range roleCodes {
 		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
 			dataType = "all"

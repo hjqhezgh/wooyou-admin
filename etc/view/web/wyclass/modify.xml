@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport    window="true">
+<viewport window="true">
     <customformpanel id="news" saveUrl="/web/wyclass/update.json" load="true" loadUrl="/web/wyclass/load.json" title="修改班级" inwindow="true">
         <element field="name" type="text" desc="班级名" validate="notNull"/>
         <element field="class_id" type="hidden" desc="主键"/>

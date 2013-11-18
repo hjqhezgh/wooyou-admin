@@ -46,12 +46,14 @@
     <url path="/web/consumer/valid_for_callcenter_list" view="web/consumer/valid_for_callcenter_list.xml" />
     <!--查看中心CallCenter详情-->
     <url path="/web/audio/center_callcenter_detail" view="web/audio/center_callcenter_detail.xml" />
+    <!--tmk名单库-->
+    <url path="/web/audio/tmk_consumer" view="web/audio/tmk_consumer.xml" />
     <!--查看中心CallCenter详情-->
     <url path="/web/audio/sendToTmk" view="web/audio/sendToTmk.xml" />
     <!--tmk运营报表-->
     <url path="/web/audio/tmk_statistics" view="web/audio/tmk_statistics.xml" />
     <!--tmk运营报表详情-->
-    <url path="/web/audio/tmk_statistics_detail" view="web/audio/tmk_statistics_detail.xml" />
+        <url path="/web/audio/tmk_statistics_detail" view="web/audio/tmk_statistics_detail.xml" />
 
     <!--app开户-->
     <url path="/web/consumer/add_app_account" view="web/consumer/add_app_account.xml" />

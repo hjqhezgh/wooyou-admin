@@ -9,6 +9,7 @@
     <customgridpanel url="/class_schedule_detail.json" pageSize="15" title="课表管理" id="grid1" width="1200" height="350" loadUrl="false">
 
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="course_id"  searchType="eq" url="/courseByCenterId.json" valueField="value" descField="desc" inputType="remoteSelect" desc="课程" parentSelect="cid" validate="notNull"/>
         <search field="day_date" searchType="ge" inputType="date" desc="起始时间" char8="true" />
         <search field="day_date" searchType="le" inputType="date" desc="结束时间" char8="true" />
 
@@ -67,7 +68,7 @@
             <formatter>
                 <![CDATA[
                         if(cellvalue =="1") {
-                            return "未上课";
+                            return "未上课"+ '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="安排学员" href="/web/wyclass/manageChild?id='+rowObject[12]+'&center_id-eq='+rowObject[13]+'" data-action="openIframeWindow">安排学员</a>';;
                         } else if(cellvalue =="2") {
                              return "正在上课";
                         }else if(cellvalue =="3") {
@@ -77,6 +78,8 @@
             </formatter>
         </column>
 
+        <column field="class_id" desc="班级" hidden="true"/>
+        <column field="center_id" desc="中心id" hidden="true"/>
         <toolaction desc="添加" url="/web/class_schedule_detail/add" colorClass="h-bg-green" linkType="iframeWindow"/>
         <action desc="修改" url="/web/class_schedule_detail/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
     </customgridpanel>

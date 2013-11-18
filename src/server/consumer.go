@@ -34,6 +34,15 @@ const (
 )
 
 //客户分页数据服务
+/*
+select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id
+from
+(select consumer_id,min(id) contacts_id from contacts group by consumer_id)a
+left join consumer_new cons on cons.id=a.consumer_id
+left join contacts cont on cont.id=a.contacts_id
+left join center ce on ce.cid=cons.center_id
+left join employee e on e.user_id=cons.current_tmk_id
+*/
 func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
@@ -51,18 +60,16 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId, ",")
+	roleCodes := strings.Split(employee.RoleCode, ",")
 
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" || roleId == "11" {
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
 			dataType = "all"
 			break
-		} else {//if roleId == "2" {
+		} else{
 			dataType = "center"
 			break
-		} /*else if roleId == "" {
-			dataType = "self"
-		}*/
+		}
 	}
 
 	err := r.ParseForm()
@@ -94,19 +101,58 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	mySort := r.FormValue("mySort-eq")
-	name := r.FormValue("name-like")
-	centerId := r.FormValue("cid-eq")
+	centerId1 := r.FormValue("centerId-eq")
+	centerId2 := r.FormValue("centerId")
+	tmkId1 := r.FormValue("tmkId-eq")
+	tmkId2 := r.FormValue("tmkId")
+	status := r.FormValue("status-eq")
+	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
+	lastContractEndTime := r.FormValue("lastContractEndTime-le")
+	kw := r.FormValue("kw-like")
+	sort := r.FormValue("sort-eq")
 
 	params := []interface{}{}
 
-	sql := "select c.id,ce.name,e.really_name,c.mother,c.mother_phone,c.father,c.father_phone,c.home_phone,c.child,a.num,a.maxtime,c.contact_status,c.parent_id from consumer c left join (select count(1) num,max(start_time) maxtime, remotephone from audio group by remotephone) a on (c.mother_phone=a.remotephone and c.mother_phone!='' and c.mother_phone is not null) or (a.remotephone=c.father_phone and c.father_phone!='' and  c.father_phone is not null) left join employee e on e.user_id=c.employee_id left join center ce on ce.cid=c.center_id where 1=1 "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark "
+	sql += " from "
+	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
+	if kw != "" {
+		sql += "left join consumer_new b on b.id=c.consumer_id where c.phone like ? or c.name like ? or b.child like ? or b.remark like ? or b.home_phone like ? "
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+	}
+	sql += " group by c.consumer_id)a "
+	sql += " left join consumer_new cons on cons.id=a.consumer_id "
+	sql += " left join contacts cont on cont.id=a.contacts_id "
+	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join employee e on e.user_id=cons.current_tmk_id where 1=1 "
 
-	if name != "" {
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		params = append(params, "%"+name+"%")
-		sql += " and c.mother like ? or c.father like ? or c.child like ? "
+	if status != "" {
+		params = append(params, status)
+		sql += " and cons.contact_status=? "
+	}
+
+	if lastContractStartTime!= "" {
+		params = append(params,lastContractStartTime)
+		sql += " and cons.last_contact_time>=? "
+	}
+
+	if lastContractEndTime!= "" {
+		params = append(params,lastContractEndTime)
+		sql += " and cons.last_contact_time<=? "
+	}
+
+	if tmkId1 != ""{
+		params = append(params,tmkId1)
+		sql += " and cons.current_tmk_id=? "
+	}
+
+	if tmkId2 != ""{
+		params = append(params,tmkId2)
+		sql += " and cons.current_tmk_id=? "
 	}
 
 	if dataType == "center" {
@@ -120,17 +166,17 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		params = append(params, _employee.CenterId)
-		sql += " and ce.cid=? "
+		sql += " and cons.center_id=? "
 	}
 
-	if dataType == "self" {
-		params = append(params, employee.UserId)
-		sql += " and e.user_id=? "
+	if centerId1 != "" && dataType == "all" {
+		params = append(params, centerId1)
+		sql += " and cons.center_id=? "
 	}
 
-	if centerId != "" && dataType == "all" {
-		params = append(params, centerId)
-		sql += " and c.center_id=? "
+	if centerId2 != "" && dataType == "all" {
+		params = append(params, centerId2)
+		sql += " and cons.center_id=? "
 	}
 
 	countSql := ""
@@ -176,10 +222,10 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	if mySort == "" || mySort == "time" {
-		sql += " order by a.maxtime desc,c.id desc  limit ?,?"
-	} else if mySort == "frequency" {
-		sql += " order by a.num desc,c.id desc  limit ?,?"
+	if sort == "" || sort == "create_time" {
+		sql += " order by cons.id desc  limit ?,? "
+	} else if sort == "last_time" {
+		sql += " order by cons.last_contact_time desc limit ?,? "
 	}
 
 	lessgo.Log.Debug(sql)
@@ -208,7 +254,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 12; i++ {
+		for i := 0; i < 9; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -619,6 +665,20 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		h2 := lessgo.LoadFormObject{"center_id", cid}
 		loadFormObjects = append(loadFormObjects, h1)
 		loadFormObjects = append(loadFormObjects, h2)
+	}else{
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		m["success"] = true
+		h1 := lessgo.LoadFormObject{"center_id", _employee.CenterId}
+		loadFormObjects = append(loadFormObjects, h1)
 	}
 
 
@@ -650,10 +710,18 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.FormValue("id")
+	id := r.FormValue("ids")
 	status := r.FormValue("status")
 
-	sql := "select contact_status from consumer where id=?"
+	if strings.Contains(id,","){
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "只能操作一个客户"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql := "select contact_status from consumer_new where id=?"
 
 	lessgo.Log.Debug(sql)
 
@@ -687,7 +755,7 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sql = "update consumer set contact_status=? where id=? "
+	sql = "update consumer_new set contact_status=? where id=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -745,7 +813,8 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 
-	m["success"] = "客户状态更改成功"
+	m["success"] = true
+	m["msg"] = "操作成功"
 	commonlib.OutputJson(w, m, " ")
 
 }
@@ -994,4 +1063,582 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 	}
 
 	return false,nil
+}
+
+func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	pageNoString := r.FormValue("page")
+	pageNo := 1
+	if pageNoString != "" {
+		pageNo, err = strconv.Atoi(pageNoString)
+		if err != nil {
+			pageNo = 1
+			lessgo.Log.Warn("错误的pageNo:", pageNo)
+		}
+	}
+
+	pageSizeString := r.FormValue("rows")
+	pageSize := 10
+	if pageSizeString != "" {
+		pageSize, err = strconv.Atoi(pageSizeString)
+		if err != nil {
+			lessgo.Log.Warn("错误的pageSize:", pageSize)
+		}
+	}
+
+	centerId1 := r.FormValue("centerId-eq")
+	status := r.FormValue("status-eq")
+	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
+	lastContractEndTime := r.FormValue("lastContractEndTime-le")
+	kw := r.FormValue("kw-like")
+
+	params := []interface{}{}
+
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark "
+	sql += " from "
+	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
+	if kw != "" {
+		sql += "left join consumer_new b on b.id=c.consumer_id where c.phone like ? or c.name like ? or b.child like ? or b.remark like ? or b.home_phone like ? "
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+	}
+	sql += " group by c.consumer_id)a "
+	sql += " left join consumer_new cons on cons.id=a.consumer_id "
+	sql += " left join contacts cont on cont.id=a.contacts_id "
+	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join employee e on e.user_id=cons.last_tmk_id where 1=1 and cons.is_own_by_tmk=2 "
+
+	if status != "" {
+		params = append(params, status)
+		sql += " and cons.contact_status=? "
+	}
+
+	if lastContractStartTime!= "" {
+		params = append(params,lastContractStartTime)
+		sql += " and cons.last_contact_time>=? "
+	}
+
+	if lastContractEndTime!= "" {
+		params = append(params,lastContractEndTime)
+		sql += " and cons.last_contact_time<=? "
+	}
+
+	if centerId1 != "" {
+		params = append(params, centerId1)
+		sql += " and cons.center_id=? "
+	}
+
+	countSql := ""
+
+	countSql = "select count(1) from (" + sql + ") num"
+
+	lessgo.Log.Debug(countSql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(countSql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	totalPage := int(math.Ceil(float64(totalNum) / float64(pageSize)))
+
+	currPageNo := pageNo
+
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	sql += " order by cons.id desc  limit ?,? "
+
+	lessgo.Log.Debug(sql)
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	rows, err = db.Query(sql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	objects := []interface{}{}
+
+	for rows.Next() {
+
+		model := new(lessgo.Model)
+
+		fillObjects := []interface{}{}
+
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 9; i++ {
+			prop := new(lessgo.Prop)
+			prop.Name = fmt.Sprint(i)
+			prop.Value = ""
+			fillObjects = append(fillObjects, &prop.Value)
+			model.Props = append(model.Props, prop)
+		}
+
+		err = commonlib.PutRecord(rows, fillObjects...)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	pageData := commonlib.BulidTraditionPage(currPageNo, pageSize, totalNum, objects)
+
+	m["PageData"] = pageData
+	m["DataLength"] = len(pageData.Datas) - 1
+	if len(pageData.Datas) > 0 {
+		m["FieldLength"] = len(pageData.Datas[0].(*lessgo.Model).Props) - 1
+	}
+
+	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
+
+}
+
+
+func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids,",") {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "每次只能邀约一个客户"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select count(1) from tmk_consumer where consumer_id=? "
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, ids)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if totalNum > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "已被其他TMK邀约，请选择其他客户"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql2 := "select count(1) from tmk_consumer tc left join consumer_new c on tc.consumer_id=c.id where c.contact_status=1 and tc.tmk_id=?  "
+	lessgo.Log.Debug(sql2)
+
+	rows2, err := db.Query(sql2,employee.UserId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	if rows2.Next() {
+		err = rows2.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if totalNum > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "您还有未联系的客户，请处理结束后再邀约新客户"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	insertSql := "insert into tmk_consumer(tmk_id,consumer_id,tmk_create_time) values (?,?,?)"
+	lessgo.Log.Debug(insertSql)
+
+	stmt, err := tx.Prepare(insertSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(employee.UserId,ids,time.Now().Format("20060102150405"))
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	updateSql := "update consumer_new set is_own_by_tmk=1,current_tmk_id=?,last_tmk_id=? where id=?"
+
+	stmt1, err := tx.Prepare(updateSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt1.Exec(employee.UserId,employee.UserId,ids)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		tx.Rollback()
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+/*
+select cons.*,cont.name,cont.phone
+from
+tmk_consumer tc
+left join (select c.consumer_id,min(c.id) contacts_id from contacts c group by c.consumer_id) a on a.consumer_id=tc.consumer_id
+left join contacts cont on cont.id=a.contacts_id
+left join consumer_new cons on cons.id=a.consumer_id
+*/
+func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	pageNoString := r.FormValue("page")
+	pageNo := 1
+	if pageNoString != "" {
+		pageNo, err = strconv.Atoi(pageNoString)
+		if err != nil {
+			pageNo = 1
+			lessgo.Log.Warn("错误的pageNo:", pageNo)
+		}
+	}
+
+	pageSizeString := r.FormValue("rows")
+	pageSize := 10
+	if pageSizeString != "" {
+		pageSize, err = strconv.Atoi(pageSizeString)
+		if err != nil {
+			lessgo.Log.Warn("错误的pageSize:", pageSize)
+		}
+	}
+
+	centerId1 := r.FormValue("centerId-eq")
+	status := r.FormValue("status-eq")
+	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
+	lastContractEndTime := r.FormValue("lastContractEndTime-le")
+	kw := r.FormValue("kw-like")
+
+	params := []interface{}{}
+
+	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark "
+	sql += " from tmk_consumer tc"
+	sql += " inner join (select c.consumer_id,min(c.id) contacts_id from contacts c  "
+	if kw != "" {
+		sql += "left join consumer_new b on b.id=c.consumer_id where c.phone like ? or c.name like ? or b.child like ? or b.remark like ? or b.home_phone like ? "
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+	}
+	sql += " group by c.consumer_id)a on a.consumer_id=tc.consumer_id "
+	sql += " left join consumer_new cons on cons.id=a.consumer_id "
+	sql += " left join contacts cont on cont.id=a.contacts_id "
+	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " where tc.tmk_id= "+employee.UserId
+
+	if status != "" {
+		params = append(params, status)
+		sql += " and cons.contact_status=? "
+	}
+
+	if lastContractStartTime!= "" {
+		params = append(params,lastContractStartTime)
+		sql += " and cons.last_contact_time>=? "
+	}
+
+	if lastContractEndTime!= "" {
+		params = append(params,lastContractEndTime)
+		sql += " and cons.last_contact_time<=? "
+	}
+
+	if centerId1 != "" {
+		params = append(params, centerId1)
+		sql += " and cons.center_id=? "
+	}
+
+	countSql := ""
+
+	countSql = "select count(1) from (" + sql + ") num"
+
+	lessgo.Log.Debug(countSql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(countSql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	totalPage := int(math.Ceil(float64(totalNum) / float64(pageSize)))
+
+	currPageNo := pageNo
+
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	sql += " order by cons.contact_status ,cons.last_contact_time desc limit ?,? "
+
+	lessgo.Log.Debug(sql)
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	rows, err = db.Query(sql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	objects := []interface{}{}
+
+	for rows.Next() {
+
+		model := new(lessgo.Model)
+
+		fillObjects := []interface{}{}
+
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 8; i++ {
+			prop := new(lessgo.Prop)
+			prop.Name = fmt.Sprint(i)
+			prop.Value = ""
+			fillObjects = append(fillObjects, &prop.Value)
+			model.Props = append(model.Props, prop)
+		}
+
+		err = commonlib.PutRecord(rows, fillObjects...)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	pageData := commonlib.BulidTraditionPage(currPageNo, pageSize, totalNum, objects)
+
+	m["PageData"] = pageData
+	m["DataLength"] = len(pageData.Datas) - 1
+	if len(pageData.Datas) > 0 {
+		m["FieldLength"] = len(pageData.Datas[0].(*lessgo.Model).Props) - 1
+	}
+
+	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
+
 }

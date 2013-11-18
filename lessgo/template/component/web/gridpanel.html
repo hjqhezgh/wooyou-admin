@@ -62,6 +62,9 @@
                 {{end}}
                 {{if compareString $toolAction.LinkType "mutiSelect"}}
                 <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-loadUrl="{{$toolAction.LoadUrl}}" data-action="mutiSelect" confirmMsg="{{$toolAction.ConfirmMsg}}" params="{{$toolAction.Params}}">{{$toolAction.Desc}}</a>
+                <callback style="display: none;">
+                    {{$toolAction.Callback}}
+                </callback>
                 {{end}}
                 {{if compareString $toolAction.LinkType "mutiSelectIframeWindow"}}
                 <a href="{{$toolAction.Url}}" class="{{$toolAction.ColorClass}}" data-loadUrl="{{$toolAction.LoadUrl}}" data-action="mutiSelectIframeWindow" params="{{$toolAction.Params}}">{{$toolAction.Desc}}</a>
@@ -146,6 +149,7 @@
         $('#{{$id}}').grid({
             tableId : '{{$tableId}}',
             pageId : '{{$pageId}}',
+            componentId : '{{.Gridpanel.PageId}}',
             dataurl: {{$id}}DataUrl,
             colNames:{{$id}}ColumnNames,
             width:{{$id}}Width,

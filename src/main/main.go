@@ -75,6 +75,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consumerLoad.json": server.ConsumerLoadAction,
 	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
 	"/contacts/page": server.ContractsListAction,
+	"/contacts/save.json": server.ContractsSaveAction,
+	"/contacts/delete.json": server.ContractsDeleteAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
@@ -86,6 +88,12 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/consumer/sendToCallCenter": server.SendToCallCenterAction,
 	//全部分配给CallCenter
 	"/web/consumer/allSendToCallCenter": server.AllSendToCallCenter,
+	//tmk的名单总库
+	"/consumer/tmkAllConsumer.json": server.TmkAllConsumerListAction,
+	//开始邀约按钮
+	"/consumer/tmkInvite.json": server.TmkInviteAction,
+	//tmk自己的名单库
+	"/consumer/tmk_consumer.json": server.TmkConsumerSelfListAction,
 	//tmk运营报表
 	"/tmkStatistics.json": server.TmkStatisticsAction,
 	//tmk运营报表详情
@@ -131,6 +139,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,
 	"/web/wyclass/update.json": server.WyClassUpdateAction,
+	"/web/wyclass/insert.json": server.WyClassInsertAction,
 	"/web/wyclass/load.json": server.WyClassLoadAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,

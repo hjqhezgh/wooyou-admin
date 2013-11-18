@@ -2,8 +2,6 @@ jQuery.fn.grid = function (opts) {
 
     var componentId = this.attr("id");
 
-    window[componentId] = this;
-
     var _this = this;
 
     var lastId = 0;
@@ -18,6 +16,11 @@ jQuery.fn.grid = function (opts) {
         width : 600,
         height : 600
     }, opts || {});
+
+    window[componentId] = this;
+    if(opts.componentId){
+        window[opts.componentId] = this;
+    }
 
     this.getGrid = function(){
         return this.grid;
@@ -382,15 +385,30 @@ jQuery.fn.grid = function (opts) {
                 url += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
             }
 
-            if(confirm(thisButton.attr('confirmMsg'))){
+            var flag = false
+
+            if(thisButton.attr('confirmMsg')){
+                flag = confirm(thisButton.attr('confirmMsg'));
+            }else{
+                flag = true;
+            }
+
+            if(flag){
                 $.get(url,params,function(data){
-                    if(data.success){
-                        _this.grid.trigger("reloadGrid");
-                        alert(data.msg);
+                    if($.trim(thisButton.next('callback').html())){
+                        eval(thisButton.next('callback').html());
                     }else{
-                        alert(data.msg);
+                        if(data.success){
+                            _this.grid.trigger("reloadGrid");
+                            alert(data.msg);
+                        }else{
+                            alert(data.msg);
+                        }
                     }
+
                 },'json');
+            }else{
+                return;
             }
         });
 

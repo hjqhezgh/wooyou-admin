@@ -42,14 +42,15 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	dataType := ""
 
-	roleIds := strings.Split(employee.RoleId, ",")
+	roleCodes := strings.Split(employee.RoleCode, ",")
 
-	for _, roleId := range roleIds {
-		if roleId == "1" || roleId == "3" || roleId == "6" || roleId == "10" {
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" || roleCode == "tmk"{
 			dataType = "all"
 			break
 		} else {
 			dataType = "center"
+			break
 		}
 	}
 
@@ -85,10 +86,11 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 	centerId := r.FormValue("cid-eq")
 	st := r.FormValue("day_date-ge")
 	et := r.FormValue("day_date-le")
+	courseId := r.FormValue("course_id-eq")
 
 	params := []interface{}{}
 
-	sql := "select csd.id,ce.name as centerName,wy.name as className,teacher.really_name as teacherName,assistant.really_name as assistantName,cour.name as courseName,les.caption,r.name,csd.start_time,csd.end_time,csd.week,csd.capacity,csd.status "
+	sql := "select csd.id,ce.name as centerName,wy.name as className,teacher.really_name as teacherName,assistant.really_name as assistantName,cour.name as courseName,les.caption,r.name,csd.start_time,csd.end_time,csd.week,csd.capacity,csd.status,wy.class_id,csd.center_id "
 	sql += " from class_schedule_detail csd left join center ce on ce.cid=csd.center_id left join employee teacher on teacher.user_id=csd.teacher_id left join employee assistant on assistant.user_id=csd.assistant_id "
 	sql += " left join course cour on cour.cid=csd.course_id left join lesson les on les.lid=csd.lesson_id left join room r on r.rid=csd.room_id left join wyclass wy on wy.class_id=csd.class_id where 1=1 "
 
@@ -119,6 +121,11 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 	if et != "" {
 		params = append(params, st)
 		sql += " and csd.day_date<=? "
+	}
+
+	if courseId != "" {
+		params = append(params, courseId)
+		sql += " and csd.course_id=? "
 	}
 
 	countSql := ""
@@ -192,7 +199,7 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 12; i++ {
+		for i := 0; i < 14; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
