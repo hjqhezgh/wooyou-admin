@@ -2,7 +2,7 @@
 <viewport window="true">
     <customformpanel id="news" saveUrl="/web/news/update.json" load="true" loadUrl="/web/news/load.json" title="修改新闻" inwindow="true">
         <element field="id" type="hidden"/>
-        <element field="title" type="text" desc="标题" validate="notNull" readonly="true"/>
+        <element field="title" type="text" desc="标题" validate="notNull"/>
         <element field="news_content" type="htmleditor" desc="新闻内容" validate="notNull"/>
         <element field="preview_image" type="image" desc="预览图片" imageEntity="pic"/>
         <element field="preview_text" type="textarea" desc="预览文本" validate="notNull"/>

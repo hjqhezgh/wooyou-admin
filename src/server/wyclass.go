@@ -254,27 +254,17 @@ func WyClassLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	sql := "select class_id,name,center_id,assistant_id,teacher_id,max_child_num,deadline,end_time,course_id from wyclass where class_id=? "
+	loadFormObjects := []lessgo.LoadFormObject{}
 
-	lessgo.Log.Debug(sql)
+	if id!= ""{
+		sql := "select class_id,name,code,start_time from wyclass where class_id=? "
 
-	db := lessgo.GetMySQL()
-	defer db.Close()
+		lessgo.Log.Debug(sql)
 
-	rows, err := db.Query(sql, id)
+		db := lessgo.GetMySQL()
+		defer db.Close()
 
-	if err != nil {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	var classId, name, centerId, assistantId, teacherId, maxChildNum, deadline, endTime, courseId string
-
-	if rows.Next() {
-		err = commonlib.PutRecord(rows, &classId, &name, &centerId, &assistantId, &teacherId, &maxChildNum, &deadline, &endTime, &courseId)
+		rows, err := db.Query(sql, id)
 
 		if err != nil {
 			m["success"] = false
@@ -283,37 +273,59 @@ func WyClassLoadAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
+
+		var classId, name, code,startTime string
+
+		if rows.Next() {
+			err = commonlib.PutRecord(rows, &classId, &name, &code, &startTime)
+
+			if err != nil {
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		m["success"] = true
+
+		h1 := lessgo.LoadFormObject{"name", name}
+		h2 := lessgo.LoadFormObject{"class_id", classId}
+		h3 := lessgo.LoadFormObject{"code", code}
+		h4 := lessgo.LoadFormObject{"start_time", startTime}
+
+		loadFormObjects = append(loadFormObjects, h1)
+		loadFormObjects = append(loadFormObjects, h2)
+		loadFormObjects = append(loadFormObjects, h3)
+		loadFormObjects = append(loadFormObjects, h4)
+
+		m["datas"] = loadFormObjects
+		commonlib.OutputJson(w, m, " ")
+		return
+	}else{
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		h1 := lessgo.LoadFormObject{"center_id", _employee.CenterId}
+		loadFormObjects = append(loadFormObjects, h1)
+		m["datas"] = loadFormObjects
+		m["success"] = true
+		commonlib.OutputJson(w, m, " ")
+		return
 	}
 
-	m["success"] = true
-
-	loadFormObjects := []lessgo.LoadFormObject{}
-
-	h1 := lessgo.LoadFormObject{"name", name}
-	h2 := lessgo.LoadFormObject{"class_id", classId}
-	h3 := lessgo.LoadFormObject{"center_id", centerId}
-	h4 := lessgo.LoadFormObject{"course_id", centerId + "," + courseId}
-	h5 := lessgo.LoadFormObject{"end_time", endTime}
-	h6 := lessgo.LoadFormObject{"deadline", deadline}
-	h7 := lessgo.LoadFormObject{"max_child_num", maxChildNum}
-	h8 := lessgo.LoadFormObject{"teacher_id", centerId + "," + teacherId}
-	h9 := lessgo.LoadFormObject{"assistant_id", centerId + "," + assistantId}
-
-	loadFormObjects = append(loadFormObjects, h1)
-	loadFormObjects = append(loadFormObjects, h2)
-	loadFormObjects = append(loadFormObjects, h3)
-	loadFormObjects = append(loadFormObjects, h4)
-	loadFormObjects = append(loadFormObjects, h5)
-	loadFormObjects = append(loadFormObjects, h6)
-	loadFormObjects = append(loadFormObjects, h7)
-	loadFormObjects = append(loadFormObjects, h8)
-	loadFormObjects = append(loadFormObjects, h9)
-
-	m["datas"] = loadFormObjects
-	commonlib.OutputJson(w, m, " ")
 }
 
-func WyClassUpdateAction(w http.ResponseWriter, r *http.Request) {
+func WyClassSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -338,154 +350,77 @@ func WyClassUpdateAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	class_id := r.FormValue("class_id")
+	id := r.FormValue("class_id")
 	name := r.FormValue("name")
 	center_id := r.FormValue("center_id")
-	course_id := r.FormValue("course_id")
-	end_time := r.FormValue("end_time")
-	deadline := r.FormValue("deadline")
-	max_child_num := r.FormValue("max_child_num")
-	teacher_id := r.FormValue("teacher_id")
-	assistant_id := r.FormValue("assistant_id")
+	code := r.FormValue("code")
+	startTime := r.FormValue("start_time")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	sql := "update wyclass set name=?,center_id=?,course_id=?,end_time=?,deadline=?,max_child_num=?,teacher_id=?,assistant_id=? where class_id=? "
+	if id == ""{
+		sql := "insert into wyclass(name,create_time,center_id,code,start_time) values(?,?,?,?,?)"
 
-	lessgo.Log.Debug(sql)
+		lessgo.Log.Debug(sql)
 
-	stmt, err := db.Prepare(sql)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	_, err = stmt.Exec(name, center_id, course_id, end_time, deadline, max_child_num, teacher_id, assistant_id, class_id)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	m["success"] = true
-	commonlib.OutputJson(w, m, " ")
-
-}
-
-func WyClassInsertAction(w http.ResponseWriter, r *http.Request) {
-
-	m := make(map[string]interface{})
-
-	employee := lessgo.GetCurrentEmployee(r)
-
-	if employee.UserId == "" {
-		lessgo.Log.Warn("用户未登陆")
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "用户未登陆"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	err := r.ParseForm()
-
-	if err != nil {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	name := r.FormValue("name")
-	center_id := r.FormValue("center_id")
-	course_id := r.FormValue("course_id")
-	end_time := r.FormValue("end_time")
-	deadline := r.FormValue("deadline")
-	max_child_num := r.FormValue("max_child_num")
-	child_num := r.FormValue("child_num")
-	teacher_id := r.FormValue("teacher_id")
-	assistant_id := r.FormValue("assistant_id")
-
-	db := lessgo.GetMySQL()
-	defer db.Close()
-
-	checkClassExistSql := "select count(1) from wyclass where center_id=? and name=? "
-	lessgo.Log.Debug(checkClassExistSql)
-
-	rows, err := db.Query(checkClassExistSql, center_id,name)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	totalNum := 0
-
-	for rows.Next() {
-		err = commonlib.PutRecord(rows, &totalNum)
+		stmt, err := db.Prepare(sql)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
 			m["success"] = false
 			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-	}
 
-	if totalNum > 0 {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "班级名重复，请更换一个班级名重复"
+		_, err = stmt.Exec(name,time.Now().Format("20060102150405"), center_id, code,startTime)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		m["success"] = true
+		commonlib.OutputJson(w, m, " ")
+		return
+	}else{
+		sql := "update wyclass set name=?,code=? where class_id=? "
+
+		lessgo.Log.Debug(sql)
+
+		stmt, err := db.Prepare(sql)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(name, code,id)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
 
-
-	sql := "insert into wyclass(assistant_id,name,create_time,course_id,center_id,child_num,end_time,deadline,max_child_num,teacher_id) values(?,?,?,?,?,?,?,?,?,?)"
-
-	lessgo.Log.Debug(sql)
-
-	stmt, err := db.Prepare(sql)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	_, err = stmt.Exec(assistant_id,name,time.Now().Format("20060102150405"), course_id, center_id,child_num, end_time, deadline, max_child_num, teacher_id)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	m["success"] = true
-	commonlib.OutputJson(w, m, " ")
 
 }
 
@@ -916,4 +851,1187 @@ func ClassByCenterIdAction(w http.ResponseWriter, r *http.Request) {
 	m["datas"] = classes
 
 	commonlib.OutputJson(w, m, " ")
+}
+
+
+//免费课列表
+/*
+select class.class_id,ce.name,class.code,class.name,class.start_time,childNum.num,signInNum.num
+from wy_class class
+left join (select count(1) num,wyclass_id from wyclass_free_child group by wyclass_id) childNum on class.class_id=childNum.wyclass_id
+left join (select count(1) num,wyclass_id from wyclass_free_sign_in group by wyclass_id)signInNUm on class.class_id=signInNum.wyclass_id
+left join center ce on ce.cid=class.center_id
+*/
+func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	dataType := ""
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" || roleCode == "tmk"{
+			dataType = "all"
+			break
+		} else {
+			dataType = "center"
+			break
+		}
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	pageNoString := r.FormValue("page")
+	pageNo := 1
+	if pageNoString != "" {
+		pageNo, err = strconv.Atoi(pageNoString)
+		if err != nil {
+			pageNo = 1
+			lessgo.Log.Warn("错误的pageNo:", pageNo)
+		}
+	}
+
+	pageSizeString := r.FormValue("rows")
+	pageSize := 10
+	if pageSizeString != "" {
+		pageSize, err = strconv.Atoi(pageSizeString)
+		if err != nil {
+			lessgo.Log.Warn("错误的pageSize:", pageSize)
+		}
+	}
+
+	centerId := r.FormValue("cid-eq")
+	startTime := r.FormValue("startTime-ge")
+	endTime := r.FormValue("endTime-le")
+
+	params := []interface{}{}
+
+	sql := "select class.class_id,ce.name as centerName,class.code,class.name,class.start_time,childNum.num as childNum,signInNum.num as signInNum,class.center_id "
+	sql += " from wyclass class "
+	sql += " left join (select count(1) num,wyclass_id from wyclass_free_child group by wyclass_id) childNum on class.class_id=childNum.wyclass_id "
+	sql += " left join (select count(1) num,wyclass_id from wyclass_free_sign_in group by wyclass_id)signInNUm on class.class_id=signInNum.wyclass_id "
+	sql += " left join center ce on ce.cid=class.center_id where 1=1 "
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+		params = append(params, _employee.CenterId)
+		sql += " and class.center_id=? "
+	}
+
+	if centerId != "" && dataType == "all" {
+		params = append(params, centerId)
+		sql += " and class.center_id=? "
+	}
+
+	if startTime != "" {
+		params = append(params, centerId)
+		sql += " and class.start_time>=? "
+	}
+
+	if endTime != ""{
+		params = append(params, centerId)
+		sql += " and class.start_time<=? "
+	}
+
+	countSql := ""
+
+	countSql = "select count(1) from (" + sql + ") num"
+
+	lessgo.Log.Debug(countSql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(countSql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	totalPage := int(math.Ceil(float64(totalNum) / float64(pageSize)))
+
+	currPageNo := pageNo
+
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	sql += " order by class.class_id desc limit ?,?"
+
+	lessgo.Log.Debug(sql)
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	rows, err = db.Query(sql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	objects := []interface{}{}
+
+	for rows.Next() {
+
+		model := new(lessgo.Model)
+
+		fillObjects := []interface{}{}
+
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 7; i++ {
+			prop := new(lessgo.Prop)
+			prop.Name = fmt.Sprint(i)
+			prop.Value = ""
+			fillObjects = append(fillObjects, &prop.Value)
+			model.Props = append(model.Props, prop)
+		}
+
+		err = commonlib.PutRecord(rows, fillObjects...)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	pageData := commonlib.BulidTraditionPage(currPageNo, pageSize, totalNum, objects)
+
+	m["PageData"] = pageData
+	m["DataLength"] = len(pageData.Datas) - 1
+	if len(pageData.Datas) > 0 {
+		m["FieldLength"] = len(pageData.Datas[0].(*lessgo.Model).Props) - 1
+	}
+
+	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
+
+}
+
+func ChildInClassListAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	pageNoString := r.FormValue("page")
+	pageNo := 1
+	if pageNoString != "" {
+		pageNo, err = strconv.Atoi(pageNoString)
+		if err != nil {
+			pageNo = 1
+			lessgo.Log.Warn("错误的pageNo:", pageNo)
+		}
+	}
+
+	pageSizeString := r.FormValue("rows")
+	pageSize := 10
+	if pageSizeString != "" {
+		pageSize, err = strconv.Atoi(pageSizeString)
+		if err != nil {
+			lessgo.Log.Warn("错误的pageSize:", pageSize)
+		}
+	}
+
+	classId := r.FormValue("classId")
+
+	params := []interface{}{}
+
+	sql := "select wfc.consumer_id,cons.child,cont.phone,e.really_name,wfc.create_time,wfsi.sign_in_time,wfc.wyclass_id,wfc.create_user "
+	sql += " from wyclass_free_child wfc "
+	sql += " left join consumer_new cons on cons.id=wfc.consumer_id "
+	sql += " left join (select consumer_id,min(id) contacts_id from contacts group by consumer_id)a "
+	sql += " on a.consumer_id=cons.id "
+	sql += " left join contacts cont on cont.id=a.contacts_id "
+	sql += " left join employee e on e.user_id=wfc.create_user "
+	sql += " left join wyclass_free_sign_in wfsi on wfsi.wyclass_id=wfc.wyclass_id and wfsi.consumer_id=wfc.consumer_id "
+	sql += " where wfc.wyclass_id=? "
+
+	params = append(params,classId)
+
+	countSql := ""
+
+	countSql = "select count(1) from (" + sql + ") num"
+
+	lessgo.Log.Debug(countSql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(countSql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	totalPage := int(math.Ceil(float64(totalNum) / float64(pageSize)))
+
+	currPageNo := pageNo
+
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	sql += " order by wfc.create_time desc limit ?,?"
+
+	lessgo.Log.Debug(sql)
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	rows, err = db.Query(sql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	objects := []interface{}{}
+
+	for rows.Next() {
+
+		model := new(lessgo.Model)
+
+		fillObjects := []interface{}{}
+
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 7; i++ {
+			prop := new(lessgo.Prop)
+			prop.Name = fmt.Sprint(i)
+			prop.Value = ""
+			fillObjects = append(fillObjects, &prop.Value)
+			model.Props = append(model.Props, prop)
+		}
+
+		err = commonlib.PutRecord(rows, fillObjects...)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	pageData := commonlib.BulidTraditionPage(currPageNo, pageSize, totalNum, objects)
+
+	m["PageData"] = pageData
+	m["DataLength"] = len(pageData.Datas) - 1
+	if len(pageData.Datas) > 0 {
+		m["FieldLength"] = len(pageData.Datas[0].(*lessgo.Model).Props) - 1
+	}
+
+	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
+
+}
+
+//学员手动签到
+func ChildSignInAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk"{
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行签到"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	classId := r.FormValue("classId")
+	ids := r.FormValue("ids")
+
+	idList := strings.Split(ids,",")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	for _,id := range idList {
+
+		checkExistSql := "select count(1) from wyclass_free_sign_in where consumer_id=? and wyclass_id=? "
+
+		lessgo.Log.Debug(checkExistSql)
+
+		rows, err := db.Query(checkExistSql, id,classId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		num := 0
+
+		if rows.Next() {
+
+			err = commonlib.PutRecord(rows, &num)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if num > 0 {
+			continue
+		}
+
+		insertWFSSql := "insert into wyclass_free_sign_in(consumer_id,sign_in_time,wyclass_id,employee_id) values(?,?,?,?)"
+
+		lessgo.Log.Debug(insertWFSSql)
+
+		insertWFSStmt, err := tx.Prepare(insertWFSSql)
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = insertWFSStmt.Exec(id,time.Now().Format("20060102150405"),classId,employee.UserId)
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		updateConsuemrStatusSql := "update consumer_new set contact_status=?,sign_in_time=? where id=? "
+
+		lessgo.Log.Debug(updateConsuemrStatusSql)
+
+		updateConsuemrStatusStmt, err := tx.Prepare(updateConsuemrStatusSql)
+
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = updateConsuemrStatusStmt.Exec(CONSUMER_STATUS_SIGNIN,time.Now().Format("20060102150405"),id)
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		insertLogSql := "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+
+		stmt, err := tx.Prepare(insertLogSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(id,employee.UserId,time.Now().Format("20060102150405"),CONSUMER_STATUS_NO_SIGNIN,CONSUMER_STATUS_SIGNIN)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+
+//从班级中移除
+func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	dataType := ""
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" ||  roleCode == "cd" {
+			dataType = "all"
+			break
+		} else{
+			dataType = "self"
+			break
+		}
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	classId := r.FormValue("classId")
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids,","){
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该操作只能操作一个学员"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkExistSql := "select count(1) from wyclass_free_sign_in where consumer_id=? and wyclass_id=? "
+
+	lessgo.Log.Debug(checkExistSql)
+
+	rows, err := db.Query(checkExistSql, ids,classId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	num := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &num)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if num > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "已签到的人员不能移除"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	if dataType != "all"{//主管级别的是可以直接从班级中剔除任何人的，其他人只能剔除自己邀约的
+		selectInviteTmk := "select create_user from wyclass_free_child where consumer_id=? and wyclass_id=? "
+
+		lessgo.Log.Debug(selectInviteTmk)
+
+		rows, err = db.Query(selectInviteTmk, ids,classId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		employeeId := ""
+
+		if rows.Next() {
+
+			err = commonlib.PutRecord(rows, &employeeId)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if employeeId != employee.UserId {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "您不能剔除其他人邀请的学员"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	deteleSql := "delete from wyclass_free_child where consumer_id=? and wyclass_id=? "
+
+	lessgo.Log.Debug(deteleSql)
+
+	stmt, err := tx.Prepare(deteleSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(ids,classId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	updateConsumerSql := "update consumer_new set contact_status=? where id=? "
+	lessgo.Log.Debug(updateConsumerSql)
+	stmt, err = tx.Prepare(updateConsumerSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(CONSUMER_STATUS_WAIT,ids)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	insertLogSql := "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+	lessgo.Log.Debug(insertLogSql)
+	stmt, err = tx.Prepare(insertLogSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(ids,employee.UserId,time.Now().Format("20060102150405"),CONSUMER_STATUS_NO_SIGNIN,CONSUMER_STATUS_WAIT)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+//报班
+func AddChildToClassAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	classId := r.FormValue("classId")
+	ids := r.FormValue("ids")
+
+	idList := strings.Split(ids,",")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	for _,id := range idList {
+
+		checkExistSql := "select count(1) from wyclass_free_child where consumer_id=? and wyclass_id=? "
+
+		rows, err := db.Query(checkExistSql, id,classId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		totalNum := 0
+
+		if rows.Next() {
+			err := rows.Scan(&totalNum)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if totalNum > 0 {
+			continue
+		}
+
+
+		insertToClassSql := "insert into wyclass_free_child(create_time,create_user,consumer_id,wyclass_id) values(?,?,?,?) "
+		lessgo.Log.Debug(insertToClassSql)
+		stmt, err := tx.Prepare(insertToClassSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(time.Now().Format("20060102150405"),employee.UserId,id,classId)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+
+		selectContatusSql := "select contact_status from consumer_new where id=? "
+		lessgo.Log.Debug(selectContatusSql)
+
+		rows, err = db.Query(selectContatusSql, id)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		oldStatus := ""
+
+		if rows.Next() {
+			err = commonlib.PutRecord(rows, &oldStatus)
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		updateConsumerStatusSql := "update consumer_new set contact_status=? where id=? "
+		lessgo.Log.Debug(updateConsumerStatusSql)
+
+		stmt, err = tx.Prepare(updateConsumerStatusSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(CONSUMER_STATUS_NO_SIGNIN,id)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		insertLogSql := "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+		lessgo.Log.Debug(insertLogSql)
+		stmt, err = tx.Prepare(insertLogSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(id,employee.UserId,time.Now().Format("20060102150405"),oldStatus,CONSUMER_STATUS_NO_SIGNIN)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+
+//报班
+func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	consumerId := r.FormValue("consumerId")
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids,","){
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "只能选择一个班级"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	checkExistSql := "select count(1) from wyclass_free_child where consumer_id=? and wyclass_id=? "
+
+	rows, err := db.Query(checkExistSql, consumerId,ids)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if totalNum > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该学员已经在班级中，无需重复分配"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+
+	insertToClassSql := "insert into wyclass_free_child(create_time,create_user,consumer_id,wyclass_id) values(?,?,?,?) "
+	lessgo.Log.Debug(insertToClassSql)
+	stmt, err := tx.Prepare(insertToClassSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(time.Now().Format("20060102150405"),employee.UserId,consumerId,ids)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	selectContatusSql := "select contact_status from consumer_new where id=? "
+	lessgo.Log.Debug(selectContatusSql)
+
+	rows, err = db.Query(selectContatusSql, consumerId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	oldStatus := ""
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &oldStatus)
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	updateConsumerStatusSql := "update consumer_new set contact_status=? where id=? "
+	lessgo.Log.Debug(updateConsumerStatusSql)
+
+	stmt, err = tx.Prepare(updateConsumerStatusSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(CONSUMER_STATUS_NO_SIGNIN,consumerId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	insertLogSql := "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+	lessgo.Log.Debug(insertLogSql)
+	stmt, err = tx.Prepare(insertLogSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(consumerId,employee.UserId,time.Now().Format("20060102150405"),oldStatus,CONSUMER_STATUS_NO_SIGNIN)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
 }

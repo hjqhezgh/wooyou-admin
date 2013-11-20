@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
-    <customformpanel id="form1" saveUrl="/web/wyclass/insert.json" load="true" loadUrl="/web/wyclass/load.json" title="添加班级" inwindow="true">
+    <customformpanel id="form1" saveUrl="/web/wyclass/save.json" load="true" loadUrl="/web/wyclass/load.json" title="添加免费课" inwindow="true">
         <element field="name" type="text" desc="班级名" validate="notNull"/>
-        <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
-        <element field="course_id"  url="/courseByCenterId.json" valueField="value" descField="desc" type="remoteSelect" desc="课程" parentSelect="center_id" validate="notNull"/>
-        <element field="end_time"  type="datetime" desc="计划结束日期" validate="notNull" char14="true"/>
-        <element field="deadline"  type="datetime" desc="报名截止日期" tip="试用于免费课" validate="notNull" char14="true"/>
-        <element field="max_child_num"  type="text" desc="容纳的小孩子数" validate="notNull" tip="报名人数将无法超过该数字"/>
-        <element field="child_num"  type="hidden" desc="" defaultValue="0"/>
-        <element field="teacher_id"  type="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="老师" validate="notNull" parentSelect="center_id"/>
-        <element field="assistant_id"  type="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="助手" validate="notNull" parentSelect="center_id"/>
+        <element field="code"  type="localSelect" localData="[{desc:'P1', value:'P1'},{desc:'P2', value:'P2'},{desc:'E1', value:'E1'},{desc:'E2', value:'E2'}]"  desc="课程代码" />
+        <element field="center_id"  type="hidden" desc="所属中心"/>
+        <element field="start_time"  type="datetime" desc="上课时间" validate="notNull" char14="true" tip="保存后无法修改"/>
     </customformpanel>
 </viewport>

@@ -500,6 +500,7 @@ function gridActionRender(cellvalue, options, rowObject,action,componentId) {
                         alert(j)
                     }
                     params += window[componentId].grid.jqGrid('getRowData',10)['name'];*/
+                    params += action.actionParams[i].value;
                 }else{//支持索引形式
                     params += rowObject[action.actionParams[i].value];
                 }

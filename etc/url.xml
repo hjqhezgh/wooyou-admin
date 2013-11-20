@@ -53,13 +53,17 @@
     <!--tmk运营报表-->
     <url path="/web/audio/tmk_statistics" view="web/audio/tmk_statistics.xml" />
     <!--tmk运营报表详情-->
-        <url path="/web/audio/tmk_statistics_detail" view="web/audio/tmk_statistics_detail.xml" />
+    <url path="/web/audio/tmk_statistics_detail" view="web/audio/tmk_statistics_detail.xml" />
 
     <!--app开户-->
     <url path="/web/consumer/add_app_account" view="web/consumer/add_app_account.xml" />
 
     <!--班级小孩子分配界面-->
     <url path="/web/wyclass/manageChild" view="web/wyclass/manageChild.xml" />
+    <!--免费课管理-->
+    <url path="/web/wyclass_free" view="web/wyclass/wyclass_free.xml" />
+    <!--tmk排课-->
+    <url path="/web/wyclass/tmk_class" view="web/wyclass/tmk_class.xml" />
 
     <!--签到管理-->
     <url path="/web/employee_sign_in" view="web/employee_sign_in/index.xml" />

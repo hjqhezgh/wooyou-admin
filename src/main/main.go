@@ -94,6 +94,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consumer/tmkInvite.json": server.TmkInviteAction,
 	//tmk自己的名单库
 	"/consumer/tmk_consumer.json": server.TmkConsumerSelfListAction,
+	//缴费
+	"/web/consumer/consumerPay.json": server.ConsumerPayAction,
 	//tmk运营报表
 	"/tmkStatistics.json": server.TmkStatisticsAction,
 	//tmk运营报表详情
@@ -138,9 +140,14 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,
-	"/web/wyclass/update.json": server.WyClassUpdateAction,
-	"/web/wyclass/insert.json": server.WyClassInsertAction,
+	"/web/wyclass/wyclass_free.json": server.WyClassFreeListAction,
+	"/web/wyclass/save.json": server.WyClassSaveAction,
 	"/web/wyclass/load.json": server.WyClassLoadAction,
+	"/web/wyclass/childInClass.json": server.ChildInClassListAction,
+	"/web/wyclass/signIn.json": server.ChildSignInAction,
+	"/web/wyclass/removeChild.json": server.RemoveChildFromClassAction,
+	"/web/wyclass/addChild.json": server.AddChildToClassAction,
+	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
 	"/classByCenterId.json": server.ClassByCenterIdAction,

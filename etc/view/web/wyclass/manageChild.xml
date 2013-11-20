@@ -1,39 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <gridpanel entity="child" pageSize="15" title="小孩子信息" id="grid1" width="1200" height="350" loadUrl="true" mutiSelect="true">
+    <customgridpanel url="/web/wyclass/childInClass.json" pageSize="15" title="已报名学员" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1">
 
-        <search field="name" searchType="like" inputType="text" desc="小孩子姓名" />
-
-        <checkboxtool loadUrl="/wyclass/loadChildInClass.json" saveUrl="/wyclass/saveChildToClass.json" desc="已分配孩子" />
-
-        <column field="name" desc="小孩子名"/>
-        <column field="sex" desc="性别">
-            <formatter>
-                <![CDATA[
-                        if(cellvalue=="1") {
-                            return '男';
-                        }else{
-                            return "女";
-                        }
-                ]]>
-            </formatter>
-        </column>
-        <column field="birthday" desc="生日">
+        <column field="childName" desc="学员姓名"/>
+        <column field="phone" desc="联系电话"/>
+        <column field="tmkName" desc="邀约人"/>
+        <column field="inviteTIme" desc="邀约时间">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
-                            return cellvalue.formatChar8Time();
+                            return cellvalue.formatChar14Time();
                         }else{
                             return "";
                         }
                 ]]>
             </formatter>
         </column>
-        <column field="parent.name" desc="App姓名"/>
-        <column field="parent.telephone" desc="App账号"/>
+        <column field="signInTime" desc="签到时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="classId" desc="班级ID" hidden="true"/>
+        <column field="tmkId" desc="tmkid" hidden="true"/>
 
-        <toolaction desc="添加至当前班级" colorClass="h-bg-green" linkType="addToCheckBox" checkboxDesc="name" />
-    </gridpanel>
+        <toolaction desc="从班级中剔除" url="/web/wyclass/removeChild.json"  colorClass="h-bg-green" linkType="mutiSelect"/>
+        <toolaction desc="签到" url="/web/wyclass/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
+    </customgridpanel>
 
+    <customgridpanel url="/consumer.json" pageSize="15" title="选择学员" id="grid2" width="1200" height="250" loadUrl="true" mutiSelect="true" pageId="grid2">
+
+        <search field="tmkId" searchType="eq" inputType="remoteSelect" url="/employeeListByRoleId.json?id=11" valueField="userId" descField="reallyName" desc="所属TMK"/>
+        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
+        <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="联系起始时间"/>
+        <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="联系结束时间"/>
+        <search field="kw" searchType="like" inputType="text" desc="关键字"/>
+        <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
+
+        <column field="centerName" desc="所属门店"/>
+        <column field="employeeName" desc="TMK"/>
+        <column field="contactName" desc="联系人"/>
+        <column field="contactPhone" desc="联系电话"/>
+        <column field="homePhone" desc="家庭电话"/>
+        <column field="child" desc="孩子姓名"/>
+        <column field="status" desc="状态" hidden="true"/>
+        <column field="isAPP" desc="是否APP用户" hidden="true"/>
+        <column field="remark" desc="备注"/>
+
+        <toolaction desc="加入当前班级" url="/web/wyclass/addChild.json"  colorClass="h-bg-green" linkType="mutiSelect">
+            <callback>
+                <![CDATA[
+                     if(!data.success){
+                        alert(data.msg)
+                     }
+                     grid1.grid.trigger("reloadGrid");
+                     grid2.grid.trigger("reloadGrid");
+                ]]>
+            </callback>
+        </toolaction>
+    </customgridpanel>
 </viewport>

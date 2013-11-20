@@ -7,6 +7,12 @@
     </crumbs>
 
     <customgridpanel url="/tmkStatistics.json" pageSize="15" title="TMK运营报表" id="grid1" width="1200" height="350" loadUrl="false">
+
+        <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="employee_id"  searchType="eq" inputType="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="员工" validate="notNull" parentSelect="centerId"/>
+        <search field="startTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
+        <search field="endTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
+
         <column field="employeeName" desc="tmk姓名">
             <formatter>
                 <![CDATA[
@@ -14,10 +20,10 @@
                 ]]>
             </formatter>
         </column>
-        <column field="totalNum" desc="名单总数"/>
-        <column field="waitNum" desc="待确认的名单数"/>
-        <column field="badNum" desc="已废弃的名单数"/>
-        <column field="inviteNum" desc="已邀约的名单数"/>
-        <column field="sureNum" desc="确认签到的名单数"/>
+        <column field="phoneNum" desc="拨打电话数"/>
+        <column field="consumerNum" desc="名单数"/>
+        <column field="inviteNum" desc="邀约数"/>
+        <column field="signNum" desc="签到数"/>
+        <column field="payNum" desc="缴费数"/>
     </customgridpanel>
 </viewport>

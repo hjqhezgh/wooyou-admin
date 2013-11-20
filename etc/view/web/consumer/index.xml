@@ -11,15 +11,16 @@
         <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="tmkId" searchType="eq" inputType="remoteSelect" url="/employeeListByRoleId.json?id=11" valueField="userId" descField="reallyName" desc="所属TMK"/>
         <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
-        <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="联系起始时间"/>
-        <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="联系结束时间"/>
+        <search field="payStatus" searchType="eq" inputType="localSelect" desc="缴费状态" localData="[{desc:'已缴费',value:'1'},{desc:'未缴费',value:'2'}]"/>
+        <search field="timeType" searchType="eq" inputType="localSelect" desc="时间查询类型" localData="[{desc:'按签到时间',value:'1'},{desc:'按缴费时间',value:'2'}]"/>
+        <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
+        <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
         <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
 
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
-        <toolaction desc="待确认" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认将该客户重置为待确认吗？" colorClass="h-bg-green" params="{status:'2'}"/>
-        <toolaction desc="签到" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认签到该客户吗？" colorClass="h-bg-green" params="{status:'5'}"/>
+        <toolaction desc="缴费" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认 将该用户设置为缴费吗？" colorClass="h-bg-green" params="{}"/>
 
         <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="TMK"/>
@@ -44,7 +45,7 @@
             ]]>
         </formatter>
         </column>
-        <column field="isAPP" desc="是否APP用户">
+        <column field="isAPP" desc="是否APP用户" hidden="true">
             <formatter>
                 <![CDATA[
                     if(cellvalue){
@@ -56,6 +57,17 @@
             </formatter>
         </column>
         <column field="remark" desc="备注"/>
+        <column field="paytime" desc="缴费时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>
 </viewport>

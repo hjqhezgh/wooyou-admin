@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+
+    <customgridpanel url="/web/wyclass/wyclass_free.json" pageSize="15" title="免费课管理" id="grid1" width="1200" height="350" loadUrl="true" mutiSelect="true">
+
+        <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间" char14="true" />
+        <search field="endTime" searchType="le" inputType="datetime" desc="结束时间" char14="true" />
+
+        <toolaction desc="快速排班" url="/web/wyclass/addChildQuick.json" colorClass="h-bg-green" linkType="mutiSelect"/>
+
+        <column field="centerName" desc="所属中心"/>
+        <column field="couseCode" desc="课程代码"/>
+        <column field="className" desc="课程名"/>
+        <column field="start_time" desc="上课时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="totalNum" desc="邀约人数"/>
+        <column field="signInNum" desc="签到人数"/>
+        <column field="centerId" desc="中心id" hidden="true"/>
+
+        <action desc="分配学员" url="/web/wyclass/manageChild" actionParams="[{name:'classId',value:'id'},{name:'centerId-eq',value:'6'}]" linkType="iframeWindow"/>
+        <!--
+        <column field="name" desc="班级名"/>
+        <column field="center.name" desc="所属中心"/>
+        <column field="course.name" desc="课程名"/>
+        <column field="end_time" desc="计划结束日期">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="deadline" desc="报名截止日期">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="max_child_num" desc="能容纳的小孩子数"/>
+        <column field="b.really_name" desc="老师"/>
+        <column field="a.really_name" desc="助手"/>
+        <column field="centerid" hidden="true" desc="班级名"/>
+
+        <toolaction desc="添加" url="/web/wyclass/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/wyclass/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+        <action desc="分配小朋友" url="/web/wyclass/manageChild" actionParams="[{name:'id',value:'id'},{name:'center_id-eq',value:'8'}]" linkType="iframeWindow"/>
+        -->
+    </customgridpanel>
+
+</viewport>

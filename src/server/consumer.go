@@ -63,7 +63,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleCodes := strings.Split(employee.RoleCode, ",")
 
 	for _, roleCode := range roleCodes {
-		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" ||  roleCode == "tmk" {
 			dataType = "all"
 			break
 		} else{
@@ -110,10 +110,12 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	lastContractEndTime := r.FormValue("lastContractEndTime-le")
 	kw := r.FormValue("kw-like")
 	sort := r.FormValue("sort-eq")
+	payStatus := r.FormValue("payStatus-eq")
+	timeType := r.FormValue("timeType-eq")
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.pay_time "
 	sql += " from "
 	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -135,14 +137,30 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.contact_status=? "
 	}
 
-	if lastContractStartTime!= "" {
+	if lastContractStartTime!= "" && timeType=="1"  {
 		params = append(params,lastContractStartTime)
-		sql += " and cons.last_contact_time>=? "
+		sql += " and cons.sign_in_time>=? "
 	}
 
-	if lastContractEndTime!= "" {
+	if lastContractStartTime!= "" && timeType=="2"  {
+		params = append(params,lastContractStartTime)
+		sql += " and cons.pay_time>=? "
+	}
+
+	if lastContractEndTime!= "" && timeType=="1"{
 		params = append(params,lastContractEndTime)
-		sql += " and cons.last_contact_time<=? "
+		sql += " and cons.sign_in_time<=? "
+	}
+
+	if lastContractEndTime!= "" && timeType=="2"  {
+		params = append(params,lastContractEndTime)
+		sql += " and cons.pay_time<=? "
+	}
+
+	if payStatus == "1" {
+		sql += " and cons.pay_time is not null and cons.pay_time != '' "
+	}else if payStatus == "2" {
+		sql += " and (cons.pay_time is null or cons.pay_time == '') "
 	}
 
 	if tmkId1 != ""{
@@ -254,7 +272,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 9; i++ {
+		for i := 0; i < 10; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -1013,6 +1031,8 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 
 	sql := "select count(1) from consumer_new where home_phone=? ";
 
+	lessgo.Log.Debug(sql)
+
 	rows, err := db.Query(sql, phone)
 
 	if err != nil {
@@ -1038,6 +1058,8 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 
 
 	sql = "select count(1) from contacts where phone=? ";
+
+	lessgo.Log.Debug(sql)
 
 	rows, err = db.Query(sql, phone)
 
@@ -1109,6 +1131,20 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	dataType := ""
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			dataType = "all"
+			break
+		} else {
+			dataType = "center"
+			break
+		}
+	}
+
 	centerId1 := r.FormValue("centerId-eq")
 	status := r.FormValue("status-eq")
 	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
@@ -1134,6 +1170,22 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join center ce on ce.cid=cons.center_id "
 	sql += " left join employee e on e.user_id=cons.last_tmk_id where 1=1 and cons.is_own_by_tmk=2 "
 
+	if dataType=="center" {
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		params = append(params, _employee.CenterId)
+		sql += " and cons.center_id=? "
+	}
+
 	if status != "" {
 		params = append(params, status)
 		sql += " and cons.contact_status=? "
@@ -1149,7 +1201,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.last_contact_time<=? "
 	}
 
-	if centerId1 != "" {
+	if centerId1 != "" && dataType=="all" {
 		params = append(params, centerId1)
 		sql += " and cons.center_id=? "
 	}
@@ -1361,10 +1413,13 @@ func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if totalNum > 0 {
+	fmt.Println(totalNum)
+
+	//这里将来要改成可配置的
+	if totalNum > 4 {
 		m["success"] = false
 		m["code"] = 100
-		m["msg"] = "您还有未联系的客户，请处理结束后再邀约新客户"
+		m["msg"] = "您还有5个未联系的客户，请处理结束后再邀约新客户"
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
@@ -1498,10 +1553,12 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
 	lastContractEndTime := r.FormValue("lastContractEndTime-le")
 	kw := r.FormValue("kw-like")
+	payStatus := r.FormValue("payStatus-eq")
+	timeType := r.FormValue("timeType-eq")
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark "
+	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.center_id,cons.pay_time "
 	sql += " from tmk_consumer tc"
 	sql += " inner join (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -1523,14 +1580,30 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.contact_status=? "
 	}
 
-	if lastContractStartTime!= "" {
+	if lastContractStartTime!= "" && timeType=="1"  {
 		params = append(params,lastContractStartTime)
-		sql += " and cons.last_contact_time>=? "
+		sql += " and cons.sign_in_time>=? "
 	}
 
-	if lastContractEndTime!= "" {
+	if lastContractStartTime!= "" && timeType=="2"  {
+		params = append(params,lastContractStartTime)
+		sql += " and cons.pay_time>=? "
+	}
+
+	if lastContractEndTime!= "" && timeType=="1"{
 		params = append(params,lastContractEndTime)
-		sql += " and cons.last_contact_time<=? "
+		sql += " and cons.sign_in_time<=? "
+	}
+
+	if lastContractEndTime!= "" && timeType=="2"  {
+		params = append(params,lastContractEndTime)
+		sql += " and cons.pay_time<=? "
+	}
+
+	if payStatus == "1" {
+		sql += " and cons.pay_time is not null and cons.pay_time != '' "
+	}else if payStatus == "2" {
+		sql += " and (cons.pay_time is null or cons.pay_time == '') "
 	}
 
 	if centerId1 != "" {
@@ -1609,7 +1682,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 8; i++ {
+		for i := 0; i < 10; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -1641,4 +1714,151 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
+}
+
+//客户缴费
+func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids,",") {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "每次只能缴费一个客户"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkSql := "select count(1) from pay_log where consumer_id=? "
+	rows, err := db.Query(checkSql, ids)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if totalNum > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该用户已缴费，无需重复操作"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	insertSql := "insert into pay_log(consumer_id,pay_time,employee_id) values(?,?,?)"
+	lessgo.Log.Debug(insertSql)
+
+	stmt, err := tx.Prepare(insertSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(ids,time.Now().Format("20060102150405"),employee.UserId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	updateSql := "update consumer_new set pay_time=? where id=?"
+	lessgo.Log.Debug(updateSql)
+
+	stmt, err = tx.Prepare(updateSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(time.Now().Format("20060102150405"),ids)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "缴费成功"
+	commonlib.OutputJson(w, m, " ")
+	return
 }

@@ -23,17 +23,27 @@ import (
 	"strconv"
 	"text/template"
 	"time"
+	"strings"
 )
 
-//tmk运营报表
+//tmk业绩报表
 /*
-select tc.tmk_id,e.really_name,count(tc.tmk_id) as '名单总数',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到'
-from tmk_consumer tc  left join employee e on e.user_id=tc.tmk_id
-left join (select * from consumer_new where contact_status=2)bb on tc.consumer_id=bb.id
-left join (select * from consumer_new where contact_status=3)cc on tc.consumer_id=cc.id
-left join (select * from consumer_new where contact_status=4)dd on tc.consumer_id=dd.id
-left join (select * from consumer_new where contact_status=5)ee on tc.consumer_id=ee.id
-group by tc.tmk_id
+select em.user_id,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '缴费数'
+from employee em left join
+(select count(1) num,e.user_id from audio a left join employee e on a.cid=e.center_id and a.localphone=e.phone_in_center
+where e.user_id is not null group by e.user_id ) aa on em.user_id= aa.user_id
+left join
+(select count(1) num,tmk_id from tmk_consumer group by tmk_id )bb on em.user_id=bb.tmk_id
+left join
+(select count(1) num,create_user from wyclass_free_child where create_time>=? and create_time <=? group by create_user) cc on em.user_id=cc.tmk_id
+left join
+(select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id,wfsi.sign_in_time from tmk_consumer tc left join wyclass_free_sign_in wfsi on tc.consumer_id=wfsi.consumer_id
+where wfsi.sign_in_time is not null ) a group by tmk_id )dd on em.user_id=dd.tmk_id
+left join
+(select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id,pl.pay_time from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id
+where pl.pay_time is not null) b group by tmk_id) ee on em.user_id=ee.tmk_id
+where cc.num is not null
+order by em.user_id
 */
 func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
@@ -79,18 +89,99 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	centerId := r.FormValue("centerId-eq")
+	startTime := r.FormValue("startTime-ge")
+	endTime := r.FormValue("endTime-le")
+	employeeId := r.FormValue("employee_id-eq")
+
+	dataType := ""
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
+			dataType = "all"
+			break
+		} else if roleCode == "cd"{
+			dataType = "center"
+			break
+		}else {
+			dataType = "self"
+			break
+		}
+	}
+
 	params := []interface{}{}
 
-	sql := "select tc.tmk_id,e.really_name,count(tc.tmk_id) as '名单总数',count(bb.id) as '待确认',count(cc.id) as '已废弃',count(dd.id) as '已邀约',count(ee.id) as '确认签到' "
-	sql += " from tmk_consumer tc  left join employee e on e.user_id=tc.tmk_id "
-	sql += " left join (select * from consumer_new where contact_status=2)bb on tc.consumer_id=bb.id "
-	sql += " left join (select * from consumer_new where contact_status=3)cc on tc.consumer_id=cc.id "
-	sql += " left join (select * from consumer_new where contact_status=4)dd on tc.consumer_id=dd.id "
-	sql += " left join (select * from consumer_new where contact_status=5)ee on tc.consumer_id=ee.id "
-	sql += " group by tc.tmk_id "
+	sql := "select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '缴费数' "
+	sql += " from employee em left join "
+	sql += " (select count(1) num,e.user_id from audio a left join employee e on a.cid=e.center_id and a.localphone=e.phone_in_center "
+	sql += " where e.user_id is not null and start_time >=? and start_time<=?  group by e.user_id ) aa on em.user_id= aa.user_id "
+	sql += " left join "
+	sql += " (select count(1) num,tmk_id from tmk_consumer where tmk_create_time >=? and tmk_create_time<=? group by tmk_id )bb on em.user_id=bb.tmk_id "
+	sql += " left join "
+	sql += " (select count(1) num,create_user from wyclass_free_child where create_time>=? and create_time <=? group by create_user) cc on em.user_id=cc.create_user "
+	sql += " left join "
+	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join wyclass_free_sign_in wfsi on tc.consumer_id=wfsi.consumer_id "
+	sql += " where wfsi.sign_in_time is not null and wfsi.sign_in_time>=? and wfsi.sign_in_time<=? ) a group by tmk_id )dd on em.user_id=dd.tmk_id "
+	sql += " left join "
+	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id "
+	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? ) b group by tmk_id) ee on em.user_id=ee.tmk_id "
+	sql += " where em.phone_in_center is not null and em.phone_in_center != '' "
+
+	defaultStartTime := "20000101000000"
+	defaultEndTime := "29991231000000"
+
+	if startTime != ""{
+		defaultStartTime = startTime
+	}
+
+	if endTime != ""{
+		defaultEndTime = endTime
+	}
+
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+		params = append(params, _employee.CenterId)
+		sql += " and em.center_id=? "
+	}
+
+	if centerId != "" && dataType == "all" {
+		params = append(params, centerId)
+		sql += " and em.center_id=? "
+	}
+
+	if dataType == "self" {
+		params = append(params, employee.UserId)
+		sql += " and em.user_id=? "
+	}
+
+	if dataType != "self" && employeeId!= "" {
+		params = append(params, employeeId)
+		sql += " and em.user_id=? "
+	}
 
 
-	countSql := "select count(distinct(tmk_id)) from tmk_consumer"
+	countSql := "select count(1) from (" + sql + ") num"
 
 	lessgo.Log.Debug(countSql)
 
@@ -131,7 +222,7 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " limit ?,?"
+	sql += " order by em.user_id limit ?,?"
 
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
