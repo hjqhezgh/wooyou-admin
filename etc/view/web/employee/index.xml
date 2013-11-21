@@ -11,7 +11,7 @@
 
         <column field="username" desc="用户名"/>
         <column field="really_name" desc="真实姓名"/>
-        <column field="department_id" desc="所属部门"/>
+        <column field="department_id" desc="所属部门" hidden="true"/>
         <column field="center.name" desc="所属中心"/>
         <column field="is_leave" desc="员工状态">
             <formatter>

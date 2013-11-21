@@ -10,42 +10,7 @@
         <element field="month"  type="localSelect" localData="[{desc:'1月', value:'1'},{desc:'2月', value:'2'},{desc:'3月', value:'3'},{desc:'4月', value:'4'},{desc:'5月', value:'5'},{desc:'6月', value:'6'},{desc:'7月', value:'7'},{desc:'8月', value:'8'},{desc:'9月', value:'9'},{desc:'10月', value:'10'},{desc:'11月', value:'11'},{desc:'12月', value:'12'}]" desc="出生月份"/>
         <element field="birthday" type="date" desc="出生日期" tip="如果填写此项，则年月无需填写" char8="true"/>
         <element field="come_from_id" type="remoteSelect" validate="notNull" url="/web/come_from/alldata" valueField="id" descField="name" desc="来源"/>
-        <element field="center_id" type="remoteSelect" validate="notNull" readonly="true" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
-        <beforeSave>
-            <![CDATA[
-                var year = container.find('form').find('[name=year]').val()
-                var month = container.find('form').find('[name=month]').val()
-                var birthday = container.find('form').find('[name=birthday]').val()
-
-                if((year=='' && month=='') && birthday==''){
-                    alert('请填写小孩子的年龄信息');
-                    return false;
-                }
-
-                if(birthday!=''){
-                    return true;
-                }
-
-                if(year==''){
-                    alert('请填写小孩子出生年份');
-                    return false;
-                }
-
-                if(month==''){
-                    alert('请选择小孩子出生月份');
-                    return false;
-                }
-
-                if(year.length!=4){
-                    alert('出生年份格式错误');
-                    return false;
-                }
-
-                return true;
-            ]]>
-        </beforeSave>
-
-        <afterRender>
+        <element field="center_id" type="remoteSelect" validate="notNull" readonly="true" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/><afterRender>
         </afterRender>
     </customformpanel>
 

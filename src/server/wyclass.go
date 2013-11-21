@@ -929,8 +929,8 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 	sql := "select class.class_id,ce.name as centerName,class.code,class.name,class.start_time,childNum.num as childNum,signInNum.num as signInNum,class.center_id "
 	sql += " from wyclass class "
 	sql += " left join (select count(1) num,wyclass_id from wyclass_free_child group by wyclass_id) childNum on class.class_id=childNum.wyclass_id "
-	sql += " left join (select count(1) num,wyclass_id from wyclass_free_sign_in group by wyclass_id)signInNUm on class.class_id=signInNum.wyclass_id "
-	sql += " left join center ce on ce.cid=class.center_id where 1=1 "
+	sql += " left join (select count(1) num,wyclass_id from wyclass_free_sign_in group by wyclass_id)signInNum on class.class_id=signInNum.wyclass_id "
+	sql += " left join center ce on ce.cid=class.center_id where 1=1  and class.start_time is not null and class.start_time != '' "
 
 	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
@@ -952,12 +952,12 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if startTime != "" {
-		params = append(params, centerId)
+		params = append(params, startTime)
 		sql += " and class.start_time>=? "
 	}
 
 	if endTime != ""{
-		params = append(params, centerId)
+		params = append(params, endTime)
 		sql += " and class.start_time<=? "
 	}
 

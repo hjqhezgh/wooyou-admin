@@ -12,7 +12,7 @@
         <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="tmkId" searchType="eq" inputType="remoteSelect" url="/employeeListByRoleId.json?id=11" valueField="userId" descField="reallyName" desc="所属TMK"/>
         <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
-        <search field="payStatus" searchType="eq" inputType="localSelect" desc="缴费状态" localData="[{desc:'已缴费',value:'1'},{desc:'未缴费',value:'2'}]"/>
+        <search field="payStatus" searchType="eq" inputType="localSelect" desc="缴费状态" localData="[{desc:'已缴定金',value:'1'},{desc:'已缴全额',value:'2'},{desc:'未缴费',value:'3'}]"/>
         <search field="timeType" searchType="eq" inputType="localSelect" desc="时间查询类型" localData="[{desc:'按签到时间',value:'1'},{desc:'按缴费时间',value:'2'}]"/>
         <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
         <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
@@ -58,6 +58,19 @@
             </formatter>
         </column>
         <column field="remark" desc="备注"/>
+        <column field="payStatus" desc="缴费状态">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return '<span style="color:blue;">缴定金</span>';
+                        }else if(cellvalue=="2") {
+                            return '<span style="color:green;">缴全额</span>';
+                        }else if(cellvalue== "") {
+                            return "未缴费";
+                        }
+                ]]>
+            </formatter>
+        </column>
         <column field="paytime" desc="缴费时间">
             <formatter>
                 <![CDATA[

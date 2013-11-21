@@ -113,7 +113,7 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '缴费数' "
+	sql := "select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '定金',ff.num as '全额' "
 	sql += " from employee em left join "
 	sql += " (select count(1) num,e.user_id from audio a left join employee e on a.cid=e.center_id and a.localphone=e.phone_in_center "
 	sql += " where e.user_id is not null and start_time >=? and start_time<=?  group by e.user_id ) aa on em.user_id= aa.user_id "
@@ -125,12 +125,17 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join wyclass_free_sign_in wfsi on tc.consumer_id=wfsi.consumer_id "
 	sql += " where wfsi.sign_in_time is not null and wfsi.sign_in_time>=? and wfsi.sign_in_time<=? ) a group by tmk_id )dd on em.user_id=dd.tmk_id "
 	sql += " left join "
-	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id "
-	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? ) b group by tmk_id) ee on em.user_id=ee.tmk_id "
-	sql += " where em.phone_in_center is not null and em.phone_in_center != '' "
+	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id "
+	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=1 ) b group by tmk_id) ee on em.user_id=ee.tmk_id "
+	sql += " left join "
+	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id "
+	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=2 ) b group by tmk_id) ff on em.user_id=ff.tmk_id "
+	sql += " left join employee_role er on em.user_id=er.user_id"
+	sql += " left join role r on r.role_id=er.role_id"
+	sql += " where (r.code='tmk' or r.code='tmk_center') and em.is_leave=0 "
 
-	defaultStartTime := "20000101000000"
-	defaultEndTime := "29991231000000"
+	defaultStartTime := "2000-01-01 00:0:000"
+	defaultEndTime := "2999-12-31 00:00:00"
 
 	if startTime != ""{
 		defaultStartTime = startTime
@@ -139,6 +144,16 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	if endTime != ""{
 		defaultEndTime = endTime
 	}
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+
+	defaultStartTime = strings.Replace(defaultStartTime,"-","",-1)
+	defaultStartTime = strings.Replace(defaultStartTime," ","",-1)
+	defaultStartTime = strings.Replace(defaultStartTime,":","",-1)
+
+	defaultEndTime = strings.Replace(defaultEndTime,"-","",-1)
+	defaultEndTime = strings.Replace(defaultEndTime," ","",-1)
+	defaultEndTime = strings.Replace(defaultEndTime,":","",-1)
 
 	params = append(params, defaultStartTime)
 	params = append(params, defaultEndTime)
@@ -250,7 +265,7 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 6; i++ {
+		for i := 0; i < 7; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

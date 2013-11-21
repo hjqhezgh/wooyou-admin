@@ -3,10 +3,10 @@
     <!--面包屑-->
     <crumbs>
         <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="Call Center跟踪" currentPage="true"/>
+        <crumb text="中心通话报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="Call Center统计数据" id="grid1" width="1200" height="350" loadUrl="false">
+    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="中心通话报表" id="grid1" width="1200" height="350" loadUrl="false">
         <column field="centerId" desc="" hidden="true"/>
         <column field="centerName" desc="所属中心" hidden="true"/>
         <column field="totalNum" desc="CallCenter名单总数"/>

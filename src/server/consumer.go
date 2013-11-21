@@ -115,7 +115,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.pay_time "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.pay_status,cons.pay_time "
 	sql += " from "
 	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -158,9 +158,11 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if payStatus == "1" {
-		sql += " and cons.pay_time is not null and cons.pay_time != '' "
+		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=1 "
 	}else if payStatus == "2" {
-		sql += " and (cons.pay_time is null or cons.pay_time == '') "
+		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=2 "
+	}else if payStatus == "3" {
+		sql += " and (cons.pay_time is null or cons.pay_time ='')"
 	}
 
 	if tmkId1 != ""{
@@ -272,7 +274,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 11; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -1136,7 +1138,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleCodes := strings.Split(employee.RoleCode, ",")
 
 	for _, roleCode := range roleCodes {
-		if roleCode == "tmk" {
+		if roleCode == "tmk" ||  roleCode == "yyzj"{
 			dataType = "all"
 			break
 		} else {
@@ -1413,8 +1415,6 @@ func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println(totalNum)
-
 	//这里将来要改成可配置的
 	if totalNum > 4 {
 		m["success"] = false
@@ -1558,7 +1558,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.center_id,cons.pay_time "
+	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.center_id,cons.pay_status,cons.pay_time "
 	sql += " from tmk_consumer tc"
 	sql += " inner join (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -1601,9 +1601,11 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if payStatus == "1" {
-		sql += " and cons.pay_time is not null and cons.pay_time != '' "
+		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=1 "
 	}else if payStatus == "2" {
-		sql += " and (cons.pay_time is null or cons.pay_time == '') "
+		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=2 "
+	}else if payStatus == "3" {
+		sql += " and (cons.pay_time is null or cons.pay_time ='')"
 	}
 
 	if centerId1 != "" {
@@ -1682,7 +1684,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 11; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -1742,6 +1744,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ids := r.FormValue("ids")
+	status := r.FormValue("status")
 
 	if strings.Contains(ids,",") {
 		m["success"] = false
@@ -1827,7 +1830,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateSql := "update consumer_new set pay_time=? where id=?"
+	updateSql := "update consumer_new set pay_time=?,pay_status=? where id=?"
 	lessgo.Log.Debug(updateSql)
 
 	stmt, err = tx.Prepare(updateSql)
@@ -1842,7 +1845,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(time.Now().Format("20060102150405"),ids)
+	_, err = stmt.Exec(time.Now().Format("20060102150405"),status,ids)
 
 	if err != nil {
 		tx.Rollback()

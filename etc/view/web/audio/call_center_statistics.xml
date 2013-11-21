@@ -3,14 +3,15 @@
     <!--面包屑-->
     <crumbs>
         <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="Call Center跟踪" currentPage="true"/>
+        <crumb text="中心通话报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="Call Center统计数据" id="grid1" width="1200" height="350" loadUrl="false">
+    <customgridpanel url="/callCenterStatistics.json" pageSize="15" title="中心通话报表" id="grid1" width="1200" height="350" loadUrl="false">
         <column field="centerName" desc="所属中心">
             <formatter>
                 <![CDATA[
-                    return '<a style="color:blue;text-decoration: underline;" title="查看该中心CallCenter详情" href="/web/audio/center_callcenter_detail?centerId='+options.rowId+'">'+cellvalue+'</a>'
+                    //return '<a style="color:blue;text-decoration: underline;" title="查看该中心CallCenter详情" href="/web/audio/center_callcenter_detail?centerId='+options.rowId+'">'+cellvalue+'</a>'
+                    return cellvalue;
                 ]]>
             </formatter>
         </column>

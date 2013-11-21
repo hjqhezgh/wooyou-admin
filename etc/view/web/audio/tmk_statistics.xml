@@ -3,20 +3,21 @@
     <!--面包屑-->
     <crumbs>
         <crumb text="电话录音报表" url="javascript:void(0);"/>
-        <crumb text="TMK运营报表" currentPage="true"/>
+        <crumb text="TMK业绩报表" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/tmkStatistics.json" pageSize="15" title="TMK运营报表" id="grid1" width="1200" height="350" loadUrl="false">
+    <customgridpanel url="/tmkStatistics.json" pageSize="15" title="TMK业绩报表" id="grid1" width="1200" height="350" loadUrl="false">
 
         <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="employee_id"  searchType="eq" inputType="remoteSelect" url="/employeeByCenterId.json" valueField="userId" descField="reallyName" desc="员工" validate="notNull" parentSelect="centerId"/>
-        <search field="startTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
-        <search field="endTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
+        <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间"/>
+        <search field="endTime" searchType="le" inputType="datetime" desc="结束时间"/>
 
         <column field="employeeName" desc="tmk姓名">
             <formatter>
                 <![CDATA[
-                    return '<a style="color:blue;text-decoration: underline;" target="_blank" href="/web/audio/tmk_statistics_detail?tmkId='+options.rowId+'">'+cellvalue+'</a>';
+                    //return '<a style="color:blue;text-decoration: underline;" target="_blank" href="/web/audio/tmk_statistics_detail?tmkId='+options.rowId+'">'+cellvalue+'</a>';
+                    return cellvalue;
                 ]]>
             </formatter>
         </column>
@@ -24,6 +25,7 @@
         <column field="consumerNum" desc="名单数"/>
         <column field="inviteNum" desc="邀约数"/>
         <column field="signNum" desc="签到数"/>
-        <column field="payNum" desc="缴费数"/>
+        <column field="djPayNum" desc="已缴定金数"/>
+        <column field="qePayNum" desc="已缴全额数"/>
     </customgridpanel>
 </viewport>
