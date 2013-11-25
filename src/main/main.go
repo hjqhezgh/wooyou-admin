@@ -75,9 +75,12 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consumerSave.json": server.ConsumerSaveAction,
 	"/consumerLoad.json": server.ConsumerLoadAction,
 	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
+	"/web/consumer/backToAllConsumer.json": server.BackToAllConsumerAction,
 	"/contacts/page": server.ContractsListAction,
 	"/contacts/save.json": server.ContractsSaveAction,
-	"/contacts/delete.json": server.ContractsDeleteAction,
+	"/web/consumerContactsLog/page.json": server.ConsumerContactLogAction,
+	"/web/consumerContactsLog/save.json": server.ConsumerContactLogSaveAction,
+	"/web/consumerContactsLog/load.json": server.ConsumerContactLogLoadAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,

@@ -24,11 +24,12 @@ import (
 )
 
 /*
-select a.aid,cons.child,cont.name contName,a.remotephone,,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.remark,cons.id,a.filename,a.cid  from audio a
+select a.aid,cons.child,cont.name contName,a.remotephone,,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,b.remark,cons.id,a.filename,a.cid  from audio a
 left join contacts cont on a.remotephone=cont.phone
 left join consumer_new cons on cont.consumer_id=cons.id
 left join employee e on e.phone_in_center=a.localphone and e.center_id=a.cid
 left join center ce on ce.cid=cons.center_id
+left join (select consumer_id,GROUP_CONCAT(concat(create_time,':',note) remark SEPARATOR "\n") note from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id
 where e.user_id=1 and a.remotephone != '' and  a.remotephone is not null
 */
 func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
@@ -100,11 +101,12 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select a.aid,cons.child,cons.remark,cont.name contName,a.remotephone,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.id,a.filename,a.cid  from audio a "
+	sql := "select a.aid,cons.child,b.remark,cont.name contName,a.remotephone,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.id,a.filename,a.cid  from audio a "
 	sql += " left join contacts cont on a.remotephone=cont.phone "
 	sql += " left join consumer_new cons on cont.consumer_id=cons.id "
 	sql += " left join employee e on e.phone_in_center=a.localphone and e.center_id=a.cid "
 	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " where e.user_id=? and a.remotephone != '' and  a.remotephone is not null "
 
 	params = append(params, eid)

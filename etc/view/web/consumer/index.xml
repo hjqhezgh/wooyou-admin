@@ -21,7 +21,6 @@
 
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
-        <toolaction desc="待确认" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认待确认该客户吗？" colorClass="h-bg-green" params="{status:'2'}"/>
         <toolaction desc="缴定金" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴定金吗？" colorClass="h-bg-green" params="{status:'1'}"/>
         <toolaction desc="缴全额" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴全额吗？" colorClass="h-bg-green" params="{status:'2'}"/>
 
@@ -85,5 +84,6 @@
             </formatter>
         </column>
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
+        <action desc="备注" url="/web/consumerContactsLog/add" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>
 </viewport>

@@ -115,7 +115,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.pay_status,cons.pay_time "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cons.pay_status,cons.pay_time "
 	sql += " from "
 	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -129,6 +129,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " group by c.consumer_id)a "
 	sql += " left join consumer_new cons on cons.id=a.consumer_id "
 	sql += " left join contacts cont on cont.id=a.contacts_id "
+	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " left join center ce on ce.cid=cons.center_id "
 	sql += " left join employee e on e.user_id=cons.current_tmk_id where 1=1 "
 
@@ -388,67 +389,6 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		/**********************获取最后联系状态**********************/
-		contactStatusSql := " select seconds,start_time,end_time,`inout` from audio where remotephone=? "
-		contactStatusParams := []interface {}{}
-		contactStatusParams = append(contactStatusParams,phone)
-
-		if homePhone!=""{
-			contactStatusSql += " or remotephone=? "
-			contactStatusParams = append(contactStatusParams,homePhone)
-		}
-		contactStatusSql += " order by start_time desc,aid desc "
-		lessgo.Log.Debug(contactStatusSql)
-
-		contactStatusRows, err := db.Query(contactStatusSql, contactStatusParams...)
-
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		contactStatus := CONSUMER_STATUS_NO_CONTACT
-		lastContactTime := ""
-
-		for contactStatusRows.Next() {
-			seconds := ""
-			endtime := ""
-			starttime := ""
-			inout := ""
-
-			err = commonlib.PutRecord(contactStatusRows, &seconds,&starttime,&endtime,&inout)
-
-			if err != nil {
-				lessgo.Log.Warn(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "系统发生错误，请联系IT部门"
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-
-			if seconds=="" && endtime==""{//说明是在接电话的过程中添加用户一定是有效数据，直接取当前的信息最为最后联系信息
-				contactStatus = CONSUMER_STATUS_WAIT
-				lastContactTime = strings.Replace(starttime,"-","",-1)
-				lastContactTime = strings.Replace(lastContactTime," ","",-1)
-				lastContactTime = strings.Replace(lastContactTime,":","",-1)
-				break
-			}
-
-			//说明这个是有效电话，直接取这次的通话信息
-			if seconds!="00:00:00" && inout!="未接听"{
-				contactStatus = CONSUMER_STATUS_WAIT
-				lastContactTime = strings.Replace(starttime,"-","",-1)
-				lastContactTime = strings.Replace(lastContactTime," ","",-1)
-				lastContactTime = strings.Replace(lastContactTime,":","",-1)
-				break
-			}
-		}
-
 		tx, err := db.Begin()
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -457,6 +397,14 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			m["msg"] = "系统发生错误，请联系IT部门"
 			commonlib.OutputJson(w, m, " ")
 			return
+		}
+
+		contactStatus := CONSUMER_STATUS_NO_CONTACT
+		lastContactTime := ""
+
+		if remark != "" {
+			contactStatus = CONSUMER_STATUS_WAIT
+			lastContactTime = time.Now().Format("20060102150405")
 		}
 
 		/**********************数据插入consumer表**********************/
@@ -524,6 +472,35 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			m["msg"] = "系统发生错误，请联系IT部门"
 			commonlib.OutputJson(w, m, " ")
 			return
+		}
+
+		//如果添加阶段就有备注，那就要开始添加接触记录
+		if remark != "" {
+			insertContactLogSql := "insert into consumer_contact_log(create_user,create_time,note,consumer_id,type) values(?,?,?,?,?) "
+
+			insertContactLogStmt, err := tx.Prepare(insertContactLogSql)
+			if err != nil {
+				tx.Rollback()
+
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = insertContactLogStmt.Exec(employee.UserId,time.Now().Format("20060102150405"),remark,consumerId,1)
+			if err != nil {
+				tx.Rollback()
+
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
 		}
 
 		tx.Commit()
@@ -1155,7 +1132,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark "
 	sql += " from "
 	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -1170,6 +1147,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join consumer_new cons on cons.id=a.consumer_id "
 	sql += " left join contacts cont on cont.id=a.contacts_id "
 	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " left join employee e on e.user_id=cons.last_tmk_id where 1=1 and cons.is_own_by_tmk=2 "
 
 	if dataType=="center" {
@@ -1558,7 +1536,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,cons.remark,cons.center_id,cons.pay_status,cons.pay_time "
+	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cons.center_id,cons.pay_status,cons.pay_time "
 	sql += " from tmk_consumer tc"
 	sql += " inner join (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -1573,6 +1551,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join consumer_new cons on cons.id=a.consumer_id "
 	sql += " left join contacts cont on cont.id=a.contacts_id "
 	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " where tc.tmk_id= "+employee.UserId
 
 	if status != "" {
@@ -1864,4 +1843,115 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	m["msg"] = "缴费成功"
 	commonlib.OutputJson(w, m, " ")
 	return
+}
+
+
+func BackToAllConsumerAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("ids")
+
+	if strings.Contains(id,","){
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "只能操作一个客户"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql := "update consumer_new set is_own_by_tmk=2,current_tmk_id=null where id=? "
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(id)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql = "delete from tmk_consumer where tmk_id=? and consumer_id=? "
+
+	lessgo.Log.Debug(sql)
+
+	stmt, err = tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(employee.UserId, id)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="修改接触记录" saveUrl="/web/consumerContactsLog/save.json" load="true" loadUrl="/web/consumerContactsLog/load.json"  inwindow="true">
+        <element field="id" type="hidden" validate="" desc="主键" defaultValue="$id"/>
+        <element field="contactType" validate="notNull"  type="localSelect" localData="[{desc:'电话', value:'1'},{desc:'当面沟通', value:'2'}]" desc="联系方式"/>
+        <element field="note" type="textarea" validate="notNull" desc="接触记录"/>
+    </customformpanel>
+</viewport>

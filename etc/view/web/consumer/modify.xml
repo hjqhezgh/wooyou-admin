@@ -2,7 +2,6 @@
 <viewport window="true">
 
     <customformpanel id="form" title="修改客户" saveUrl="/consumerSave.json" load="true" loadUrl="/consumerLoad.json" inwindow="true">
-        <element field="remark" type="textarea" validate="" desc="备注"/>
         <element field="id" type="hidden" validate="" desc="id"/>
         <element field="homePhone" type="text" validate="" desc="家庭电话"/>
         <element field="child" type="text" validate="notNull" desc="小孩姓名"/>
@@ -13,6 +12,38 @@
         <element field="center_id" type="remoteSelect" validate="notNull" readonly="true" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/><afterRender>
         </afterRender>
     </customformpanel>
+
+    <customgridpanel url="/web/consumerContactsLog/page.json" pageSize="15" title="客户接触记录" id="grid1" height="50" loadUrl="true">
+        <toolaction desc="添加" url="/web/consumerContactsLog/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+
+        <column field="createTime" desc="联系时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="employeeName" desc="联系人"/>
+        <column field="note" desc="内容"/>
+        <column field="type" desc="类型">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "电联";
+                        }else if(cellvalue=="2") {
+                            return "面谈";
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <action desc="修改" url="/web/consumerContactsLog/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
 
     <customgridpanel url="/contacts/page" pageSize="15" title="联系人列表" id="grid1" height="50" loadUrl="true" mutiSelect="true">
         <toolaction desc="添加" url="/web/contacts/add" colorClass="h-bg-green" linkType="iframeWindow"/>

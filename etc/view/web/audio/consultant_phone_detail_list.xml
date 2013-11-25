@@ -20,6 +20,9 @@
 
                 if(cellvalue){
                     value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击查看详情" href="/web/consumer/modify?consumerId='+rowObject[9]+'" data-action="openIframeWindow">'+cellvalue+'</a>';
+
+                    value += '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="添加备注" href="/web/consumerContactsLog/add?consumerId='+rowObject[9]+'" data-action="openIframeWindow">备注</a>';
+
                     if(rowObject[6]==""){
                         value += '&nbsp;<span style="color:red;">通话中!!!</span>'
                     }
@@ -31,6 +34,7 @@
                             value += '<a style="color:blue;text-decoration: underline;" target="_blank" title="点击查看详情" href="/web/consumer/modify?consumerId='+rowObject[9]+'" data-action="openIframeWindow" >无名</a>';
                         }
 
+                        value += '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="添加备注" href="/web/consumerContactsLog/add?consumerId='+rowObject[9]+'" data-action="openIframeWindow">备注</a>';
 
                         if(rowObject[5]==""){
                             value += '&nbsp;<span style="color:red;">通话中!!!</span>'

@@ -355,4 +355,14 @@
         <field name="is_default"/>
         <field name="consumer_id"/>
     </entity>
+
+    <!--客户联系人-->
+    <entity id="consumerContactsLog">
+        <pk>id</pk>
+        <field name="create_user"/>
+        <field name="create_time"/>
+        <field name="note"/>
+        <field name="consumer_id"/>
+        <field name="type"/>
+    </entity>
 </entitys>

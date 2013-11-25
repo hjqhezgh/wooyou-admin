@@ -10,7 +10,7 @@
         <element field="birthday" type="date" desc="出生日期" tip="如果填写此项，则年月无需填写" char8="true"/>
         <element field="come_from_id" type="remoteSelect" validate="notNull" url="/web/come_from/alldata" valueField="id" descField="name" desc="来源"/>
         <element field="center_id" type="remoteSelect" validate="notNull" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
-        <element field="remark" type="textarea" validate="" desc="备注"/>
+        <element field="remark" type="textarea" validate="notNull" desc="备注"/>
         <afterRender>
         </afterRender>
     </customformpanel>

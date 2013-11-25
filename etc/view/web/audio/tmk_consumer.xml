@@ -76,7 +76,17 @@
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
 
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
-        <toolaction desc="待确认" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认将该客户重置为待确认吗？" colorClass="h-bg-green" params="{status:'2'}"/>
+        <toolaction desc="回总库" url="/web/consumer/backToAllConsumer.json" linkType="mutiSelect" confirmMsg="确认把该客户重置回总库吗？" colorClass="h-bg-green" params="{}">
+            <callback>
+                <![CDATA[
+                     if(!data.success){
+                        alert(data.msg)
+                     }
+                     grid1.grid.trigger("reloadGrid");
+                     grid2.grid.trigger("reloadGrid");
+                ]]>
+            </callback>
+        </toolaction>
 
         <column field="centerName" desc="所属门店"/>
         <column field="contactName" desc="联系人"/>
@@ -138,5 +148,6 @@
             </formatter>
         </column>
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
+        <action desc="备注" url="/web/consumerContactsLog/add" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>
 </viewport>
