@@ -26,6 +26,8 @@ import (
 
 func main() {
 
+//	test.ConsumerRemarkDataMove(0,100000)
+
 	r := lessgo.ConfigLessgo()
 
 	portString, _ := lessgo.Config.GetValue("lessgo", "port")
@@ -81,6 +83,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/consumerContactsLog/page.json": server.ConsumerContactLogAction,
 	"/web/consumerContactsLog/save.json": server.ConsumerContactLogSaveAction,
 	"/web/consumerContactsLog/load.json": server.ConsumerContactLogLoadAction,
+	"/web/contacts/contactsLoad.json": server.ContactsLoadAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
