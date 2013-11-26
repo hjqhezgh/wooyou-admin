@@ -302,6 +302,34 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
+
+			insertContactStatus := "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+
+			lessgo.Log.Debug(insertContactStatus)
+
+			stmt, err = tx.Prepare(insertContactStatus)
+			if err != nil {
+				tx.Rollback()
+
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(consumerId,employee.UserId,time.Now().Format("20060102150405"),CONSUMER_STATUS_NO_CONTACT,CONSUMER_STATUS_WAIT)
+			if err != nil {
+				tx.Rollback()
+
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
 		}else{
 			updateConsumerStatsuSql := "update consumer_new set last_contact_time=? where id=? "
 			lessgo.Log.Debug(updateConsumerStatsuSql)

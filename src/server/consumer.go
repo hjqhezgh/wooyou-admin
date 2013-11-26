@@ -350,6 +350,17 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
 	if id == "" {
 
 		homePhoneFlag,err := CheckConsumerPhoneExist(homePhone)
@@ -385,16 +396,6 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			m["success"] = false
 			m["code"] = 100
 			m["msg"] = "家庭电话已经在系统中存在，无需重复录入"
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		tx, err := db.Begin()
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
@@ -508,32 +509,110 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
 	} else {
+		selectOldHomePhone := "select home_phone from consumer_new where id=? "
+		lessgo.Log.Debug(selectOldHomePhone)
 
-		sql := "update consumer_new set remark=?,home_phone=?,child=?,year=?,month=?,birthday=?,come_from_id=? where id=? "
-
-		lessgo.Log.Debug(sql)
-
-		stmt, err := db.Prepare(sql)
-
+		rows, err := db.Query(selectOldHomePhone, id)
 		if err != nil {
+			tx.Rollback()
+
 			lessgo.Log.Warn(err.Error())
 			m["success"] = false
 			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			m["msg"] = "系统发生错误，请联系IT部门"
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
 
-		_, err = stmt.Exec(remark, homePhone, child, year, month, birthday, come_from_id,id)
+		oldHomePhone := ""
+		if rows.Next() {
+			err = commonlib.PutRecord(rows, &oldHomePhone)
+			if err != nil {
+				tx.Rollback()
 
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
 		}
+
+		if oldHomePhone == homePhone {
+			sql := "update consumer_new set remark=?,child=?,year=?,month=?,birthday=?,come_from_id=? where id=? "
+
+			lessgo.Log.Debug(sql)
+
+			stmt, err := db.Prepare(sql)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(remark, child, year, month, birthday, come_from_id,id)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}else{
+			phoneFlag,err := CheckConsumerPhoneExist(homePhone)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			if phoneFlag{
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "联系人家庭电话已经存在，无需重复录入"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			sql := "update consumer_new set remark=?,child=?,year=?,month=?,home_phone=?,birthday=?,come_from_id=? where id=? "
+
+			lessgo.Log.Debug(sql)
+
+			stmt, err := db.Prepare(sql)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(remark, child, year, month,homePhone, birthday, come_from_id,id)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+		}
+
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")

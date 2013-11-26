@@ -101,7 +101,7 @@ func WyClassListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select  c.class_id,c.name,ce.name as cename,cou.name as courseName,c.end_time,c.deadline,c.max_child_num,tea.really_name as teacherName,ass.really_name as assName,c.center_id from wyclass c left join center ce on ce.cid=c.center_id left join employee tea on tea.user_id=c.teacher_id left join employee ass on ass.user_id=c.assistant_id left join course cou on c.course_id=cou.cid where 1=1 "
+	sql := "select  c.class_id,c.name,ce.name as cename,cou.name as courseName,c.end_time,c.deadline,c.max_child_num,tea.really_name as teacherName,ass.really_name as assName,c.center_id from wyclass c left join center ce on ce.cid=c.center_id left join employee tea on tea.user_id=c.teacher_id left join employee ass on ass.user_id=c.assistant_id left join course cou on c.course_id=cou.cid where 1=1 and (c.start_time is null or c.start_time = '') "
 
 	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)

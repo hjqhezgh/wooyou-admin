@@ -194,7 +194,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.FormValue("id1111")//虚拟的。暂时没用，因为还没有做修改功能
+	id := r.FormValue("id")
 	name := r.FormValue("name")
 	phone := r.FormValue("phone")
 	isDefault := r.FormValue("is_default")
@@ -244,6 +244,107 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
 			commonlib.OutputJson(w, m, " ")
 			return
+		}
+	}else{
+		selectOldPhonesql := "select phone contacts where id=? "
+
+		lessgo.Log.Debug(selectOldPhonesql)
+
+		db := lessgo.GetMySQL()
+		defer db.Close()
+
+		rows, err := db.Query(selectOldPhonesql, id)
+
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		var oldPhone string
+
+		if rows.Next() {
+			err = commonlib.PutRecord(rows, &oldPhone)
+
+			if err != nil {
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if oldPhone == phone{
+			updateSql := "update contacts set name=? ,is_default=? where id=? "
+
+			lessgo.Log.Debug(updateSql)
+
+			stmt, err := db.Prepare(updateSql)
+
+			if err != nil {
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(name,isDefault,id)
+
+			if err != nil {
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}else{
+			phoneFlag,err := CheckConsumerPhoneExist(phone)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			if phoneFlag{
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "联系人家庭电话已经存在，无需重复录入"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			updateSql := "update contacts set name=? ,phone=?,is_default=? where id=? "
+
+			lessgo.Log.Debug(updateSql)
+
+			stmt, err := db.Prepare(updateSql)
+
+			if err != nil {
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(name,phone,isDefault,id)
+
+			if err != nil {
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
 		}
 	}
 
@@ -363,3 +464,76 @@ func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.OutputJson(w, m, " ")
 }
 
+func ContactsLoadAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("id")
+
+	sql := "select name,phone,is_default from contacts where id=? "
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, id)
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	var name, phone, is_default string
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &name, &phone, &is_default)
+
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	loadFormObjects := []lessgo.LoadFormObject{}
+
+	h1 := lessgo.LoadFormObject{"name", name}
+	h2 := lessgo.LoadFormObject{"phone", phone}
+	h3 := lessgo.LoadFormObject{"is_default", is_default}
+
+	loadFormObjects = append(loadFormObjects, h1)
+	loadFormObjects = append(loadFormObjects, h2)
+	loadFormObjects = append(loadFormObjects, h3)
+
+	m["success"] = true
+	m["datas"] = loadFormObjects
+	commonlib.OutputJson(w, m, " ")
+
+}
