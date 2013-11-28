@@ -21,11 +21,78 @@
                 ]]>
             </formatter>
         </column>
-        <column field="phoneNum" desc="拨打电话数"/>
+        <column field="phoneNum" desc="电话数"/>
         <column field="consumerNum" desc="名单数"/>
         <column field="inviteNum" desc="邀约数"/>
         <column field="signNum" desc="签到数"/>
         <column field="djPayNum" desc="已缴定金数"/>
         <column field="qePayNum" desc="已缴全额数"/>
+        <column field="qePayNum" desc="邀约率（邀约数/电话数）">
+            <formatter>
+                <![CDATA[
+                    var phoneNum = rowObject[1];
+                    var inviteNum = rowObject[3];
+
+                    if(!phoneNum){
+                        return "无效";
+                    }
+
+                    if(!inviteNum){
+                        return "0%";
+                    }
+
+                    var value = (parseInt(inviteNum)/parseInt(phoneNum))*100
+
+                    return value.toFixed(3)+ "%";
+                ]]>
+            </formatter>
+        </column>
+        <column field="qePayNum" desc="签到率（签到数/邀约数）">
+            <formatter>
+                <![CDATA[
+                    var signNum = rowObject[4];
+                    var inviteNum = rowObject[3];
+
+                    if(!inviteNum){
+                        return "无效";
+                    }
+
+                    if(!signNum){
+                        return "0%";
+                    }
+
+                    var value = (parseInt(signNum)/parseInt(inviteNum))*100
+
+                    return value.toFixed(3)+ "%";
+                ]]>
+            </formatter>
+        </column>
+        <column field="qePayNum" desc="报名率（缴费数/签到数）">
+            <formatter>
+                <![CDATA[
+                    var signNum = rowObject[4];
+                    var djPayNum = rowObject[5];
+                    var qePayNum = rowObject[6];
+
+                    if(!signNum){
+                        return "无效";
+                    }
+
+                    var payNum=0;
+
+                   if(djPayNum){
+                        payNum += parseInt(djPayNum);
+                    }
+
+                    if(qePayNum){
+                        payNum += parseInt(qePayNum);
+                    }
+
+                    var value = (payNum/parseInt(signNum))*100
+
+                    return value.toFixed(3)+ "%";
+                ]]>
+            </formatter>
+        </column>
     </customgridpanel>
 </viewport>

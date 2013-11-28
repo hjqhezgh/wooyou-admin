@@ -73,6 +73,7 @@
         <column field="consumerId" desc="客户id" hidden="true"/>
         <column field="filename" desc="文件名" hidden="true"/>
         <column field="audioCenterId" desc="录音归属中心ID" hidden="true"/>
+        <column field="currentTmk" desc="当前tmk"/>
 
         <!--
         <column field="cName" desc="客户姓名">

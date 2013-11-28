@@ -112,10 +112,11 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sort := r.FormValue("sort-eq")
 	payStatus := r.FormValue("payStatus-eq")
 	timeType := r.FormValue("timeType-eq")
+	partTimeName := r.FormValue("partTimeName-eq")
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cons.pay_status,cons.pay_time "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cons.pay_status,cons.pay_time,cf.name comeFromName, cons.parttime_name partTimeName "
 	sql += " from "
 	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -131,7 +132,8 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join contacts cont on cont.id=a.contacts_id "
 	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " left join center ce on ce.cid=cons.center_id "
-	sql += " left join employee e on e.user_id=cons.current_tmk_id where 1=1 "
+	sql += " left join employee e on e.user_id=cons.current_tmk_id "
+	sql += " left join come_from cf on cf.id=cons.come_from_id where 1=1 "
 
 	if status != "" {
 		params = append(params, status)
@@ -198,6 +200,11 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	if centerId2 != "" && dataType == "all" {
 		params = append(params, centerId2)
 		sql += " and cons.center_id=? "
+	}
+
+	if partTimeName != ""{
+		params = append(params, partTimeName)
+		sql += " and cons.parttime_name=? "
 	}
 
 	countSql := ""
@@ -275,7 +282,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 11; i++ {
+		for i := 0; i < 13; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -346,6 +353,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	come_from_id := r.FormValue("come_from_id")
 	center_id := r.FormValue("center_id")
 	remark := r.FormValue("remark")
+	parttimeName := r.FormValue("parttimeName")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -409,7 +417,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		/**********************数据插入consumer表**********************/
-		insertConsumerSql := "insert into consumer_new(center_id,contact_status,home_phone,create_time,child,year,month,birthday,last_contact_time,come_from_id,remark,create_user_id) values(?,?,?,?,?,?,?,?,?,?,?,?)"
+		insertConsumerSql := "insert into consumer_new(center_id,contact_status,home_phone,create_time,child,year,month,birthday,last_contact_time,come_from_id,remark,create_user_id,parttime_name) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"
 		lessgo.Log.Debug(insertConsumerSql)
 		insertConsumerStmt, err := tx.Prepare(insertConsumerSql)
 		if err != nil {
@@ -423,7 +431,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		insertConsumerRes, err := insertConsumerStmt.Exec(center_id,contactStatus,homePhone,time.Now().Format("20060102150405"),child,year,month,birthday,lastContactTime,come_from_id,remark,employee.UserId)
+		insertConsumerRes, err := insertConsumerStmt.Exec(center_id,contactStatus,homePhone,time.Now().Format("20060102150405"),child,year,month,birthday,lastContactTime,come_from_id,remark,employee.UserId,parttimeName)
 		if err != nil {
 			tx.Rollback()
 
@@ -540,7 +548,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if oldHomePhone == homePhone {
-			sql := "update consumer_new set remark=?,child=?,year=?,month=?,birthday=?,come_from_id=? where id=? "
+			sql := "update consumer_new set remark=?,child=?,year=?,month=?,birthday=?,come_from_id=?,parttime_name=? where id=? "
 
 			lessgo.Log.Debug(sql)
 
@@ -555,7 +563,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(remark, child, year, month, birthday, come_from_id,id)
+			_, err = stmt.Exec(remark, child, year, month, birthday, come_from_id,parttimeName,id)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -585,7 +593,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			sql := "update consumer_new set remark=?,child=?,year=?,month=?,home_phone=?,birthday=?,come_from_id=? where id=? "
+			sql := "update consumer_new set remark=?,child=?,year=?,month=?,home_phone=?,birthday=?,come_from_id=?,parttime_name=? where id=? "
 
 			lessgo.Log.Debug(sql)
 
@@ -600,7 +608,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(remark, child, year, month,homePhone, birthday, come_from_id,id)
+			_, err = stmt.Exec(remark, child, year, month,homePhone, birthday, come_from_id,parttimeName,id)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -652,7 +660,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects := []lessgo.LoadFormObject{}
 
 	if id!= ""{
-		sql := "select center_id,home_phone,child,year,month,birthday,come_from_id,remark from consumer_new where id=? "
+		sql := "select center_id,home_phone,child,year,month,birthday,come_from_id,remark,parttime_name from consumer_new where id=? "
 
 		lessgo.Log.Debug(sql)
 
@@ -669,10 +677,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var center_id, home_phone, child, year, month, birthday, come_from_id,remark string
+		var center_id, home_phone, child, year, month, birthday, come_from_id,remark,parttimeName string
 
 		if rows.Next() {
-			err = commonlib.PutRecord(rows, &center_id, &home_phone, &child, &year, &month, &birthday, &come_from_id,&remark)
+			err = commonlib.PutRecord(rows, &center_id, &home_phone, &child, &year, &month, &birthday, &come_from_id,&remark,&parttimeName)
 
 			if err != nil {
 				m["success"] = false
@@ -694,6 +702,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		h7 := lessgo.LoadFormObject{"center_id", center_id}
 		h8 := lessgo.LoadFormObject{"remark", remark}
 		h9 := lessgo.LoadFormObject{"id", id}
+		h10 := lessgo.LoadFormObject{"parttimeName", parttimeName}
 
 		loadFormObjects = append(loadFormObjects, h1)
 		loadFormObjects = append(loadFormObjects, h2)
@@ -704,6 +713,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		loadFormObjects = append(loadFormObjects, h7)
 		loadFormObjects = append(loadFormObjects, h8)
 		loadFormObjects = append(loadFormObjects, h9)
+		loadFormObjects = append(loadFormObjects, h10)
 	}else if aid!="" {
 		sql := "select remotephone,cid from audio where aid=? "
 		lessgo.Log.Debug(sql)
@@ -1208,10 +1218,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
 	lastContractEndTime := r.FormValue("lastContractEndTime-le")
 	kw := r.FormValue("kw-like")
+	partTimeName := r.FormValue("partTimeName-eq")
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark "
+	sql := " select cons.id,ce.name as centerName,e.really_name,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cf.name comeFromName,cons.parttime_name "
 	sql += " from "
 	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -1226,6 +1237,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join consumer_new cons on cons.id=a.consumer_id "
 	sql += " left join contacts cont on cont.id=a.contacts_id "
 	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join come_from cf on cf.id=cons.come_from_id "
 	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " left join employee e on e.user_id=cons.last_tmk_id where 1=1 and cons.is_own_by_tmk=2 "
 
@@ -1263,6 +1275,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	if centerId1 != "" && dataType=="all" {
 		params = append(params, centerId1)
 		sql += " and cons.center_id=? "
+	}
+
+	if partTimeName!= "" {
+		params = append(params,partTimeName)
+		sql += " and cons.parttime_name=? "
 	}
 
 	countSql := ""
@@ -1336,7 +1353,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 9; i++ {
+		for i := 0; i < 11; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -1612,10 +1629,11 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	kw := r.FormValue("kw-like")
 	payStatus := r.FormValue("payStatus-eq")
 	timeType := r.FormValue("timeType-eq")
+	partTimeName := r.FormValue("partTimeName-eq")
 
 	params := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cons.center_id,cons.pay_status,cons.pay_time "
+	sql := " select cons.id,ce.name as centerName,cont.name,cont.phone,cons.home_phone,cons.child,cons.contact_status,cons.parent_id,b.remark,cons.center_id,cons.pay_status,cons.pay_time,cf.name comeFromName,cons.parttime_name "
 	sql += " from tmk_consumer tc"
 	sql += " inner join (select c.consumer_id,min(c.id) contacts_id from contacts c  "
 	if kw != "" {
@@ -1630,6 +1648,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join consumer_new cons on cons.id=a.consumer_id "
 	sql += " left join contacts cont on cont.id=a.contacts_id "
 	sql += " left join center ce on ce.cid=cons.center_id "
+	sql += " left join come_from cf on cf.id=cons.come_from_id "
 	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " where tc.tmk_id= "+employee.UserId
 
@@ -1656,6 +1675,11 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	if lastContractEndTime!= "" && timeType=="2"  {
 		params = append(params,lastContractEndTime)
 		sql += " and cons.pay_time<=? "
+	}
+
+	if partTimeName!= ""{
+		params = append(params,partTimeName)
+		sql += " and cons.parttime_name=? "
 	}
 
 	if payStatus == "1" {
@@ -1742,7 +1766,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 11; i++ {
+		for i := 0; i < 13; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

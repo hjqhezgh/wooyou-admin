@@ -17,6 +17,7 @@
         <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
         <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
+        <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
         <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
 
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
@@ -47,11 +48,11 @@
             ]]>
         </formatter>
         </column>
-        <column field="isAPP" desc="是否APP用户" hidden="true">
+        <column field="isAPP" desc="是否APP用户">
             <formatter>
                 <![CDATA[
                     if(cellvalue){
-                        return '是' + '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="排课" href="/web/class_schedule_detail">排课</a>';
+                        return '是';
                     }else{
                         return '<a style="color:blue;text-decoration: underline;" target="_blank" title="APP开户" href="/web/consumer/add_app_account?id='+options.rowId+'" data-action="openIframeWindow">开户</a>';
                     }
@@ -83,6 +84,19 @@
                 ]]>
             </formatter>
         </column>
+        <column field="comefrom" desc="来源">
+            <formatter>
+                <![CDATA[
+                    var value = cellvalue;
+                    if(rowObject[12]){
+                        value += '('+rowObject[12]+')';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="parttimeName" desc="兼职人员姓名" hidden="true"/>
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
         <action desc="备注" url="/web/consumerContactsLog/add" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>

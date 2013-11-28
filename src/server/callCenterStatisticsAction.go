@@ -98,26 +98,58 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	startTime := r.FormValue("startTime-ge")
+	endTime := r.FormValue("endTime-le")
+
 	params := []interface{}{}
 
-	sql := " select ce.cid,ce.name,a.num as '全部名单', b.num as '未联系', c.num as '待确认', d.num as '已废弃', e.num as '已邀约',f.num as '已签到'  from center ce "
+	sql := " select ce.cid,ce.name,a.num as '全部名单', b.num as '未联系', c.num as '拨打电话数', d.num as '邀约数', e.num as '签到数',f.num as '定金',g.num as '全额',1,2,3  from center ce "
 	sql += " left join "
 	sql += " (select count(1) num,center_id from consumer_new group by center_id )a on a.center_id=ce.cid "
 	sql += " left join "
 	sql += " (select count(1) num,center_id from consumer_new where contact_status=1 group by center_id )b on b.center_id=ce.cid "
 	sql += " left join "
-	sql += " (select count(1) num,center_id from consumer_new where contact_status=2 group by center_id )c on c.center_id=ce.cid "
+	sql += " (select count(1) num,cid from audio where start_time >=? and start_time<=? group by cid )c on c.cid=ce.cid "
 	sql += " left join "
-	sql += " (select count(1) num,center_id from consumer_new where contact_status=3 group by center_id )d on d.center_id=ce.cid "
+	sql += " (select count(1) num,class.center_id from wyclass_free_child wfc left join wyclass class on wfc.wyclass_id=class.class_id where wfc.create_time>=? and wfc.create_time <=? group by class.center_id)d on d.center_id=ce.cid "
 	sql += " left join "
-	sql += " (select count(1) num,center_id from consumer_new where contact_status=4 group by center_id )e on e.center_id=ce.cid "
+	sql += " (select count(1) num,class.center_id from wyclass_free_sign_in wfsi left join wyclass class on wfsi.wyclass_id=class.class_id where wfsi.sign_in_time>=? and wfsi.sign_in_time<=? group by class.center_id )e on e.center_id=ce.cid "
 	sql += " left join "
-	sql += " (select count(1) num,center_id from consumer_new where contact_status=5 group by center_id )f on f.center_id=ce.cid where ce.cid!=9 "//将总部过滤掉
+	sql += " (select count(1) num,center_id from consumer_new where pay_status=1 and pay_time>=? and pay_time<=? group by center_id )f on f.center_id=ce.cid "
+	sql += " left join "
+	sql += " (select count(1) num,center_id from consumer_new where pay_status=2 and pay_time>=? and pay_time<=? group by center_id )g on g.center_id=ce.cid where ce.cid!=9 "//屏蔽总部数据
+
+	defaultStartTime := "2000-01-01 00:0:000"
+	defaultEndTime := "2999-12-31 00:00:00"
+
+	if startTime != ""{
+		defaultStartTime = startTime
+	}
+
+	if endTime != ""{
+		defaultEndTime = endTime
+	}
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+
+	defaultStartTime = strings.Replace(defaultStartTime,"-","",-1)
+
+	defaultEndTime = strings.Replace(defaultEndTime,"-","",-1)
+
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+	params = append(params, defaultStartTime)
+	params = append(params, defaultEndTime)
+
+	userId, _ := strconv.Atoi(employee.UserId)
+	_employee, err := FindEmployeeById(userId)
 
 	if dataType == "center" {
 		sql += " and ce.cid=? "
-		userId, _ := strconv.Atoi(employee.UserId)
-		_employee, err := FindEmployeeById(userId)
 
 		if err != nil {
 			m["success"] = false
@@ -133,7 +165,7 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	countSql := "select count(1) from center where cid!=9 "
 
 	if dataType == "center" {
-		countSql += " and cid=? "
+		countSql += " and cid="+_employee.CenterId
 	}
 
 	lessgo.Log.Debug(countSql)
@@ -141,7 +173,7 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql, params...)
+	rows, err := db.Query(countSql)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -175,7 +207,7 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " limit ?,?"
+	sql += " order by ce.cid limit ?,?"
 
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
@@ -203,7 +235,7 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 7; i++ {
+		for i := 0; i < 11; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

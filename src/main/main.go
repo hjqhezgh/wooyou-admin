@@ -26,7 +26,7 @@ import (
 
 func main() {
 
-//	test.ConsumerRemarkDataMove(0,100000)
+//	test.ImportParttimeNameData()
 
 	r := lessgo.ConfigLessgo()
 

@@ -13,6 +13,7 @@
         <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="联系起始时间"/>
         <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="联系结束时间"/>
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
+        <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
 
         <toolaction desc="开始邀约" url="/consumer/tmkInvite.json" linkType="mutiSelect" colorClass="h-bg-green">
             <callback>
@@ -62,6 +63,19 @@
             </formatter>
         </column>
         <column field="remark" desc="备注"/>
+        <column field="comefrom" desc="来源">
+            <formatter>
+                <![CDATA[
+                    var value = cellvalue;
+                    if(rowObject[10]){
+                        value += '('+rowObject[10]+')';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="parttimeName" desc="兼职人员姓名" hidden="true"/>
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>
 
@@ -74,6 +88,7 @@
         <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
         <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
+        <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
 
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
         <toolaction desc="回总库" url="/web/consumer/backToAllConsumer.json" linkType="mutiSelect" confirmMsg="确认把该客户重置回总库吗？" colorClass="h-bg-green" params="{}">
@@ -147,6 +162,19 @@
                 ]]>
             </formatter>
         </column>
+        <column field="comefrom" desc="来源">
+            <formatter>
+                <![CDATA[
+                    var value = cellvalue;
+                    if(rowObject[12]){
+                        value += '('+rowObject[12]+')';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="parttimeName" desc="兼职人员姓名" hidden="true"/>
         <action desc="修改" url="/web/consumer/modify" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
         <action desc="备注" url="/web/consumerContactsLog/add" linkType="iframeWindow" actionParams="[{name:'consumerId',value:'id'}]"/>
     </customgridpanel>
