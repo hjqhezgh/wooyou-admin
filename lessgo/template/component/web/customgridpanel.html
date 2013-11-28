@@ -48,9 +48,12 @@
                 <legend>{{.CustomGridPanel.Checkboxtool.Desc}}</legend>
                 <div class="checkbox-container">
                 </div>
+                {{if compareString .CustomGridPanel.Checkboxtool.HideSave "true"}}
+                {{else}}
                 <div class="inline">
                     <a href="javascript:void(0)" data-action="checkboxSave" class="btn btn-primary">保存</a>
                 </div>
+                {{end}}
             </fieldset>
             {{end}}
 
