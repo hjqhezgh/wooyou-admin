@@ -266,7 +266,12 @@ jQuery.fn.grid = function (opts) {
                 }
             });
 
-            $('#' + opts.tableId).jqGrid('setGridParam',{url:url,page:1}).trigger("reloadGrid");
+            var customSearch = $.trim(_this.find('customSearch').html());
+            if(customSearch){
+                eval(customSearch);
+            }else{
+                $('#' + opts.tableId).jqGrid('setGridParam',{url:url,page:1}).trigger("reloadGrid");
+            }
 
         });
 
@@ -466,9 +471,62 @@ jQuery.fn.grid = function (opts) {
             }
 
         });
+
+
+        _this.on('click','[data-action=ajax]',function(event){
+
+            thisButton = $(this);
+            event.preventDefault();
+
+            var url = thisButton.attr('href');
+
+            if(document.URL.lastIndexOf('?')>-1){
+
+                if(url.lastIndexOf('?')>-1){
+                    url += "&"
+                }else{
+                    url += "?"
+                }
+
+                url += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+            }
+
+            var flag = false
+
+            if(thisButton.attr('confirmMsg')){
+                flag = confirm(thisButton.attr('confirmMsg'));
+            }else{
+                flag = true;
+            }
+
+            if(flag){
+                $.get(url,{},function(data){
+                    if(data.success){
+                        _this.grid.trigger("reloadGrid");
+                        alert(data.msg);
+                    }else{
+                        alert(data.msg);
+                    }
+                },'json');
+            }else{
+                return;
+            }
+        });
+    }
+
+    var beforeRender = $.trim(_this.find("beforeRender").html());
+
+    if(beforeRender){
+        eval(beforeRender);
     }
 
     this.render();
+
+    var afterRender = $.trim(_this.find("afterRender").html());
+
+    if(afterRender){
+        eval(afterRender);
+    }
 
     return this;
 }
@@ -519,14 +577,19 @@ function gridActionRender(cellvalue, options, rowObject,action,componentId) {
         });
 
     }else if (action.linkType == "iframeWindow"){
-        var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" data-action="openIframeWindow" window-width="${width}"  window-height="${height}"   window-title="${title}">${desc}</a>&nbsp;';
+        var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" data-action="openIframeWindow">${desc}</a>&nbsp;';
+        return juicer(tmp,{
+            url:action.url,
+            desc:action.desc,
+            params:params
+        });
+    }else if (action.linkType == "ajax"){
+        var tmp = '<a style="color:blue;text-decoration: underline;" href="${url}{@if params!=""}${params}{@/if}" data-action="ajax" confirmMsg="${confirmMsg}">${desc}</a>&nbsp;';
         return juicer(tmp,{
             url:action.url,
             desc:action.desc,
             params:params,
-            width : action.width,
-            height : action.height,
-            title : action.title
+            confirmMsg : action.confirmMsg
         });
     }
 }

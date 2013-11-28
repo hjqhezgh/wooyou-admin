@@ -17,6 +17,10 @@ jQuery.fn.form = function (opts) {
     opts = jQuery.extend({
     }, opts || {});
 
+    if(opts.componentId){
+        window[opts.componentId] = this;
+    }
+
     //进行各种类型表单控件的渲染和初始化操作
     this.render = function(){
 

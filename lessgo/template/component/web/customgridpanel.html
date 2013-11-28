@@ -81,6 +81,16 @@
                 <table id="{{$tableId}}"></table>
                 <div class="page" id="{{$pageId}}"></div>
             </div><!--E table-box-->
+
+            <beforeRender style="display: none;">
+                {{.CustomGridPanel.BeforeRender}}
+            </beforeRender>
+            <afterRender style="display: none;">
+                {{.CustomGridPanel.AfterRender}}
+            </afterRender>
+            <customSearch style="display: none;">
+                {{.CustomGridPanel.CustomSearch}}
+            </customSearch>
         </div>
     </div><!--E cont-->
 </div><!--E block-->
@@ -97,7 +107,6 @@
         {{$id}}ColumnModels.push({
             "name" : '{{$column.Field}}',
             "index" : '{{$column.Field}}',
-            "width":70,
             "sortable":false,
             {{if compareString $column.Hidden "true"}}
             "hidden" : true,
@@ -131,6 +140,7 @@
                     linkType : '{{$action.LinkType}}',
                     desc : '{{$action.Desc}}',
                     url : '{{$action.Url}}',
+                    confirmMsg : '{{$action.ConfirmMsg}}',
                     actionParams : "{{$action.ActionParams}}"
                 }
                 value += gridActionRender(cellvalue, options, rowObject,action);

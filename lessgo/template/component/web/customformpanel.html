@@ -82,6 +82,7 @@
 
         $('#{{$id}}').form({
             saveUrl : '{{.CustomFormPanel.SaveUrl}}',
+            componentId : '{{.CustomFormPanel.PageId}}',
             buttons : buttons,
             {{if compareString .CustomFormPanel.Load "true" }}
             loadUrl : '{{.CustomFormPanel.LoadUrl}}',

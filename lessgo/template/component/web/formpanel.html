@@ -88,6 +88,7 @@
 
         $('#{{$id}}').form({
             saveUrl : '/{{.Terminal}}/{{.Entity.Id}}/save?componentId={{.Formpanel.Id}}',
+            componentId : '{{.Formpanel.PageId}}',
             buttons : buttons,
             {{if compareString .Formpanel.AfterSave ""}}
             successCallback : function(data){

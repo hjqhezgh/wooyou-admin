@@ -97,6 +97,7 @@
 
         $('#{{$id}}').form({
             saveUrl : '{{.TabFormPanel.SaveUrl}}',
+            componentId : '{{.TabFormPanel.PageId}}',
             buttons : buttons,
             {{if compareString .TabFormPanel.Load "true" }}
             loadUrl : '{{.TabFormPanel.LoadUrl}}',
