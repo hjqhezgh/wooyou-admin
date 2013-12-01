@@ -432,6 +432,17 @@ jQuery.fn.grid = function (opts) {
 
             var url = thisButton.attr('href');
 
+            if(document.URL.lastIndexOf('?')>-1){
+
+                if(url.lastIndexOf('?')>-1){
+                    url += "&"
+                }else{
+                    url += "?"
+                }
+
+                url += document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);
+            }
+
             if(url.lastIndexOf('?')>-1){
                 url += "&ids="+ids.toString();
             }else{
