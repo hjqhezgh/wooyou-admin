@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+
+    <customgridpanel url="/web/wyclass/wyclass_free.json" pageSize="15" title="免费课管理" id="grid1" width="1200" height="350" loadUrl="true">
+
+        <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间" char14="true" />
+        <search field="endTime" searchType="le" inputType="datetime" desc="结束时间" char14="true" />
+
+        <column field="centerName" desc="所属中心"/>
+        <column field="couseCode" desc="课程代码"/>
+        <column field="className" desc="课程名"/>
+        <column field="start_time" desc="上课时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="totalNum" desc="邀约人数"/>
+        <column field="signInNum" desc="签到人数"/>
+        <column field="centerId" desc="中心id" hidden="true"/>
+
+        <action desc="调入此班" url="/web/wyclass/changeClass.json" linkType="ajax" confirmMsg="" actionParams="[{name:'newClassId',value:'id'}]"/>
+    </customgridpanel>
+
+</viewport>

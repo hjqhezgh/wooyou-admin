@@ -312,7 +312,7 @@ func ConsultantPhoneListAction(w http.ResponseWriter, r *http.Request) {
 
 		model := new(lessgo.Model)
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		model.Id = r.Intn(1000)
+		model.Id = fmt.Sprint(r.Intn(1000))
 		model.Props = []*lessgo.Prop{}
 
 		fillObjects := []interface{}{}

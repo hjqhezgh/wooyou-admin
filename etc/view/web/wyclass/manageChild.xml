@@ -30,9 +30,24 @@
         </column>
         <column field="classId" desc="班级ID" hidden="true"/>
         <column field="tmkId" desc="tmkid" hidden="true"/>
-
-        <toolaction desc="从班级中剔除" url="/web/wyclass/removeChild.json"  colorClass="h-bg-green" linkType="mutiSelect"/>
+        <column field="centerId" desc="centerId" hidden="true"/>
+        <column field="smsStatus" desc="短信发送状态">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "未发送";
+                        }else if(cellvalue=="2"){
+                            return "发送成功";
+                        }else if(cellvalue=="3"){
+                            return "发送失败";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <action desc="剔除" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'consumerId',value:'id'},{name:'oldClassId',value:'5'},{name:'cid-eq',value:'7'}]" linkType="iframeWindow"/>
         <toolaction desc="签到" url="/web/wyclass/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
+        <toolaction desc="发送邀约短信" url="/web/wyclass/sendSMS"  colorClass="h-bg-green"  linkType="mutiSelectIframeWindow" params="{}"/>
     </customgridpanel>
 
     <customgridpanel url="/consumer.json" pageSize="15" title="选择学员" id="grid2" width="1200" height="250" loadUrl="true" mutiSelect="true" pageId="grid2">

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <customgridpanel url="/web/wyclass/wyclass_free.json" pageSize="15" title="免费课管理" id="grid1" width="1200" height="350" loadUrl="true" mutiSelect="true">
+    <customgridpanel url="/web/wyclass/wyclass_free.json" pageSize="15" title="免费课管理" id="grid1" width="1200" height="350" loadUrl="true">
 
         <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间" char14="true" />
         <search field="endTime" searchType="le" inputType="datetime" desc="结束时间" char14="true" />
-
-        <toolaction desc="快速排班" url="/web/wyclass/addChildQuick.json" colorClass="h-bg-green" linkType="mutiSelect"/>
 
         <column field="centerName" desc="所属中心"/>
         <column field="couseCode" desc="课程代码"/>
@@ -27,6 +25,7 @@
         <column field="centerId" desc="中心id" hidden="true"/>
 
         <action desc="分配学员" url="/web/wyclass/manageChild" actionParams="[{name:'classId',value:'id'},{name:'centerId-eq',value:'6'}]" linkType="iframeWindow"/>
+        <action desc="快速排班" url="/web/wyclass/addChildQuick.json" linkType="ajax" confirmMsg="" actionParams="[{name:'ids',value:'id'}]"/>
         <!--
         <column field="name" desc="班级名"/>
         <column field="center.name" desc="所属中心"/>

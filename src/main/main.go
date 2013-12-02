@@ -157,6 +157,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
+	"/web/wyclass/sendSMS/load.json": server.WyClassSendSMSLoadAction,
+	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
+	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
 	"/classByCenterId.json": server.ClassByCenterIdAction,
 
 	"/roomByCenterId.json": server.RoomByCenterIdListAction,

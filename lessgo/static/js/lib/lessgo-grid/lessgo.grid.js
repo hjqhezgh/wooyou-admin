@@ -455,6 +455,9 @@ jQuery.fn.grid = function (opts) {
                 url += "&" + prop + "=" + params[prop];
             }
 
+            url = url.replace(new RegExp("parentComponent","gm"),"pastComponent");
+            url = url.replace(new RegExp("parentWindowName","gm"),"pastWindowName");
+
             $.openIframeWindow({
                 url : url,
                 parentComponent : componentId,

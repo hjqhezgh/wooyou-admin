@@ -11,6 +11,7 @@
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间" char14="true" />
         <search field="endTime" searchType="le" inputType="datetime" desc="结束时间" char14="true" />
+        <search field="kw" searchType="eq" inputType="text" desc="手机号/学员名字" char14="true" />
 
         <toolaction desc="添加" url="/web/wyclass/add" colorClass="h-bg-green" linkType="iframeWindow"/>
 

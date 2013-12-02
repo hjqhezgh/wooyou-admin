@@ -70,4 +70,9 @@
 
     <!--查看与顾客的通话记录-->
     <url path="/web/consumer/contact_record" view="web/consumer/contact_record.xml" />
+
+    <!--免费课中的邀约短信发送界面-->
+    <url path="/web/wyclass/sendSMS" view="web/wyclass/sendSMS.xml" />
+    <!--调班界面-->
+    <url path="/web/wyclass/changeClass" view="web/wyclass/changeClass.xml" />
 </urls>

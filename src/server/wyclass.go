@@ -923,6 +923,8 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 	centerId := r.FormValue("cid-eq")
 	startTime := r.FormValue("startTime-ge")
 	endTime := r.FormValue("endTime-le")
+	kw := r.FormValue("kw-eq")
+	oldClassId := r.FormValue("oldClassId")
 
 	params := []interface{}{}
 
@@ -959,6 +961,20 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 	if endTime != ""{
 		params = append(params, endTime)
 		sql += " and class.start_time<=? "
+	}
+
+	if kw != ""{
+		sql += " and class.class_id in (select wfc.wyclass_id from contacts cont left join wyclass_free_child wfc "
+		sql += " on wfc.consumer_id=cont.consumer_id "
+		sql += " left join consumer_new cons on cons.id=cont.consumer_id "
+		sql += " where cons.child=? or cont.phone=?) "
+		params = append(params, kw)
+		params = append(params, kw)
+	}
+
+	if oldClassId != "" {
+		params = append(params, oldClassId)
+		sql += " and class.class_id!=? "
 	}
 
 	countSql := ""
@@ -1114,7 +1130,7 @@ func ChildInClassListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select wfc.consumer_id,cons.child,cont.phone,e.really_name,wfc.create_time,wfsi.sign_in_time,wfc.wyclass_id,wfc.create_user "
+	sql := "select wfc.consumer_id,cons.child,cont.phone,e.really_name,wfc.create_time,wfsi.sign_in_time,wfc.wyclass_id,wfc.create_user,cons.center_id,wfc.sms_status "
 	sql += " from wyclass_free_child wfc "
 	sql += " left join consumer_new cons on cons.id=wfc.consumer_id "
 	sql += " left join (select consumer_id,min(id) contacts_id from contacts group by consumer_id)a "
@@ -1197,7 +1213,7 @@ func ChildInClassListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 7; i++ {
+		for i := 0; i < 9; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -2027,6 +2043,181 @@ func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	id := r.FormValue("consumerId")
+	oldClassId := r.FormValue("oldClassId")
+	newClassId := r.FormValue("newClassId")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkExistSql := "select count(1) from wyclass_free_child where wyclass_id=? and consumer_id=? "
+	lessgo.Log.Debug(checkExistSql)
+
+	rows, err := db.Query(checkExistSql,newClassId,id)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if totalNum > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该学员已经在此班级中，无需重复排班"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	getInviteEmployeeIdSql := "select create_user from wyclass_free_child where wyclass_id=? "
+	lessgo.Log.Debug(getInviteEmployeeIdSql)
+
+	rows, err = db.Query(getInviteEmployeeIdSql,oldClassId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	inviteEmployeeId := ""
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &inviteEmployeeId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	deleteOldClassSql := "delete from wyclass_free_child where wyclass_id=? and consumer_id=? "
+	lessgo.Log.Debug(deleteOldClassSql)
+
+	stmt, err := tx.Prepare(deleteOldClassSql)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(oldClassId,id)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	insertNewClassSql := "insert into wyclass_free_child(create_time,create_user,consumer_id,wyclass_id) values(?,?,?,?)"
+	lessgo.Log.Debug(insertNewClassSql)
+	stmt, err = tx.Prepare(insertNewClassSql)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(time.Now().Format("20060102150405"),inviteEmployeeId,id,newClassId)
+
+	if err != nil {
+		tx.Rollback()
+
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
 	tx.Commit()
 
 	m["success"] = true

@@ -3,7 +3,7 @@
     <customformpanel id="news" saveUrl="/web/wyclass/save.json" load="true" loadUrl="/web/wyclass/load.json" title="添加免费课" inwindow="true">
         <element field="class_id" type="hidden" desc="主键"/>
         <element field="name" type="text" desc="班级名" validate="notNull"/>
-        <element field="code"  type="localSelect" localData="[{desc:'P1', value:'P1'},{desc:'P2', value:'P2'},{desc:'E1', value:'E1'},{desc:'E2', value:'E2'}]"  desc="课程代码" />
+        <element field="code"  type="localSelect" localData="[{desc:'P1', value:'P1'},{desc:'P2', value:'P2'},{desc:'P3', value:'P3'},{desc:'E1', value:'E1'},{desc:'E2', value:'E2'}]"  desc="课程代码" />
         <element field="start_time"  readonly="true" type="datetime" desc="上课时间" validate="notNull" char14="true" tip="保存后无法修改"/>
     </customformpanel>
 </viewport>
