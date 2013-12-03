@@ -93,10 +93,6 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if strings.HasPrefix(phone,"133") || strings.HasPrefix(phone,"1349") || strings.HasPrefix(phone,"153")|| strings.HasPrefix(phone,"181")|| strings.HasPrefix(phone,"189"){//电信手机暂时不支持
-			continue
-		}
-
 		phonesContent += phone+"("+childName+"),"
 		phones += phone+","
 		consumerIds += consumerId+","

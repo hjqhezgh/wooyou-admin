@@ -1839,41 +1839,6 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	checkSql := "select count(1) from pay_log where consumer_id=? "
-	rows, err := db.Query(checkSql, ids)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	totalNum := 0
-
-	if rows.Next() {
-		err := rows.Scan(&totalNum)
-
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-	}
-
-	if totalNum > 0 {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "该用户已缴费，无需重复操作"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
 	tx, err := db.Begin()
 
 	if err != nil {
