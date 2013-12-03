@@ -2,7 +2,7 @@
 <viewport window="true">
     <customformpanel id="form1" saveUrl="/web/wyclass/sendSMS/save.json" load="true" loadUrl="/web/wyclass/sendSMS/load.json" title="发送邀约短信" inwindow="true">
         <element field="phonesContent" type="textarea" desc="客户姓名" validate="notNull" readonly="true" tip="固话用户已被滤除"/>
-        <element field="content" type="textarea" desc="短信内容" validate="notNull"/>
+        <element field="content" type="textarea" desc="短信内容" validate="notNull" tip="$child到时候会被替换为具体的孩子名字"/>
         <element field="phones" type="hidden" desc="手机号列表"/>
         <element field="consumerIds" type="hidden" desc="用户id列表"/>
         <element field="classId" type="hidden" desc="班级id"/>

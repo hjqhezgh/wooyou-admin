@@ -53,7 +53,7 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	loadFormObjects := []lessgo.LoadFormObject{}
 
-	findPhoneSql := "select cons.id,cont.phone,cons.child,ce.name,ce.intro from contacts cont left join consumer_new cons on cont.consumer_id=cons.id left join center ce on ce.cid=cons.center_id where cont.consumer_id in ("+id+")"
+	findPhoneSql := "select cons.id,cont.phone,cons.child from contacts cont left join consumer_new cons on cont.consumer_id=cons.id where cont.consumer_id in ("+id+")"
 	lessgo.Log.Debug(findPhoneSql)
 
 	db := lessgo.GetMySQL()
@@ -74,11 +74,9 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 	phones := ""
 	consumerIds := ""
 
-	var centerName,centerAddress string
-
 	for rows.Next() {
 		var consumerId,phone,childName string
-		err = commonlib.PutRecord(rows, &consumerId, &phone, &childName, &centerName, &centerAddress)
+		err = commonlib.PutRecord(rows, &consumerId, &phone, &childName)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -112,36 +110,35 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 	h5 := lessgo.LoadFormObject{"classId", classId}
 	h6 := lessgo.LoadFormObject{"centerId", centerId}
 
-	findTimeSql := "select name from wyclass where class_id=?"
-	lessgo.Log.Debug(findTimeSql)
-
-	rows, err = db.Query(findTimeSql, classId)
+	getCenterInfo := "select ce.name,ce.intro,class.name,class.start_time from wyclass class left join center ce on ce.cid=class.center_id where class.class_id=?"
+	lessgo.Log.Debug(getCenterInfo)
+	rows, err = db.Query(getCenterInfo, classId)
 
 	if err != nil {
-	lessgo.Log.Warn(err.Error())
-	m["success"] = false
-	m["code"] = 100
-	m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-	commonlib.OutputJson(w, m, " ")
-	return
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
 	}
 
-	var className string
+	var centerName ,centerIntro,className,classStartTime string
 
 	if rows.Next() {
-	err = commonlib.PutRecord(rows, &className)
+		err := rows.Scan(&centerName,&centerIntro,&className,&classStartTime)
 
-	if err != nil {
-	lessgo.Log.Warn(err.Error())
-	m["success"] = false
-	m["code"] = 100
-	m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-	commonlib.OutputJson(w, m, " ")
-	return
-	}
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
 	}
 
-	h3 := lessgo.LoadFormObject{"content", "欢迎您来试听"+centerName+className+"的课程，请提前10分钟到达"}
+	h3 := lessgo.LoadFormObject{"content", getSmsTmpText(employee.ReallyName,"$child",centerIntro,classStartTime)}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -183,7 +180,6 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	classId := r.FormValue("classId")
-	centerId := r.FormValue("centerId")
 	consumerIds := r.FormValue("consumerIds")
 	phones := r.FormValue("phones")
 	content := r.FormValue("content")
@@ -205,39 +201,11 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getCenterInfo := "select ce.name,ce.intro,class.name,class.start_time from wyclass class left join center ce on ce.cid=class.center_id where class.class_id=?"
-	lessgo.Log.Debug(getCenterInfo)
-	rows, err := db.Query(getCenterInfo, centerId)
-
-	if err != nil {
-		lessgo.Log.Warn(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	var centerName ,centerIntro,className,classStartTime string
-
-	if rows.Next() {
-		err := rows.Scan(&centerName,&centerIntro,&className,&classStartTime)
-
-		if err != nil {
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-	}
-
 	for index,phone := range phoneList {
 		if phone!= ""{
 			getConsumerInfo := "select child from consumer_new  where id=?"
 			lessgo.Log.Debug(getConsumerInfo)
-			rows, err = db.Query(getConsumerInfo, consumerIdList[index])
+			rows, err := db.Query(getConsumerInfo, consumerIdList[index])
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -263,7 +231,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			contentDetail := replaceSmsText(content,childName,centerIntro)
+			contentDetail := getSmsContent(content,childName)
 			smsResult ,err := SendMessage(phone, contentDetail)
 
 			if err != nil {
@@ -356,6 +324,15 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func replaceSmsText(text,child,centerIntro string) string{
-	return "欢迎您来试听厦门瑞景中心1208    19:00    英语的课程，请提前10分钟到达，您的注册验证码是13123123，请准时来临哟【吾幼儿童英语中心】"
+//获取短信模板文本
+func getSmsTmpText(employeeName,child,centerIntro,startTime string) string{
+	st, _ := time.ParseInLocation("20060102150405", startTime, time.Local)
+	content := child+"家长，您好，我是您吾幼儿童社区的老师"+employeeName+"。咱们约定的时间："+st.Format("2006-01-02 15:04")+"。咱们"+centerIntro+"到时找不到地址直接打中心电话确认。咱们官网：www.wooyou.com.cn您可以提前上网了解。祝生活愉快！"
+	content+= "【吾幼儿童社区】"
+	return content
+}
+
+//替换为具体的短信模板
+func getSmsContent(content,childName string) string {
+	return strings.Replace(content,"$child",childName,-1)
 }
