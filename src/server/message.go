@@ -130,10 +130,3 @@ func GetResult(data string) (SmsResult, error){
 
 	return ret, nil
 }
-
-func heheheh() {
-	telephone := "13646014516"
-	//telephone := "13646014516,15980816382"		//多个手机以,分隔
-	text := "注册验证码: 123456。【吾幼儿童英语中心】"  // 吾幼儿童英语中心厦门火车站凯旋开业啦，欢迎免费试听课程。---信息非法
-	SendMessage(telephone, text)
-}
