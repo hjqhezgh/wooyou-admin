@@ -126,7 +126,7 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 	var centerName ,centerIntro,className,classStartTime string
 
 	if rows.Next() {
-		err := rows.Scan(&centerName,&centerIntro,&className,&classStartTime)
+		err := commonlib.PutRecord(rows,&centerName,&centerIntro,&className,&classStartTime)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -328,7 +328,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 func getSmsTmpText(employeeName,child,centerIntro,startTime string) string{
 	st, _ := time.ParseInLocation("20060102150405", startTime, time.Local)
 	content := child+"家长，您好，我是您吾幼儿童社区的老师"+employeeName+"。咱们约定的时间："+st.Format("2006-01-02 15:04")+"。咱们"+centerIntro+"到时找不到地址直接打中心电话确认。咱们官网：www.wooyou.com.cn您可以提前上网了解。祝生活愉快！"
-	content+= "【吾幼儿童社区】"
+	content+= "【吾幼英语美术社区】"
 	return content
 }
 
