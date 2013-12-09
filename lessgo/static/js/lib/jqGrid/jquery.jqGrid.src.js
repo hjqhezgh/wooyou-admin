@@ -2252,8 +2252,10 @@ $.fn.jqGrid = function( pin ) {
 			if(ts.p.sortname !== index && idxcol) {ts.p.lastsort = idxcol;}
 		},
 		setColWidth = function () {
-			var initwidth = 0, brd=$.jgrid.cell_width? 0: intNum(ts.p.cellLayout,0), vc=0, lvc, scw=intNum(ts.p.scrollOffset,0),cw,hs=false,aw,gw=0,cr;
-			$.each(ts.p.colModel, function() {
+
+            var initwidth = 0, brd=$.jgrid.cell_width? 0: intNum(ts.p.cellLayout,0), vc=0, lvc, scw=intNum(ts.p.scrollOffset,0),cw,hs=false,aw,gw=0,cr;
+
+            $.each(ts.p.colModel, function() {
 				if(this.hidden === undefined) {this.hidden=false;}
 				if(ts.p.grouping && ts.p.autowidth) {
 					var ind = $.inArray(this.name, ts.p.groupingView.groupField);
@@ -2271,11 +2273,13 @@ $.fn.jqGrid = function( pin ) {
 					}
 				}
 			});
-			if(isNaN(ts.p.width)) {
+
+            if(isNaN(ts.p.width)) {
 				ts.p.width  = initwidth + ((ts.p.shrinkToFit ===false && !isNaN(ts.p.height)) ? scw : 0);
 			}
 			grid.width = ts.p.width;
 			ts.p.tblwidth = initwidth;
+
 			if(ts.p.shrinkToFit ===false && ts.p.forceFit === true) {ts.p.forceFit=false;}
 			if(ts.p.shrinkToFit===true && vc > 0) {
 				aw = grid.width-brd*vc-gw;
@@ -2286,8 +2290,10 @@ $.fn.jqGrid = function( pin ) {
 				initwidth =0;
 				$.each(ts.p.colModel, function(i) {
 					if(this.hidden === false && !this.fixed){
-						cw = Math.round(aw*this.width/(ts.p.tblwidth-brd*vc-gw));
-						this.width =cw;
+//						cw = Math.round(aw*this.width/(ts.p.tblwidth-brd*vc-gw));
+//                        alert(this.width);
+//						this.width =cw;
+                        cw = this.width;     //bill updae
 						initwidth += cw;
 						lvc = i;
 					}
@@ -2300,8 +2306,10 @@ $.fn.jqGrid = function( pin ) {
 				} else if(!hs && Math.abs(grid.width-gw-(initwidth+brd*vc)) !== 1) {
 					cr = grid.width-gw-(initwidth+brd*vc);
 				}
-				ts.p.colModel[lvc].width += cr;
+
+//				ts.p.colModel[lvc].width += cr;
 				ts.p.tblwidth = initwidth+cr+brd*vc+gw;
+
 				if(ts.p.tblwidth > ts.p.width) {
 					ts.p.colModel[lvc].width -= (ts.p.tblwidth - parseInt(ts.p.width,10));
 					ts.p.tblwidth = ts.p.width;
@@ -2745,6 +2753,7 @@ $.fn.jqGrid = function( pin ) {
 			.addClass("ui-jqgrid-bdiv")
 			.css({ height: ts.p.height+(isNaN(ts.p.height)?"":"px"), width: (grid.width)+"px"})
 			.scroll(grid.scrollGrid);
+
 		$("table:first",grid.bDiv).css({width:ts.p.tblwidth+"px"});
 		if( !$.support.tbody ) { //IE
 			if( $("tbody",this).length === 2 ) { $("tbody:gt(0)",this).remove();}

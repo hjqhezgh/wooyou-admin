@@ -108,7 +108,6 @@
 
         {{range $columnIndex,$column := .CustomGridPanel.Columns}}
         {{$id}}ColumnModels.push({
-            "name" : '{{$column.Field}}',
             "index" : '{{$column.Field}}',
             "sortable":false,
             {{if compareString $column.Hidden "true"}}
@@ -120,7 +119,12 @@
                 {{$column.Formatter}}
             },
             {{end}}
-            "width":70
+            {{if compareString $column.Width ""}}
+            "width":100,
+            {{else}}
+            "width": {{$column.Width}},
+            {{end}}
+            "name" : '{{$column.Field}}'
         });
         {{$id}}ColumnNames.push('{{$column.Desc}}');
         {{end}}
@@ -153,7 +157,14 @@
         });
         {{$id}}ColumnNames.push('操作');
 
-        var {{$id}}DataUrl = '{{.CustomGridPanel.Url}}?componentId={{.CustomGridPanel.Id}}'
+            var {{$id}}DataUrl = '{{.CustomGridPanel.Url}}'
+
+            if({{$id}}DataUrl.lastIndexOf('?')>-1){
+                {{$id}}DataUrl += "&componentId={{.CustomGridPanel.Id}}'";
+            }else{
+                {{$id}}DataUrl += "?componentId={{.CustomGridPanel.Id}}'";
+            }
+
         {{if compareString .CustomGridPanel.LoadUrl "true"}}
         if(document.URL.lastIndexOf('?')>-1){
             {{$id}}DataUrl = {{$id}}DataUrl + "&"+ document.URL.substring(document.URL.lastIndexOf('?')+1,document.URL.length);

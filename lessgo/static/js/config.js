@@ -37,7 +37,7 @@ define(function (require, exports, module) {
                 src: productUrl + '/lib/juicer/v0.6.5-stable/juicer-min.js'
             },
             'jq-ui':{//时间控件、部分动画效果
-                src: productUrl + '/lib/jq-ui/1.10.3/jquery-ui-1.10.3.custom.min.js',
+                src: productUrl + '/lib/jq-ui/1.10.3/jquery-ui-1.10.3.custom.js',
                 deps: ['jquery','jq-ui-i18n']
             },
             'jq-ui-i18n':{//时间控件、部分动画效果
