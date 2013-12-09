@@ -164,7 +164,7 @@ jQuery.fn.form = function (opts) {
 
         });
 
-        //本地下拉框
+        //当前时间
         myform.find('[field-type=currentTime]').each(function(index,element){
             $(element).append(juicer(hiddenFieldTemp,{
                 fieldName:$(element).attr('field-name'),
@@ -202,6 +202,9 @@ jQuery.fn.form = function (opts) {
                 select.find("option[value="+$(element).attr('field-value')+"]").attr("selected","selected");
             }
 
+            if($(element).attr('field-defaultValue')){
+                select.val($(element).attr('field-defaultValue'));
+            }
         });
 
 

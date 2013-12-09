@@ -132,7 +132,11 @@
         {{$id}}ColumnModels.push({
             "name" : '操作',
             "index" : '操作',
+            {{if compareString .Gridpanel.ActionWidth ""}}
             "width":70,
+            {{else}}
+            "width":{{.Gridpanel.ActionWidth}},
+            {{end}}
             "sortable":false,
             {{if compareInt .ActionLength 0 "gt"}}
             "hidden" : false,
