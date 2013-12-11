@@ -63,6 +63,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	//根据角色ID获取员工列表
 	"/employeeListByRoleId.json": server.EmployeeListByRoleIdAction,
 	"/employeeByCenterId.json": server.EmployeeListByCenterIdAction,
+	"/courseInCenter.json": server.CourseInCenterAction,
+	"/employeeInCenter.json": server.EmployeeListInCenterAction,
 
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
@@ -139,27 +141,36 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/courseByCenterId.json": server.CourseByCenterIdListAction,
 	"/time_section.json": server.TimeSectionListAction,
 	"/class_schedule_detail.json": server.ClassScheduleDetailListAction,
-	"/class_schedule_detail/save.json": server.ClassScheduleDetailSaveAction,
-	"/class_schedule_detail/load.json": server.ClassScheduleDetailLoadAction,
 	"/lessonByClassId.json": server.LessonByClassIdAction,
 	"/timeSectionByCenterId.json": server.TimeSectionByCenterIdAction,
 
+	//课表相关
+	"/web/class_schedule_detail/data.json": server.ClassScheduleDetailListAction,
+	"/web/class_schedule_detail/load.json": server.ClassScheduleDetailLoadAction,
+	"/web/class_schedule_detail/add.json": server.ClassScheduleDetailAddAction,
+	"/web/class_schedule_detail/modify.json": server.ClassScheduleDetailModifyAction,
+	"/web/class_schedule_detail/createWeekSchedule.json": server.CreateWeekScheduleAction,
+	"/web/child/childInCenter.json": server.ChildInCenterAction,
+	"/web/child/childInClass.json": server.ChildInClassListAction,
+	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
+	"/web/child/childInNormalSchedule.json": server.ChildInNormalScheduleAction,
+	"/web/wyclass/signIn.json": server.ChildSignInAction,
+	"/web/wyclass/removeChild.json": server.RemoveChildFromClassAction,
+	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
+	"/web/wyclass/addChild.json": server.AddChildToClassAction,
+	"/web/wyclass/addChildForNormalOnce.json": server.AddChildForNormalOnceAction,
+	"/web/wyclass/addChildForNormalTempelate.json": server.AddChildForNormalTempelateAction,
+	"/web/wyclass/sendSMS/load.json": server.WyClassSendSMSLoadAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,
 	"/web/wyclass/wyclass_free.json": server.WyClassFreeListAction,
 	"/web/wyclass/save.json": server.WyClassSaveAction,
 	"/web/wyclass/load.json": server.WyClassLoadAction,
-	"/web/wyclass/childInClass.json": server.ChildInClassListAction,
-	"/web/wyclass/signIn.json": server.ChildSignInAction,
-	"/web/wyclass/removeChild.json": server.RemoveChildFromClassAction,
-	"/web/wyclass/addChild.json": server.AddChildToClassAction,
 	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
-	"/web/wyclass/sendSMS/load.json": server.WyClassSendSMSLoadAction,
 	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
-	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
 	"/classByCenterId.json": server.ClassByCenterIdAction,
 
 	"/roomByCenterId.json": server.RoomByCenterIdListAction,

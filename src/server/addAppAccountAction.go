@@ -65,7 +65,7 @@ func AddAppAccountLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var contactName,phone,child,centerId,birthday string
+	var contactName, phone, child, centerId, birthday string
 
 	if rows.Next() {
 		err = commonlib.PutRecord(rows, &contactName, &phone, &child, &centerId, &birthday)

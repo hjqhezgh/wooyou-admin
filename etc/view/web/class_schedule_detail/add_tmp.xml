@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="添加课表" saveUrl="/web/class_schedule_detail/add.json" load="true" loadUrl="/web/class_schedule_detail/load.json" inwindow="true">
+        <element field="name"  type="text" desc="课程名" />
+        <element field="code"  type="localSelect" localData="[{desc:'P1', value:'P1'},{desc:'P2', value:'P2'},{desc:'P3', value:'P3'},{desc:'E1', value:'E1'},{desc:'E2', value:'E2'}]"  desc="课程代码" />
+        <element field="week"  type="hidden"/>
+        <element field="roomId"  type="hidden" />
+        <element field="timeId"  type="hidden"/>
+        <element field="date"  type="hidden"/>
+        <element field="roomName"  type="pureText" desc="教室" />
+        <element field="timeDesc"  type="pureText" desc="时间" />
+        <element field="weekDesc"  type="pureText" desc="星期" />
+        <element field="capacity"  type="text" desc="课程容量" />
+        <element field="type"  type="hidden" defaultValue="tmp" />
+
+        <afterSave>
+            <![CDATA[
+                alert('保存成功');
+                parent.process.render();
+                top.layer.close(top.layer.getFrameIndex(window.name));
+            ]]>
+        </afterSave>
+    </customformpanel>
+</viewport>

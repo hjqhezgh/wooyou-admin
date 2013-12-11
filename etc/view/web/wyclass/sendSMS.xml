@@ -6,6 +6,7 @@
         <element field="phones" type="hidden" desc="手机号列表"/>
         <element field="consumerIds" type="hidden" desc="用户id列表"/>
         <element field="classId" type="hidden" desc="班级id"/>
+        <element field="scheduleId" type="hidden" desc="课表id"/>
         <element field="centerId" type="hidden" desc="中心id"/>
     </customformpanel>
 </viewport>

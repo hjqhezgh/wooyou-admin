@@ -117,24 +117,24 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join "
 	sql += " (select count(1) num,center_id from consumer_new where pay_status=1 and pay_time>=? and pay_time<=? group by center_id )f on f.center_id=ce.cid "
 	sql += " left join "
-	sql += " (select count(1) num,center_id from consumer_new where pay_status=2 and pay_time>=? and pay_time<=? group by center_id )g on g.center_id=ce.cid where ce.cid!=9 "//屏蔽总部数据
+	sql += " (select count(1) num,center_id from consumer_new where pay_status=2 and pay_time>=? and pay_time<=? group by center_id )g on g.center_id=ce.cid where ce.cid!=9 " //屏蔽总部数据
 
 	defaultStartTime := "2000-01-01 00:0:000"
 	defaultEndTime := "2999-12-31 00:00:00"
 
-	if startTime != ""{
+	if startTime != "" {
 		defaultStartTime = startTime
 	}
 
-	if endTime != ""{
+	if endTime != "" {
 		defaultEndTime = endTime
 	}
 	params = append(params, defaultStartTime)
 	params = append(params, defaultEndTime)
 
-	defaultStartTime = strings.Replace(defaultStartTime,"-","",-1)
+	defaultStartTime = strings.Replace(defaultStartTime, "-", "", -1)
 
-	defaultEndTime = strings.Replace(defaultEndTime,"-","",-1)
+	defaultEndTime = strings.Replace(defaultEndTime, "-", "", -1)
 
 	params = append(params, defaultStartTime)
 	params = append(params, defaultEndTime)
@@ -165,7 +165,7 @@ func CallCenterStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	countSql := "select count(1) from center where cid!=9 "
 
 	if dataType == "center" {
-		countSql += " and cid="+_employee.CenterId
+		countSql += " and cid=" + _employee.CenterId
 	}
 
 	lessgo.Log.Debug(countSql)

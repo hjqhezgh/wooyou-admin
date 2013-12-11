@@ -141,7 +141,7 @@ func CenterCallCenterDetailAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if name != ""{
+	if name != "" {
 		sql += " and (c.mother like ? or c.mother_phone like ? or c.father like ? or c.father_phone like ? or c.home_phone like ? or c.child like ? )"
 		params = append(params, "%"+name+"%")
 		params = append(params, "%"+name+"%")

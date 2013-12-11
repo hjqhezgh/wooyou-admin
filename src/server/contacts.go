@@ -169,7 +169,6 @@ func ContractsListAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 }
 
-
 func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
 
@@ -203,8 +202,8 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	if id == ""{
-		flag ,err := CheckConsumerPhoneExist(phone)
+	if id == "" {
+		flag, err := CheckConsumerPhoneExist(phone)
 
 		if err != nil {
 			m["success"] = false
@@ -236,7 +235,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(name,phone,isDefault,consumerId)
+		_, err = stmt.Exec(name, phone, isDefault, consumerId)
 
 		if err != nil {
 			m["success"] = false
@@ -245,7 +244,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-	}else{
+	} else {
 		selectOldPhonesql := "select phone contacts where id=? "
 
 		lessgo.Log.Debug(selectOldPhonesql)
@@ -277,7 +276,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if oldPhone == phone{
+		if oldPhone == phone {
 			updateSql := "update contacts set name=? ,is_default=? where id=? "
 
 			lessgo.Log.Debug(updateSql)
@@ -292,7 +291,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(name,isDefault,id)
+			_, err = stmt.Exec(name, isDefault, id)
 
 			if err != nil {
 				m["success"] = false
@@ -301,8 +300,8 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
-		}else{
-			phoneFlag,err := CheckConsumerPhoneExist(phone)
+		} else {
+			phoneFlag, err := CheckConsumerPhoneExist(phone)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -313,7 +312,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if phoneFlag{
+			if phoneFlag {
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "联系人家庭电话已经存在，无需重复录入"
@@ -335,7 +334,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(name,phone,isDefault,id)
+			_, err = stmt.Exec(name, phone, isDefault, id)
 
 			if err != nil {
 				m["success"] = false
@@ -409,7 +408,7 @@ func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	idList := strings.Split(ids,",")
+	idList := strings.Split(ids, ",")
 
 	if len(idList) == num {
 		m["success"] = false
@@ -432,7 +431,7 @@ func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
 
 	deleteSql := "delete from contacts where id=? "
 
-	for _,id := range idList {
+	for _, id := range idList {
 		stmt, err := tx.Prepare(deleteSql)
 		if err != nil {
 			tx.Rollback()

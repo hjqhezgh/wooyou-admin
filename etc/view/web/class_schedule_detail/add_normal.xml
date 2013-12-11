@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="添加课表" saveUrl="/web/class_schedule_detail/add.json" load="true" loadUrl="/web/class_schedule_detail/load.json" inwindow="true">
+        <element field="courseId"  type="remoteSelect" url="/courseInCenter.json" valueField="value" descField="desc" desc="课程" validate="notNull"/>
+        <element field="teacherId"  type="remoteSelect" url="/employeeInCenter.json" valueField="userId" descField="reallyName" desc="老师" validate="notNull"/>
+        <element field="assistantId"  type="remoteSelect" url="/employeeInCenter.json" valueField="userId" descField="reallyName" desc="助教" validate="notNull"/>
+        <element field="week"  type="hidden"/>
+        <element field="roomId"  type="hidden" />
+        <element field="timeId"  type="hidden"/>
+        <element field="date"  type="hidden"/>
+        <element field="roomName"  type="pureText" desc="教室" />
+        <element field="timeDesc"  type="pureText" desc="时间" />
+        <element field="weekDesc"  type="pureText" desc="日期" />
+        <element field="capacity"  type="text" desc="课程容量" />
+        <element field="type"  type="hidden" defaultValue="normal" />
+        <element field="isTmp"  type="localSelect" localData="[{desc:'是', value:'1'},{desc:'否', value:'2'}]" defaultValue="2"  desc="设为模板" />
+
+        <afterSave>
+            <![CDATA[
+                alert('保存成功');
+                parent.process.render();
+                top.layer.close(top.layer.getFrameIndex(window.name));
+            ]]>
+        </afterSave>
+    </customformpanel>
+</viewport>

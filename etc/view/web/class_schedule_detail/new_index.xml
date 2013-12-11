@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="课程管理" url="javascript:void(0);"/>
+        <crumb text="课表管理" currentPage="true"/>
+    </crumbs>
+
+    <blankpanel>
+        <content>
+<![CDATA[
+    <div class="block gridpanel" id="gridpanel5425" style="width: 100%;">
+        <h4 class="title">
+            <i class="icon-table"></i>课表
+                    <span class="iconright">
+                        <!--点击收起的时候用这个<i class="icon-plus-sign"></i>-->
+                        <i class="icon-minus-sign"></i>
+                    </span>
+        </h4>
+
+        <div class="cont schedule">
+            <div class="input-box text-center">
+
+                <form class="form-inline">
+
+                    <div class="inline form-field" field-desc="日期" field-name="start_time" field-searchtype="eq" field-inputtype="date" field-localdata="" field-url="" field-valuefield="" field-descfield="" field-char14="" field-char8="" field-parentselect="">
+                    日期：<input name="start_time" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="eq" />
+                    <input name="firstDayOfWeek" type="hidden"/>
+                    </div>
+
+                    <div class="inline">
+                        <a href="javascript:void(0)" data-action="search" class="btn btn-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">搜索</span></a>
+                        <a href="javascript:void(0)" data-action="reset" class="btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">重置</span></a>
+                    </div>
+                </form>
+
+                <div class="btn-box">
+                    <a href="#" class="h-bg-green" data-action="preWeek">上一周</a>
+                    <a href="#" class="h-bg-green" data-action="nextWeek">下一周</a>
+                    <a href="#" class="h-bg-green" data-action="createWeekSchedule">生成本周课表</a>
+                </div><!--E btn-box-->
+
+                <div class="table-box">
+                    <div class="fakeContainer">
+                        <table border="1" id="schedule" width="100%" border="0" cellpadding="0" cellspacing="0">
+
+                        </table>
+                    </div>
+                </div><!--E table-box-->
+            </div>
+        </div><!--E cont-->
+    </div>
+
+    <script type="text/javascript">
+            seajs.use(['/js/schedule.js']);
+    </script>
+]]>
+        </content>
+    </blankpanel>
+
+</viewport>

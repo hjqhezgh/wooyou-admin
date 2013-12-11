@@ -17,14 +17,14 @@ import (
 	"fmt"
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
+	"io"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
-	"os"
-	"io"
 )
 
 func CourseListAction(w http.ResponseWriter, r *http.Request) {
@@ -325,7 +325,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 		checkCourseExistSql := "select count(1) from course where center_id=? and name=? "
 		lessgo.Log.Debug(checkCourseExistSql)
 
-		rows, err := db.Query(checkCourseExistSql, center_id,name)
+		rows, err := db.Query(checkCourseExistSql, center_id, name)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -374,7 +374,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := stmt.Exec(name, center_id, price, is_probation, typeString, begin_age, end_age, intro,app_display_level,time.Now().Format("20060102150405"),lesson_num)
+		res, err := stmt.Exec(name, center_id, price, is_probation, typeString, begin_age, end_age, intro, app_display_level, time.Now().Format("20060102150405"), lesson_num)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -385,7 +385,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		courseId ,err := res.LastInsertId()
+		courseId, err := res.LastInsertId()
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -396,7 +396,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if courseTmpImg!="" {
+		if courseTmpImg != "" {
 			tmpFile, err := os.OpenFile(".."+courseTmpImg, os.O_RDWR, 0777)
 
 			if err != nil {
@@ -408,7 +408,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			courseImgDir ,err := lessgo.Config.GetValue("wooyou", "courseImgDir")
+			courseImgDir, err := lessgo.Config.GetValue("wooyou", "courseImgDir")
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -419,7 +419,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			err = os.MkdirAll(fmt.Sprint(courseImgDir+"/",courseId), 0777)
+			err = os.MkdirAll(fmt.Sprint(courseImgDir+"/", courseId), 0777)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -430,7 +430,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			disFile, err := os.Create(fmt.Sprint(courseImgDir+"/",courseId,"/480_230.png"))
+			disFile, err := os.Create(fmt.Sprint(courseImgDir+"/", courseId, "/480_230.png"))
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -443,9 +443,8 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 
 			io.Copy(disFile, tmpFile)
 
-			os.Remove(".."+courseTmpImg)
+			os.Remove(".." + courseTmpImg)
 		}
-
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
@@ -466,7 +465,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(name, center_id, price, is_probation, typeString, begin_age, end_age, intro,lesson_num,id)
+		_, err = stmt.Exec(name, center_id, price, is_probation, typeString, begin_age, end_age, intro, lesson_num, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -476,7 +475,6 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
-
 
 		if courseTmpImg != "" {
 			tmpFile, err := os.OpenFile(".."+courseTmpImg, os.O_RDWR, 0777)
@@ -490,7 +488,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			courseImgDir ,err := lessgo.Config.GetValue("wooyou", "courseImgDir")
+			courseImgDir, err := lessgo.Config.GetValue("wooyou", "courseImgDir")
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -501,7 +499,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			err = os.MkdirAll(fmt.Sprint(courseImgDir+"/",id), 0777)
+			err = os.MkdirAll(fmt.Sprint(courseImgDir+"/", id), 0777)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -512,7 +510,7 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			disFile, err := os.Create(fmt.Sprint(courseImgDir+"/",id,"/480_230.png"))
+			disFile, err := os.Create(fmt.Sprint(courseImgDir+"/", id, "/480_230.png"))
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -525,16 +523,14 @@ func CourseSaveAction(w http.ResponseWriter, r *http.Request) {
 
 			io.Copy(disFile, tmpFile)
 
-			os.Remove(".."+courseTmpImg)
+			os.Remove(".." + courseTmpImg)
 		}
-
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
 	}
 
 }
-
 
 func CourseLoadAction(w http.ResponseWriter, r *http.Request) {
 
@@ -581,7 +577,7 @@ func CourseLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var name, centerId, price, isProbation, typeString, beginAge, endAge,intro,lessonNum string
+	var name, centerId, price, isProbation, typeString, beginAge, endAge, intro, lessonNum string
 
 	if rows.Next() {
 		err = commonlib.PutRecord(rows, &name, &centerId, &price, &isProbation, &typeString, &beginAge, &endAge, &intro, &lessonNum)
@@ -610,7 +606,7 @@ func CourseLoadAction(w http.ResponseWriter, r *http.Request) {
 	h8 := lessgo.LoadFormObject{"end_age", endAge}
 	h9 := lessgo.LoadFormObject{"intro", intro}
 	h10 := lessgo.LoadFormObject{"lesson_num", lessonNum}
-	h11 := lessgo.LoadFormObject{"courseImg", fmt.Sprint("http://app.wooyou.com.cn:9100/pic/course/",id,"/480_230.png")}
+	h11 := lessgo.LoadFormObject{"courseImg", fmt.Sprint("http://app.wooyou.com.cn:9100/pic/course/", id, "/480_230.png")}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -626,4 +622,80 @@ func CourseLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
+}
+
+func CourseInCenterAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	userId, _ := strconv.Atoi(employee.UserId)
+	_employee, err := FindEmployeeById(userId)
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	sql := "select  cid,name  from course where center_id=? "
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, _employee.CenterId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	type Result struct {
+		Value string `json:"value"`
+		Desc  string `json:"desc"`
+	}
+
+	objects := []*Result{}
+
+	for rows.Next() {
+
+		model := new(Result)
+
+		err = commonlib.PutRecord(rows, &model.Value, &model.Desc)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	m["success"] = true
+	m["datas"] = objects
+
+	commonlib.OutputJson(w, m, " ")
+	return
+
 }

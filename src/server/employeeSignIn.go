@@ -116,12 +116,12 @@ func EmployeeSignInListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and esi.employee_id=? "
 	}
 
-	if st != ""{
+	if st != "" {
 		params = append(params, st)
 		sql += " and esi.sign_time >= ? "
 	}
 
-	if et != ""{
+	if et != "" {
 		params = append(params, et)
 		sql += " and esi.sign_time <= ? "
 	}
@@ -230,4 +230,3 @@ func EmployeeSignInListAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
 }
-

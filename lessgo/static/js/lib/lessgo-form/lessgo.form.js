@@ -10,6 +10,7 @@ jQuery.fn.form = function (opts) {
     var textAreaTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><textarea name="${fieldName}" rows="7" style="width:60%" data-field validate="${fieldValidate}" data-desc="${fieldDesc}" {@if fieldReadOnly=="true"}readonly{@/if} >${fieldValue}</textarea><span>${fieldTip}</span></div>';
     var checkboxContainerTemp = '<label class="control-label">${fieldDesc}：</label><div class="controls"><input data-field type="hidden" name="${fieldName}" validate="${fieldValidate}" data-desc="${fieldDesc}"  /></div>';
     var checkboxTemp = '<input validate="${fieldValidate}" value="${value}" type="checkbox" {@if fieldReadOnly=="true"}readonly{@/if} />${desc}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    var pureTextTemp = '<label class="control-label">${fieldDesc}：</label><label style="padding-top: 5px;">${fieldValue}</label>';
 
     //初始化html编辑器对象，一个表单只能拥有一个编辑器
     this.editor = "";
@@ -169,6 +170,14 @@ jQuery.fn.form = function (opts) {
             $(element).append(juicer(hiddenFieldTemp,{
                 fieldName:$(element).attr('field-name'),
                 fieldValue:""
+            }));
+        });
+
+        //纯文本
+        myform.find('[field-type=pureText]').each(function(index,element){
+            $(element).append(juicer(pureTextTemp,{
+                fieldDesc:$(element).attr('field-desc'),
+                fieldValue:$(element).attr('field-value')
             }));
         });
 

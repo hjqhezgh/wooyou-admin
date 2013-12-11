@@ -27,10 +27,10 @@ import (
 
 const (
 	CONSUMER_STATUS_NO_CONTACT = "1"
-	CONSUMER_STATUS_WAIT = "2"
-	CONSUMER_STATUS_ABANDON = "3"
-	CONSUMER_STATUS_NO_SIGNIN = "4"
-	CONSUMER_STATUS_SIGNIN = "5"
+	CONSUMER_STATUS_WAIT       = "2"
+	CONSUMER_STATUS_ABANDON    = "3"
+	CONSUMER_STATUS_NO_SIGNIN  = "4"
+	CONSUMER_STATUS_SIGNIN     = "5"
 )
 
 //客户分页数据服务
@@ -63,10 +63,10 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleCodes := strings.Split(employee.RoleCode, ",")
 
 	for _, roleCode := range roleCodes {
-		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" ||  roleCode == "tmk" {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" || roleCode == "tmk" {
 			dataType = "all"
 			break
-		} else{
+		} else {
 			dataType = "center"
 			break
 		}
@@ -140,41 +140,41 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.contact_status=? "
 	}
 
-	if lastContractStartTime!= "" && timeType=="1"  {
-		params = append(params,lastContractStartTime)
+	if lastContractStartTime != "" && timeType == "1" {
+		params = append(params, lastContractStartTime)
 		sql += " and cons.sign_in_time>=? "
 	}
 
-	if lastContractStartTime!= "" && timeType=="2"  {
-		params = append(params,lastContractStartTime)
+	if lastContractStartTime != "" && timeType == "2" {
+		params = append(params, lastContractStartTime)
 		sql += " and cons.pay_time>=? "
 	}
 
-	if lastContractEndTime!= "" && timeType=="1"{
-		params = append(params,lastContractEndTime)
+	if lastContractEndTime != "" && timeType == "1" {
+		params = append(params, lastContractEndTime)
 		sql += " and cons.sign_in_time<=? "
 	}
 
-	if lastContractEndTime!= "" && timeType=="2"  {
-		params = append(params,lastContractEndTime)
+	if lastContractEndTime != "" && timeType == "2" {
+		params = append(params, lastContractEndTime)
 		sql += " and cons.pay_time<=? "
 	}
 
 	if payStatus == "1" {
 		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=1 "
-	}else if payStatus == "2" {
+	} else if payStatus == "2" {
 		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=2 "
-	}else if payStatus == "3" {
+	} else if payStatus == "3" {
 		sql += " and (cons.pay_time is null or cons.pay_time ='')"
 	}
 
-	if tmkId1 != ""{
-		params = append(params,tmkId1)
+	if tmkId1 != "" {
+		params = append(params, tmkId1)
 		sql += " and cons.current_tmk_id=? "
 	}
 
-	if tmkId2 != ""{
-		params = append(params,tmkId2)
+	if tmkId2 != "" {
+		params = append(params, tmkId2)
 		sql += " and cons.current_tmk_id=? "
 	}
 
@@ -202,7 +202,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.center_id=? "
 	}
 
-	if partTimeName != ""{
+	if partTimeName != "" {
 		params = append(params, partTimeName)
 		sql += " and cons.parttime_name=? "
 	}
@@ -371,7 +371,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	if id == "" {
 
-		homePhoneFlag,err := CheckConsumerPhoneExist(homePhone)
+		homePhoneFlag, err := CheckConsumerPhoneExist(homePhone)
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
 			m["success"] = false
@@ -381,7 +381,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		phoneFlag,err := CheckConsumerPhoneExist(phone)
+		phoneFlag, err := CheckConsumerPhoneExist(phone)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -392,7 +392,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if phoneFlag{
+		if phoneFlag {
 			m["success"] = false
 			m["code"] = 100
 			m["msg"] = "联系人电话已经存在，无需重复录入"
@@ -400,7 +400,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if homePhoneFlag{
+		if homePhoneFlag {
 			m["success"] = false
 			m["code"] = 100
 			m["msg"] = "家庭电话已经在系统中存在，无需重复录入"
@@ -431,7 +431,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		insertConsumerRes, err := insertConsumerStmt.Exec(center_id,contactStatus,homePhone,time.Now().Format("20060102150405"),child,year,month,birthday,lastContactTime,come_from_id,remark,employee.UserId,parttimeName)
+		insertConsumerRes, err := insertConsumerStmt.Exec(center_id, contactStatus, homePhone, time.Now().Format("20060102150405"), child, year, month, birthday, lastContactTime, come_from_id, remark, employee.UserId, parttimeName)
 		if err != nil {
 			tx.Rollback()
 
@@ -443,7 +443,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		consumerId,err := insertConsumerRes.LastInsertId()
+		consumerId, err := insertConsumerRes.LastInsertId()
 		if err != nil {
 			tx.Rollback()
 
@@ -471,7 +471,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = insertContactsStmt.Exec(contactsName,phone,"1",consumerId)
+		_, err = insertContactsStmt.Exec(contactsName, phone, "1", consumerId)
 		if err != nil {
 			tx.Rollback()
 
@@ -499,7 +499,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = insertContactLogStmt.Exec(employee.UserId,time.Now().Format("20060102150405"),remark,consumerId,1)
+			_, err = insertContactLogStmt.Exec(employee.UserId, time.Now().Format("20060102150405"), remark, consumerId, 1)
 			if err != nil {
 				tx.Rollback()
 
@@ -563,7 +563,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(remark, child, year, month, birthday, come_from_id,parttimeName,id)
+			_, err = stmt.Exec(remark, child, year, month, birthday, come_from_id, parttimeName, id)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -573,8 +573,8 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
-		}else{
-			phoneFlag,err := CheckConsumerPhoneExist(homePhone)
+		} else {
+			phoneFlag, err := CheckConsumerPhoneExist(homePhone)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -585,7 +585,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if phoneFlag{
+			if phoneFlag {
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "联系人家庭电话已经存在，无需重复录入"
@@ -608,7 +608,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(remark, child, year, month,homePhone, birthday, come_from_id,parttimeName,id)
+			_, err = stmt.Exec(remark, child, year, month, homePhone, birthday, come_from_id, parttimeName, id)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -620,7 +620,6 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			}
 
 		}
-
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
@@ -659,7 +658,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	loadFormObjects := []lessgo.LoadFormObject{}
 
-	if id!= ""{
+	if id != "" {
 		sql := "select center_id,home_phone,child,year,month,birthday,come_from_id,remark,parttime_name from consumer_new where id=? "
 
 		lessgo.Log.Debug(sql)
@@ -677,10 +676,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var center_id, home_phone, child, year, month, birthday, come_from_id,remark,parttimeName string
+		var center_id, home_phone, child, year, month, birthday, come_from_id, remark, parttimeName string
 
 		if rows.Next() {
-			err = commonlib.PutRecord(rows, &center_id, &home_phone, &child, &year, &month, &birthday, &come_from_id,&remark,&parttimeName)
+			err = commonlib.PutRecord(rows, &center_id, &home_phone, &child, &year, &month, &birthday, &come_from_id, &remark, &parttimeName)
 
 			if err != nil {
 				m["success"] = false
@@ -714,7 +713,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		loadFormObjects = append(loadFormObjects, h8)
 		loadFormObjects = append(loadFormObjects, h9)
 		loadFormObjects = append(loadFormObjects, h10)
-	}else if aid!="" {
+	} else if aid != "" {
 		sql := "select remotephone,cid from audio where aid=? "
 		lessgo.Log.Debug(sql)
 
@@ -731,7 +730,7 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var remotephone,cid string
+		var remotephone, cid string
 
 		if rows.Next() {
 			err = commonlib.PutRecord(rows, &remotephone, &cid)
@@ -745,13 +744,12 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-
 		m["success"] = true
 		h1 := lessgo.LoadFormObject{"phone", remotephone}
 		h2 := lessgo.LoadFormObject{"center_id", cid}
 		loadFormObjects = append(loadFormObjects, h1)
 		loadFormObjects = append(loadFormObjects, h2)
-	}else{
+	} else {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
@@ -766,7 +764,6 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 		h1 := lessgo.LoadFormObject{"center_id", _employee.CenterId}
 		loadFormObjects = append(loadFormObjects, h1)
 	}
-
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
@@ -799,7 +796,7 @@ func ConsumerStatusChangeAction(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("ids")
 	status := r.FormValue("status")
 
-	if strings.Contains(id,","){
+	if strings.Contains(id, ",") {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "只能操作一个客户"
@@ -1088,16 +1085,16 @@ func ConsumerContactRecordListAction(w http.ResponseWriter, r *http.Request) {
 }
 
 //判断客户是否已经存在
-func CheckConsumerPhoneExist(phone string) (bool,error) {
+func CheckConsumerPhoneExist(phone string) (bool, error) {
 
-	if phone == ""{
+	if phone == "" {
 		return false, nil
 	}
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	sql := "select count(1) from consumer_new where home_phone=? ";
+	sql := "select count(1) from consumer_new where home_phone=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -1105,7 +1102,7 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return false,err
+		return false, err
 	}
 
 	num := 0
@@ -1116,16 +1113,15 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
-			return false,err
+			return false, err
 		}
 	}
 
-	if  num > 0 {
-		return true ,nil
+	if num > 0 {
+		return true, nil
 	}
 
-
-	sql = "select count(1) from contacts where phone=? ";
+	sql = "select count(1) from contacts where phone=? "
 
 	lessgo.Log.Debug(sql)
 
@@ -1133,7 +1129,7 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return false,err
+		return false, err
 	}
 
 	num = 0
@@ -1144,15 +1140,15 @@ func CheckConsumerPhoneExist(phone string) (bool,error) {
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
-			return false,err
+			return false, err
 		}
 	}
 
-	if  num > 0 {
-		return true ,nil
+	if num > 0 {
+		return true, nil
 	}
 
-	return false,nil
+	return false, nil
 }
 
 func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
@@ -1204,7 +1200,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	roleCodes := strings.Split(employee.RoleCode, ",")
 
 	for _, roleCode := range roleCodes {
-		if roleCode == "tmk" ||  roleCode == "yyzj"{
+		if roleCode == "tmk" || roleCode == "yyzj" {
 			dataType = "all"
 			break
 		} else {
@@ -1241,7 +1237,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
 	sql += " left join employee e on e.user_id=cons.last_tmk_id where 1=1 and cons.is_own_by_tmk=2 "
 
-	if dataType=="center" {
+	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 
@@ -1262,23 +1258,23 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.contact_status=? "
 	}
 
-	if lastContractStartTime!= "" {
-		params = append(params,lastContractStartTime)
+	if lastContractStartTime != "" {
+		params = append(params, lastContractStartTime)
 		sql += " and cons.last_contact_time>=? "
 	}
 
-	if lastContractEndTime!= "" {
-		params = append(params,lastContractEndTime)
+	if lastContractEndTime != "" {
+		params = append(params, lastContractEndTime)
 		sql += " and cons.last_contact_time<=? "
 	}
 
-	if centerId1 != "" && dataType=="all" {
+	if centerId1 != "" && dataType == "all" {
 		params = append(params, centerId1)
 		sql += " and cons.center_id=? "
 	}
 
-	if partTimeName!= "" {
-		params = append(params,partTimeName)
+	if partTimeName != "" {
+		params = append(params, partTimeName)
 		sql += " and cons.parttime_name=? "
 	}
 
@@ -1387,7 +1383,6 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
 
@@ -1414,7 +1409,7 @@ func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 
 	ids := r.FormValue("ids")
 
-	if strings.Contains(ids,",") {
+	if strings.Contains(ids, ",") {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "每次只能邀约一个客户"
@@ -1465,7 +1460,7 @@ func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 	sql2 := "select count(1) from tmk_consumer tc left join consumer_new c on tc.consumer_id=c.id where c.contact_status=1 and tc.tmk_id=?  "
 	lessgo.Log.Debug(sql2)
 
-	rows2, err := db.Query(sql2,employee.UserId)
+	rows2, err := db.Query(sql2, employee.UserId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -1524,7 +1519,7 @@ func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(employee.UserId,ids,time.Now().Format("20060102150405"))
+	_, err = stmt.Exec(employee.UserId, ids, time.Now().Format("20060102150405"))
 
 	if err != nil {
 		tx.Rollback()
@@ -1550,7 +1545,7 @@ func TmkInviteAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt1.Exec(employee.UserId,employee.UserId,ids)
+	_, err = stmt1.Exec(employee.UserId, employee.UserId, ids)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1650,43 +1645,43 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join center ce on ce.cid=cons.center_id "
 	sql += " left join come_from cf on cf.id=cons.come_from_id "
 	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
-	sql += " where tc.tmk_id= "+employee.UserId
+	sql += " where tc.tmk_id= " + employee.UserId
 
 	if status != "" {
 		params = append(params, status)
 		sql += " and cons.contact_status=? "
 	}
 
-	if lastContractStartTime!= "" && timeType=="1"  {
-		params = append(params,lastContractStartTime)
+	if lastContractStartTime != "" && timeType == "1" {
+		params = append(params, lastContractStartTime)
 		sql += " and cons.sign_in_time>=? "
 	}
 
-	if lastContractStartTime!= "" && timeType=="2"  {
-		params = append(params,lastContractStartTime)
+	if lastContractStartTime != "" && timeType == "2" {
+		params = append(params, lastContractStartTime)
 		sql += " and cons.pay_time>=? "
 	}
 
-	if lastContractEndTime!= "" && timeType=="1"{
-		params = append(params,lastContractEndTime)
+	if lastContractEndTime != "" && timeType == "1" {
+		params = append(params, lastContractEndTime)
 		sql += " and cons.sign_in_time<=? "
 	}
 
-	if lastContractEndTime!= "" && timeType=="2"  {
-		params = append(params,lastContractEndTime)
+	if lastContractEndTime != "" && timeType == "2" {
+		params = append(params, lastContractEndTime)
 		sql += " and cons.pay_time<=? "
 	}
 
-	if partTimeName!= ""{
-		params = append(params,partTimeName)
+	if partTimeName != "" {
+		params = append(params, partTimeName)
 		sql += " and cons.parttime_name=? "
 	}
 
 	if payStatus == "1" {
 		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=1 "
-	}else if payStatus == "2" {
+	} else if payStatus == "2" {
 		sql += " and cons.pay_time is not null and cons.pay_time != '' and cons.pay_status=2 "
-	}else if payStatus == "3" {
+	} else if payStatus == "3" {
 		sql += " and (cons.pay_time is null or cons.pay_time ='')"
 	}
 
@@ -1828,7 +1823,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	ids := r.FormValue("ids")
 	status := r.FormValue("status")
 
-	if strings.Contains(ids,",") {
+	if strings.Contains(ids, ",") {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "每次只能缴费一个客户"
@@ -1865,7 +1860,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(ids,time.Now().Format("20060102150405"),employee.UserId)
+	_, err = stmt.Exec(ids, time.Now().Format("20060102150405"), employee.UserId)
 
 	if err != nil {
 		tx.Rollback()
@@ -1892,7 +1887,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(time.Now().Format("20060102150405"),status,ids)
+	_, err = stmt.Exec(time.Now().Format("20060102150405"), status, ids)
 
 	if err != nil {
 		tx.Rollback()
@@ -1912,7 +1907,6 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.OutputJson(w, m, " ")
 	return
 }
-
 
 func BackToAllConsumerAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
@@ -1940,7 +1934,7 @@ func BackToAllConsumerAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("ids")
 
-	if strings.Contains(id,","){
+	if strings.Contains(id, ",") {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "只能操作一个客户"

@@ -21,9 +21,9 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
-	"strings"
 )
 
 //tmk业绩报表
@@ -102,10 +102,10 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" {
 			dataType = "all"
 			break
-		} else if roleCode == "cd"{
+		} else if roleCode == "cd" {
 			dataType = "center"
 			break
-		}else {
+		} else {
 			dataType = "self"
 			break
 		}
@@ -137,23 +137,23 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	defaultStartTime := "2000-01-01 00:0:000"
 	defaultEndTime := "2999-12-31 00:00:00"
 
-	if startTime != ""{
+	if startTime != "" {
 		defaultStartTime = startTime
 	}
 
-	if endTime != ""{
+	if endTime != "" {
 		defaultEndTime = endTime
 	}
 	params = append(params, defaultStartTime)
 	params = append(params, defaultEndTime)
 
-	defaultStartTime = strings.Replace(defaultStartTime,"-","",-1)
-	defaultStartTime = strings.Replace(defaultStartTime," ","",-1)
-	defaultStartTime = strings.Replace(defaultStartTime,":","",-1)
+	defaultStartTime = strings.Replace(defaultStartTime, "-", "", -1)
+	defaultStartTime = strings.Replace(defaultStartTime, " ", "", -1)
+	defaultStartTime = strings.Replace(defaultStartTime, ":", "", -1)
 
-	defaultEndTime = strings.Replace(defaultEndTime,"-","",-1)
-	defaultEndTime = strings.Replace(defaultEndTime," ","",-1)
-	defaultEndTime = strings.Replace(defaultEndTime,":","",-1)
+	defaultEndTime = strings.Replace(defaultEndTime, "-", "", -1)
+	defaultEndTime = strings.Replace(defaultEndTime, " ", "", -1)
+	defaultEndTime = strings.Replace(defaultEndTime, ":", "", -1)
 
 	params = append(params, defaultStartTime)
 	params = append(params, defaultEndTime)
@@ -190,11 +190,10 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and em.user_id=? "
 	}
 
-	if dataType != "self" && employeeId!= "" {
+	if dataType != "self" && employeeId != "" {
 		params = append(params, employeeId)
 		sql += " and em.user_id=? "
 	}
-
 
 	countSql := "select count(1) from (" + sql + ") num"
 

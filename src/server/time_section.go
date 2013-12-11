@@ -306,7 +306,7 @@ func FindTimeSectionById(id string) (TimeSection, error) {
 	timeSection := TimeSection{}
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &timeSection.Id, &timeSection.CenterId, &timeSection.StartTime, &timeSection.EndTime,&timeSection.LessonNo)
+		err = commonlib.PutRecord(rows, &timeSection.Id, &timeSection.CenterId, &timeSection.StartTime, &timeSection.EndTime, &timeSection.LessonNo)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())

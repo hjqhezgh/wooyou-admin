@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="修改课表" saveUrl="/web/class_schedule_detail/modify.json" load="true" loadUrl="/web/class_schedule_detail/load.json" inwindow="true">
+        <element field="scheduleId"  type="hidden" desc="主键" />
+        <element field="name"  type="text" desc="课程名" />
+        <element field="code"  type="localSelect" localData="[{desc:'P1', value:'P1'},{desc:'P2', value:'P2'},{desc:'P3', value:'P3'},{desc:'E1', value:'E1'},{desc:'E2', value:'E2'}]"  desc="课程代码" />
+        <element field="type"  type="hidden" defaultValue="tmp" />
+        <element field="classId"  type="hidden"/>
+
+        <afterSave>
+            <![CDATA[
+                alert('保存成功');
+                parent.process.render();
+                top.layer.close(top.layer.getFrameIndex(window.name));
+            ]]>
+        </afterSave>
+    </customformpanel>
+</viewport>

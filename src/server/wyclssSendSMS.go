@@ -49,11 +49,12 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("ids")
 	classId := r.FormValue("classId")
+	scheduleId := r.FormValue("scheduleId")
 	centerId := r.FormValue("centerId-eq")
 
 	loadFormObjects := []lessgo.LoadFormObject{}
 
-	findPhoneSql := "select cons.id,cont.phone,cons.child from contacts cont left join consumer_new cons on cont.consumer_id=cons.id where cont.consumer_id in ("+id+")"
+	findPhoneSql := "select ch.cid,p.telephone,ch.name from child ch left join parent p on p.pid=ch.pid where ch.cid in (" + id + ")"
 	lessgo.Log.Debug(findPhoneSql)
 
 	db := lessgo.GetMySQL()
@@ -75,7 +76,7 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 	consumerIds := ""
 
 	for rows.Next() {
-		var consumerId,phone,childName string
+		var consumerId, phone, childName string
 		err = commonlib.PutRecord(rows, &consumerId, &phone, &childName)
 
 		if err != nil {
@@ -87,16 +88,16 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if len(phone)!= 11{//不是手机号码
+		if len(phone) != 11 { //不是手机号码
 			continue
 		}
 
-		phonesContent += phone+"("+childName+"),"
-		phones += phone+","
-		consumerIds += consumerId+","
+		phonesContent += phone + "(" + childName + "),"
+		phones += phone + ","
+		consumerIds += consumerId + ","
 	}
 
-	if phones == ""{
+	if phones == "" {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "本次没有可以发送的号码，请重新选择"
@@ -109,6 +110,7 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 	h4 := lessgo.LoadFormObject{"consumerIds", consumerIds}
 	h5 := lessgo.LoadFormObject{"classId", classId}
 	h6 := lessgo.LoadFormObject{"centerId", centerId}
+	h7 := lessgo.LoadFormObject{"scheduleId", scheduleId}
 
 	getCenterInfo := "select ce.name,ce.intro,class.name,class.start_time from wyclass class left join center ce on ce.cid=class.center_id where class.class_id=?"
 	lessgo.Log.Debug(getCenterInfo)
@@ -123,10 +125,10 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var centerName ,centerIntro,className,classStartTime string
+	var centerName, centerIntro, className, classStartTime string
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows,&centerName,&centerIntro,&className,&classStartTime)
+		err := commonlib.PutRecord(rows, &centerName, &centerIntro, &className, &classStartTime)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -138,7 +140,7 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	h3 := lessgo.LoadFormObject{"content", getSmsTmpText(employee.ReallyName,"$child",centerIntro,classStartTime)}
+	h3 := lessgo.LoadFormObject{"content", getSmsTmpText(employee.ReallyName, "$child", centerIntro, classStartTime)}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
@@ -146,6 +148,7 @@ func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects = append(loadFormObjects, h4)
 	loadFormObjects = append(loadFormObjects, h5)
 	loadFormObjects = append(loadFormObjects, h6)
+	loadFormObjects = append(loadFormObjects, h7)
 
 	m["success"] = true
 	m["datas"] = loadFormObjects
@@ -180,12 +183,13 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	classId := r.FormValue("classId")
+	scheduleId := r.FormValue("scheduleId")
 	consumerIds := r.FormValue("consumerIds")
 	phones := r.FormValue("phones")
 	content := r.FormValue("content")
 
-	phoneList := strings.Split(phones,",")
-	consumerIdList := strings.Split(consumerIds,",")
+	phoneList := strings.Split(phones, ",")
+	consumerIdList := strings.Split(consumerIds, ",")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -201,8 +205,8 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for index,phone := range phoneList {
-		if phone!= ""{
+	for index, phone := range phoneList {
+		if phone != "" {
 			getConsumerInfo := "select child from consumer_new  where id=?"
 			lessgo.Log.Debug(getConsumerInfo)
 			rows, err := db.Query(getConsumerInfo, consumerIdList[index])
@@ -231,8 +235,8 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			contentDetail := getSmsContent(content,childName)
-			smsResult ,err := SendMessage(phone, contentDetail)
+			contentDetail := getSmsContent(content, childName)
+			smsResult, err := SendMessage(phone, contentDetail)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -243,7 +247,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if smsResult.Msg == "" {//请求短信接口没有成功
+			if smsResult.Msg == "" { //请求短信接口没有成功
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "短信发送错误，请联系IT部门"
@@ -253,14 +257,13 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 
 			smsStatus := ""
 
-			if smsResult.Result == 0 {//发送成功
-				smsStatus  = "2"
-			}else{
-				smsStatus  = "3"
+			if smsResult.Result == 0 { //发送成功
+				smsStatus = "2"
+			} else {
+				smsStatus = "3"
 			}
 
-
-			updateClassSmsStatus := "update wyclass_free_child set sms_status=? where wyclass_id=? and consumer_id=? "
+			updateClassSmsStatus := "update schedule_detail_child set sms_status=? where wyclass_id=? and child_id=? and schedule_detail_id=? "
 			lessgo.Log.Debug(updateClassSmsStatus)
 
 			stmt, err := tx.Prepare(updateClassSmsStatus)
@@ -275,7 +278,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(smsStatus,classId,consumerIdList[index])
+			_, err = stmt.Exec(smsStatus, classId, consumerIdList[index],scheduleId)
 			if err != nil {
 				tx.Rollback()
 				lessgo.Log.Warn(err.Error())
@@ -285,7 +288,6 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
-
 
 			insertSmsLog := "insert into sms_send_log(phone,content,result_code,result_msg,send_time,send_status) values(?,?,?,?,?,?) "
 			lessgo.Log.Debug(insertSmsLog)
@@ -301,7 +303,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(phone,contentDetail,smsResult.Result,smsResult.Msg,time.Now().Format("20060102150405"),3)
+			_, err = stmt.Exec(phone, contentDetail, smsResult.Result, smsResult.Msg, time.Now().Format("20060102150405"), 3)
 			if err != nil {
 				tx.Rollback()
 				lessgo.Log.Warn(err.Error())
@@ -325,14 +327,14 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 }
 
 //获取短信模板文本
-func getSmsTmpText(employeeName,child,centerIntro,startTime string) string{
+func getSmsTmpText(employeeName, child, centerIntro, startTime string) string {
 	st, _ := time.ParseInLocation("20060102150405", startTime, time.Local)
-	content := child+"家长，您好，我是您吾幼儿童社区的老师"+employeeName+"。咱们约定的时间："+st.Format("2006-01-02 15:04")+"。咱们"+centerIntro+"到时找不到地址直接打中心电话确认。咱们官网：www.wooyou.com.cn您可以提前上网了解。祝生活愉快！"
-	content+= "【吾幼英语美术社区】"
+	content := child + "家长，您好，我是您吾幼儿童社区的老师" + employeeName + "。咱们约定的时间：" + st.Format("2006-01-02 15:04") + "。咱们" + centerIntro + "到时找不到地址直接打中心电话确认。咱们官网：www.wooyou.com.cn您可以提前上网了解。祝生活愉快！"
+	content += "【吾幼英语美术社区】"
 	return content
 }
 
 //替换为具体的短信模板
-func getSmsContent(content,childName string) string {
-	return strings.Replace(content,"$child",childName,-1)
+func getSmsContent(content, childName string) string {
+	return strings.Replace(content, "$child", childName, -1)
 }

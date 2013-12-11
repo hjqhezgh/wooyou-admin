@@ -75,4 +75,17 @@
     <url path="/web/wyclass/sendSMS" view="web/wyclass/sendSMS.xml" />
     <!--调班界面-->
     <url path="/web/wyclass/changeClass" view="web/wyclass/changeClass.xml" />
+
+    <!--表格样式的课表展示-->
+    <url path="/web/new_class_schedule_detail" view="web/class_schedule_detail/new_index.xml" />
+    <!--添加常规课程-->
+    <url path="/web/class_schedule_detail/add_normal" view="web/class_schedule_detail/add_normal.xml" />
+    <!--添加临时课程-->
+    <url path="/web/class_schedule_detail/add_tmp" view="web/class_schedule_detail/add_tmp.xml" />
+    <!--修改临时课程-->
+    <url path="/web/class_schedule_detail/modify_tmp" view="web/class_schedule_detail/modify_tmp.xml" />
+    <!--修改常规课程-->
+    <url path="/web/class_schedule_detail/modify_normal" view="web/class_schedule_detail/modify_normal.xml" />
+    <!--常规班级小孩子分配界面-->
+    <url path="/web/wyclass/manageChildForNormal" view="web/wyclass/manageChildForNormal.xml" />
 </urls>

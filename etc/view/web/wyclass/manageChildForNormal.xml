@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+
+    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1">
+
+        <column field="childName" desc="学生"/>
+        <column field="phone" desc="联系电话"/>
+        <column field="signInType" desc="签到状态">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue==1) {
+                            return "签到成功";
+                        }else if(cellvalue==2){
+                            return "请假";
+                        }else if(cellvalue==3){
+                            return "旷课";
+                        }else{
+                            return "未签到";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="signInTime" desc="签到时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <action desc="临时剔除" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="剔除" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="请假" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
+    </customgridpanel>
+
+    <customgridpanel url="/web/child/childInCenter.json" pageSize="15" title="选择学生" id="grid2" width="1200" height="250" loadUrl="true" mutiSelect="true" pageId="grid2">
+        <search field="kw" searchType="like" inputType="text" desc="名字/电话"/>
+
+        <column field="centerName" desc="门店"/>
+        <column field="contactPhone" desc="学生"/>
+        <column field="child" desc="联系电话"/>
+
+        <toolaction desc="跟班" url="/web/wyclass/addChildForNormalTempelate.json"  colorClass="h-bg-green" linkType="mutiSelect">
+            <callback>
+                <![CDATA[
+                     if(!data.success){
+                        alert(data.msg)
+                     }
+                     grid1.grid.trigger("reloadGrid");
+                ]]>
+            </callback>
+        </toolaction>
+
+        <toolaction desc="临时插班" url="/web/wyclass/addChildForNormalOnce.json"  colorClass="h-bg-green" linkType="mutiSelect">
+            <callback>
+                <![CDATA[
+                     if(!data.success){
+                        alert(data.msg)
+                     }
+                     grid1.grid.trigger("reloadGrid");
+                ]]>
+            </callback>
+        </toolaction>
+    </customgridpanel>
+</viewport>

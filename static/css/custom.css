@@ -1,0 +1,37 @@
+/*2013.12.06 做课表表格*/
+.fakeContainer { /* The parent container */
+     margin: 0 0 20px;
+     border: none;
+     width: 100%; /* Required to set */
+     height: 500px; /* Required to set */
+     overflow: hidden; /* Required to set */
+     z-index: -99;
+ }
+.schedule .table-box{
+    z-index: -99;
+}
+.fakeContainer p{
+    margin: 0;
+}
+.fakeContainer .schedule-detail{
+    color: #000000;
+}
+/*
+.fakeContainer .room{
+    color: #AD6704;
+}
+
+.fakeContainer .sFHeader{
+    z-index: 0;
+}
+
+.fakeContainer .sHeader{
+    z-index: 0;
+}
+.fakeContainer .sFData{
+    z-index: 0;
+}
+
+.fakeContainer .sData{
+    z-index: 0;
+}*/

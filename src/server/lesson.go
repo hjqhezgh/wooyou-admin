@@ -20,14 +20,14 @@ import (
 )
 
 type Lesson struct {
-	Lid int
-	CourseId int
-	Caption string
-	TeacherId int
-	KeyStone string
+	Lid        int
+	CourseId   int
+	Caption    string
+	TeacherId  int
+	KeyStone   string
 	LessonTime int
-	OrderNo int
-	IsLast string
+	OrderNo    int
+	IsLast     string
 }
 
 func LessonByClassIdAction(w http.ResponseWriter, r *http.Request) {
@@ -114,7 +114,7 @@ func FindLessonById(id string) (Lesson, error) {
 	lesson := Lesson{}
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &lesson.Lid,&lesson.CourseId,&lesson.Caption,&lesson.TeacherId,&lesson.KeyStone,&lesson.LessonTime,&lesson.OrderNo,&lesson.IsLast)
+		err = commonlib.PutRecord(rows, &lesson.Lid, &lesson.CourseId, &lesson.Caption, &lesson.TeacherId, &lesson.KeyStone, &lesson.LessonTime, &lesson.OrderNo, &lesson.IsLast)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())

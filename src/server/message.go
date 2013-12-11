@@ -11,16 +11,16 @@
 // 修改历史:版本号 修改日期 修改人 修改说明
 
 package server
- 
+
 import (
-    "net/http"
-    "io/ioutil"
-	"strings"
-	"fmt"
-	"time"
 	"crypto/md5"
-	"io"
 	"encoding/xml"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
 )
 
 //md5加密方法
@@ -37,15 +37,14 @@ func getTimeString() string {
 	return str[2:]
 }
 
-func GenerateXml(mobile, msg string) string{
+func GenerateXml(mobile, msg string) string {
 	cpid := "020000001832"
 	port := "0723"
 	secret_key := "87bd337f7640aab36ab613f806c3b062"
 	now_time := getTimeString()
 	cpmid := "12345"
 	signature := Md5Str(secret_key + now_time)
-	
-	 
+
 	xml := `<?xml version="1.0" encoding="UTF-8"?>
 	<MtPacket>
 		<cpid>%s</cpid>
@@ -59,47 +58,47 @@ func GenerateXml(mobile, msg string) string{
 		<validtime></validtime>
 	</MtPacket>
 `
-	return fmt.Sprintf(xml, cpid, cpmid, mobile, port, msg, signature, now_time)	
+	return fmt.Sprintf(xml, cpid, cpmid, mobile, port, msg, signature, now_time)
 }
 
-func SendMessage(mobile, msg string) (SmsResult, error){
+func SendMessage(mobile, msg string) (SmsResult, error) {
 	trim_mgs := strings.TrimLeft(strings.TrimRight(msg, " "), " ")
 	data := GenerateXml(mobile, trim_mgs)
-    client := &http.Client{}
-    reqest, _ := http.NewRequest("POST", "http://221.179.216.74/providermt", strings.NewReader(data))
+	client := &http.Client{}
+	reqest, _ := http.NewRequest("POST", "http://221.179.216.74/providermt", strings.NewReader(data))
 
 	reqest.Header.Set("Content-Type", "text/xml; charset=GBK")
-    reqest.Header.Set("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-    reqest.Header.Set("Accept-Charset","zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3")
-    reqest.Header.Set("Accept-Encoding","gzip,deflate,sdch")
-    reqest.Header.Set("Accept-Language","zh-CN,zh;q=0.8")
-    reqest.Header.Set("Cache-Control","max-age=0")
-    reqest.Header.Set("Connection","keep-alive")
+	reqest.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	reqest.Header.Set("Accept-Charset", "zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3")
+	reqest.Header.Set("Accept-Encoding", "gzip,deflate,sdch")
+	reqest.Header.Set("Accept-Language", "zh-CN,zh;q=0.8")
+	reqest.Header.Set("Cache-Control", "max-age=0")
+	reqest.Header.Set("Connection", "keep-alive")
 
-    response,_ := client.Do(reqest)
-    if response.StatusCode == 200 {
-        body, _ := ioutil.ReadAll(response.Body)
-        bodystr := string(body)
-		fmt.Println("****************",bodystr)
+	response, _ := client.Do(reqest)
+	if response.StatusCode == 200 {
+		body, _ := ioutil.ReadAll(response.Body)
+		bodystr := string(body)
+		fmt.Println("****************", bodystr)
 		return GetResult(bodystr)
-    }
+	}
 
-	return SmsResult{},nil
+	return SmsResult{}, nil
 }
 
-type SmsResult struct{
-	MtResponse string   `xml:"MtResponse"`
-	Mid   	   string   `xml:"mid"`
-	Cpmid      string   `xml:"cpmid"`
-	Result     int      `xml:"result"`
+type SmsResult struct {
+	MtResponse string `xml:"MtResponse"`
+	Mid        string `xml:"mid"`
+	Cpmid      string `xml:"cpmid"`
+	Result     int    `xml:"result"`
 	Msg        string
 }
 
-func GetResult(data string) (SmsResult, error){
+func GetResult(data string) (SmsResult, error) {
 
 	var ret SmsResult
-	
-    err := xml.Unmarshal([]byte(data), &ret)
+
+	err := xml.Unmarshal([]byte(data), &ret)
 
 	if err != nil {
 		fmt.Printf("error: %v", err)

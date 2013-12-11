@@ -20,8 +20,8 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"time"
 	"text/template"
+	"time"
 )
 
 func ConsumerContactLogAction(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +74,7 @@ func ConsumerContactLogAction(w http.ResponseWriter, r *http.Request) {
 
 	sql := "select  c.id,c.create_time,e.really_name,c.note,c.type from consumer_contact_log c left join employee e on e.user_id=c.create_user where c.consumer_id=? "
 
-	params = append(params,consumerId)
+	params = append(params, consumerId)
 
 	countSql := ""
 
@@ -263,7 +263,7 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(employee.UserId,time.Now().Format("20060102150405"),note,consumerId,contactType)
+		_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), note, consumerId, contactType)
 		if err != nil {
 			tx.Rollback()
 
@@ -291,7 +291,7 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(CONSUMER_STATUS_WAIT,time.Now().Format("20060102150405"),consumerId)
+			_, err = stmt.Exec(CONSUMER_STATUS_WAIT, time.Now().Format("20060102150405"), consumerId)
 			if err != nil {
 				tx.Rollback()
 
@@ -319,7 +319,7 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(consumerId,employee.UserId,time.Now().Format("20060102150405"),CONSUMER_STATUS_NO_CONTACT,CONSUMER_STATUS_WAIT)
+			_, err = stmt.Exec(consumerId, employee.UserId, time.Now().Format("20060102150405"), CONSUMER_STATUS_NO_CONTACT, CONSUMER_STATUS_WAIT)
 			if err != nil {
 				tx.Rollback()
 
@@ -330,7 +330,7 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
-		}else{
+		} else {
 			updateConsumerStatsuSql := "update consumer_new set last_contact_time=? where id=? "
 			lessgo.Log.Debug(updateConsumerStatsuSql)
 
@@ -346,7 +346,7 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(time.Now().Format("20060102150405"),consumerId)
+			_, err = stmt.Exec(time.Now().Format("20060102150405"), consumerId)
 			if err != nil {
 				tx.Rollback()
 
@@ -380,7 +380,7 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(note, contactType,id)
+		_, err = stmt.Exec(note, contactType, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -396,7 +396,6 @@ func ConsumerContactLogSaveAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
 
 func ConsumerContactLogLoadAction(w http.ResponseWriter, r *http.Request) {
 
@@ -444,7 +443,7 @@ func ConsumerContactLogLoadAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var contactType,note string
+	var contactType, note string
 
 	if rows.Next() {
 		err = commonlib.PutRecord(rows, &contactType, &note)
@@ -467,7 +466,6 @@ func ConsumerContactLogLoadAction(w http.ResponseWriter, r *http.Request) {
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
 	loadFormObjects = append(loadFormObjects, h3)
-
 
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
