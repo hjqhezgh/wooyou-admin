@@ -146,6 +146,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//课表相关
 	"/web/class_schedule_detail/data.json": server.ClassScheduleDetailListAction,
+	"/web/class_schedule_detail/quick_data.json": server.ClassScheduleDetailListQuickAction,
 	"/web/class_schedule_detail/load.json": server.ClassScheduleDetailLoadAction,
 	"/web/class_schedule_detail/add.json": server.ClassScheduleDetailAddAction,
 	"/web/class_schedule_detail/modify.json": server.ClassScheduleDetailModifyAction,
@@ -155,19 +156,22 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
 	"/web/child/childInNormalSchedule.json": server.ChildInNormalScheduleAction,
 	"/web/wyclass/signIn.json": server.ChildSignInAction,
-	"/web/wyclass/removeChild.json": server.RemoveChildFromClassAction,
 	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
 	"/web/wyclass/addChild.json": server.AddChildToClassAction,
 	"/web/wyclass/addChildForNormalOnce.json": server.AddChildForNormalOnceAction,
 	"/web/wyclass/addChildForNormalTempelate.json": server.AddChildForNormalTempelateAction,
 	"/web/wyclass/sendSMS/load.json": server.WyClassSendSMSLoadAction,
+	"/web/wyclass/removeChild.json": server.RemoveChildFromClassAction,
+	"/web/wyclass/removeChildForNormalOnce.json": server.RemoveChildForNormalOnceAction,
+	"/web/wyclass/removeChildForNormal.json": server.RemoveChildForNormalAction,
+	"/web/wyclass/leaveForChild.json": server.LeaveForChildAction,
+	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,
 	"/web/wyclass/wyclass_free.json": server.WyClassFreeListAction,
 	"/web/wyclass/save.json": server.WyClassSaveAction,
 	"/web/wyclass/load.json": server.WyClassLoadAction,
-	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
 	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,

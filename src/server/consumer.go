@@ -491,9 +491,6 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				tx.Rollback()
 
-				lessgo.Log.Warn(err.Error())
-				m["success"] = false
-				m["code"] = 100
 				m["msg"] = "系统发生错误，请联系IT部门"
 				commonlib.OutputJson(w, m, " ")
 				return
@@ -507,6 +504,150 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		/******************插入parent表*****************/
+		checkParentSql := "select pid from parent where telephone=? "
+		lessgo.Log.Debug(checkParentSql)
+
+		rows, err := db.Query(checkParentSql, phone)
+		pid := 0
+
+		if rows.Next() {
+			err := commonlib.PutRecord(rows, &pid)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if pid!= 0{
+			updateConsumerSql := "update consumer_new set parent_id=? where id=? "
+			lessgo.Log.Debug(updateConsumerSql)
+			stmt, err := tx.Prepare(updateConsumerSql)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(pid,consumerId)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}else{
+			insertParentSql := "insert into parent(name,password,telephone,reg_date,come_form) values(?,?,?,?,?)"
+			lessgo.Log.Debug(insertParentSql)
+			stmt, err := tx.Prepare(insertParentSql)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			newParentName := child+"家长"
+			if contactsName!= ""{
+				newParentName = contactsName
+			}
+
+			res, err := stmt.Exec(newParentName,"123456",phone,time.Now().Format("20060102150405"),2)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			newParentId, err := res.LastInsertId()
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			insertChildSql := "insert into child(name,pid,sex,birthday,center_id) values(?,?,?,?,?)"
+			lessgo.Log.Debug(insertChildSql)
+
+			stmt, err = tx.Prepare(insertChildSql)
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			childBirthday := "20090101"
+			if birthday!= ""{
+				childBirthday = birthday
+			}else{
+				if year!= "" && month!= ""{
+					childBirthday = year+month+"01"
+				}else if year!= ""{
+					childBirthday = year+"0101"
+				}
+			}
+
+			_, err = stmt.Exec(child,newParentId,1,childBirthday,center_id)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			updateConsumerSql := "update consumer_new set parent_id=? where id=? "
+			lessgo.Log.Debug(updateConsumerSql)
+
+			stmt, err = tx.Prepare(updateConsumerSql)
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(newParentId,consumerId)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
 				commonlib.OutputJson(w, m, " ")
 				return
 			}

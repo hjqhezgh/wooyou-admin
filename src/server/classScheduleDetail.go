@@ -290,6 +290,228 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.OutputJson(w, m, "")
 }
 
+func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	date := r.FormValue("date")
+	centerId := r.FormValue("centerId")
+	dateType := r.FormValue("type")
+
+	searchDate := time.Now()
+
+	if date != "" {
+		searchDate, _ = time.ParseInLocation("20060102150405", date, time.Local)
+	}
+
+	if dateType== "pre" {
+		searchDate = searchDate.Add(time.Duration(-7*24)*time.Hour)
+	}else if dateType== "next" {
+		searchDate = searchDate.Add(time.Duration(7*24)*time.Hour)
+	}
+
+	week := 0
+
+	if searchDate.Weekday() == time.Monday {
+		week = 1
+	} else if searchDate.Weekday() == time.Tuesday {
+		week = 2
+	} else if searchDate.Weekday() == time.Wednesday {
+		week = 3
+	} else if searchDate.Weekday() == time.Thursday {
+		week = 4
+	} else if searchDate.Weekday() == time.Friday {
+		week = 5
+	} else if searchDate.Weekday() == time.Saturday {
+		week = 6
+	} else if searchDate.Weekday() == time.Sunday {
+		week = 7
+	}
+
+	monday := searchDate.Add(-1 * time.Duration(week-1) * 24 * time.Hour)
+	sunday := searchDate.Add(time.Duration(7-week) * 24 * time.Hour)
+	st := monday.Format("20060102") + "000000"
+	et := sunday.Format("20060102") + "235959"
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+	rooms := []RoomOrTime{}
+	times := []RoomOrTime{}
+	weekdates := []Weekdate{}
+	schedules := []Schedule{}
+
+	getRoomInfoSql := "select rid,name from room where cid=? "
+	lessgo.Log.Debug(getRoomInfoSql)
+
+	rows, err := db.Query(getRoomInfoSql, centerId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	for rows.Next() {
+		room := RoomOrTime{}
+		err = commonlib.PutRecord(rows,&room.Id, &room.Name)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		rooms = append(rooms, room)
+	}
+
+	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by lesson_no"
+	lessgo.Log.Debug(getRoomInfoSql)
+
+	rows, err = db.Query(getTimeSql, centerId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	for rows.Next() {
+		timeObject := RoomOrTime{}
+		startTime := ""
+		endTime := ""
+		err = commonlib.PutRecord(rows,&timeObject.Id, &startTime, &endTime)
+		timeObject.Name = startTime + "~" + endTime
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		times = append(times, timeObject)
+	}
+
+	for i := 0; i < 7; i++ {
+		var weekdate = Weekdate{}
+		if i == 0 {
+			weekdate.Week = "星期一"
+		} else if i == 1 {
+			weekdate.Week = "星期二"
+		} else if i == 2 {
+			weekdate.Week = "星期三"
+		} else if i == 3 {
+			weekdate.Week = "星期四"
+		} else if i == 4 {
+			weekdate.Week = "星期五"
+		} else if i == 5 {
+			weekdate.Week = "星期六"
+		} else if i == 6 {
+			weekdate.Week = "星期日"
+		}
+
+		theday := monday.Add(time.Duration(i*24) * time.Hour)
+		weekdate.Date = theday.Format("2006-01-02")
+
+		weekdates = append(weekdates, weekdate)
+	}
+
+	getScheduleInfoSql := "select csd.id,csd.room_id,csd.time_id,csd.course_id,teacher.really_name teaName,assistant.really_name assName,personNum.num perNum,signNum.num sigNum,wc.name,cour.name,csd.week,csd.class_id,csd.center_id,wc.code from class_schedule_detail csd "
+	getScheduleInfoSql += " left join employee teacher on teacher.user_id=csd.teacher_id  "
+	getScheduleInfoSql += " left join employee assistant on assistant.user_id=csd.assistant_id "
+	getScheduleInfoSql += " left join (select count(1) num,schedule_detail_id from schedule_detail_child group by schedule_detail_id) personNum on personNum.schedule_detail_id = csd.id "
+	getScheduleInfoSql += " left join time_section ts on ts.id=csd.time_id "
+	getScheduleInfoSql += " left join (select count(1) num,schedule_detail_id from sign_in group by schedule_detail_id) signNum on signNum.schedule_detail_id = csd.id "
+	getScheduleInfoSql += " left join wyclass wc on wc.class_id=csd.class_id "
+	getScheduleInfoSql += " left join course cour on cour.cid=csd.course_id "
+	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=? and csd.course_id is null"
+	lessgo.Log.Debug(getScheduleInfoSql)
+
+	rows, err = db.Query(getScheduleInfoSql,st,et,centerId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	for rows.Next() {
+		schedule := Schedule{}
+		courseId := 0
+		className := ""
+		courseName := ""
+
+		err = commonlib.PutRecord(rows,&schedule.Id, &schedule.RoomId, &schedule.TimeId,&courseId,&schedule.Teacher,&schedule.Assistant,&schedule.PersonNum,&schedule.SignNum,&className,&courseName,&schedule.Week,&schedule.ClassId,&schedule.CenterId,&schedule.Code)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		if courseId!=0 {
+			schedule.IsNormal = 1
+			schedule.Name = courseName
+		}else{
+			schedule.IsNormal = 2
+			schedule.Name = className
+		}
+
+
+		schedules = append(schedules, schedule)
+	}
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "成功"
+	m["times"] = times
+	m["rooms"] = rooms
+	m["weekdates"] = weekdates
+	m["schedules"] = schedules
+	m["firstDayOfWeek"] = st
+
+	commonlib.OutputJson(w, m, "")
+}
+
 func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})

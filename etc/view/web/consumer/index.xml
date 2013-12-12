@@ -6,7 +6,7 @@
         <crumb text="客户管理" currentPage="true"/>
     </crumbs>
 
-    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="400" loadUrl="false" mutiSelect="true" actionWidth="400">
+    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="400" loadUrl="false" mutiSelect="true">
 
         <search field="centerId" searchType="eq" inputType="remoteSelect" desc="客户所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
         <search field="cid" searchType="eq" inputType="remoteSelect" desc="TMK所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
@@ -25,7 +25,7 @@
         <toolaction desc="缴定金" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴定金吗？" colorClass="h-bg-green" params="{status:'1'}"/>
         <toolaction desc="缴全额" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴全额吗？" colorClass="h-bg-green" params="{status:'2'}"/>
 
-        <column field="centerName" desc="所属门店" width="600"/>
+        <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="TMK"/>
         <column field="contactName" desc="联系人"/>
         <column field="contactPhone" desc="联系电话"/>

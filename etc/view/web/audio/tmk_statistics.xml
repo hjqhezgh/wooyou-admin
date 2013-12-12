@@ -27,7 +27,7 @@
         <column field="signNum" desc="签到数"/>
         <column field="djPayNum" desc="已缴定金数"/>
         <column field="qePayNum" desc="已缴全额数"/>
-        <column field="qePayNum" desc="邀约率（邀约数/电话数）">
+        <column field="qePayNum" desc="邀约率（邀约数/电话数）" hidden="true">
             <formatter>
                 <![CDATA[
                     var phoneNum = rowObject[1];

@@ -1,66 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <customgridpanel url="/web/wyclass/wyclass_free.json" pageSize="15" title="免费课管理" id="grid1" width="1200" height="350" loadUrl="true">
+    <blankpanel>
+        <content>
+            <![CDATA[
+    <div class="block gridpanel" id="gridpanel5425" style="width: 100%;">
+        <h4 class="title">
+            <i class="icon-table"></i>快速排课
+                    <span class="iconright">
+                        <!--点击收起的时候用这个<i class="icon-plus-sign"></i>-->
+                        <i class="icon-minus-sign"></i>
+                    </span>
+        </h4>
 
-        <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间" char14="true" />
-        <search field="endTime" searchType="le" inputType="datetime" desc="结束时间" char14="true" />
+        <div class="cont schedule">
+            <div class="input-box text-center">
 
-        <column field="centerName" desc="所属中心"/>
-        <column field="couseCode" desc="课程代码"/>
-        <column field="className" desc="课程名"/>
-        <column field="start_time" desc="上课时间">
-            <formatter>
-                <![CDATA[
-                        if(cellvalue) {
-                            return cellvalue.formatChar14Time();
-                        }else{
-                            return "";
-                        }
-                ]]>
-            </formatter>
-        </column>
-        <column field="totalNum" desc="邀约人数"/>
-        <column field="signInNum" desc="签到人数"/>
-        <column field="centerId" desc="中心id" hidden="true"/>
+                <form class="form-inline">
 
-        <action desc="分配学员" url="/web/wyclass/manageChild" actionParams="[{name:'classId',value:'id'},{name:'centerId-eq',value:'6'}]" linkType="iframeWindow"/>
-        <action desc="快速排班" url="/web/wyclass/addChildQuick.json" linkType="ajax" confirmMsg="" actionParams="[{name:'ids',value:'id'}]"/>
-        <!--
-        <column field="name" desc="班级名"/>
-        <column field="center.name" desc="所属中心"/>
-        <column field="course.name" desc="课程名"/>
-        <column field="end_time" desc="计划结束日期">
-            <formatter>
-                <![CDATA[
-                        if(cellvalue) {
-                            return cellvalue.formatChar14Time();
-                        }else{
-                            return "";
-                        }
-                ]]>
-            </formatter>
-        </column>
-        <column field="deadline" desc="报名截止日期">
-            <formatter>
-                <![CDATA[
-                        if(cellvalue) {
-                            return cellvalue.formatChar14Time();
-                        }else{
-                            return "";
-                        }
-                ]]>
-            </formatter>
-        </column>
-        <column field="max_child_num" desc="能容纳的小孩子数"/>
-        <column field="b.really_name" desc="老师"/>
-        <column field="a.really_name" desc="助手"/>
-        <column field="centerid" hidden="true" desc="班级名"/>
+                    <div class="inline form-field" field-desc="日期" field-name="start_time" field-searchtype="eq" field-inputtype="date" field-localdata="" field-url="" field-valuefield="" field-descfield="" field-char14="" field-char8="" field-parentselect="">
+                    日期：<input name="start_time" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="eq" />
+                    <input name="firstDayOfWeek" type="hidden"/>
+                    <input name="centerId" type="hidden"/>
+                    <input name="consumerId" type="hidden"/>
+                    </div>
 
-        <toolaction desc="添加" url="/web/wyclass/add" colorClass="h-bg-green" linkType="iframeWindow"/>
-        <action desc="修改" url="/web/wyclass/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
-        <action desc="分配小朋友" url="/web/wyclass/manageChild" actionParams="[{name:'id',value:'id'},{name:'center_id-eq',value:'8'}]" linkType="iframeWindow"/>
-        -->
-    </customgridpanel>
+                    <div class="inline">
+                        <a href="javascript:void(0)" data-action="search" class="btn btn-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">搜索</span></a>
+                        <a href="javascript:void(0)" data-action="reset" class="btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">重置</span></a>
+                    </div>
+                </form>
+
+                <div class="btn-box">
+                    <a href="#" class="h-bg-green" data-action="preWeek">上一周</a>
+                    <a href="#" class="h-bg-green" data-action="nextWeek">下一周</a>
+                </div><!--E btn-box-->
+
+                <div class="table-box">
+                    <div class="fakeContainer">
+                        <table border="1" id="schedule" width="100%" border="0" cellpadding="0" cellspacing="0">
+
+                        </table>
+                    </div>
+                </div><!--E table-box-->
+            </div>
+        </div><!--E cont-->
+    </div>
+
+    <script type="text/javascript">
+            seajs.use(['/js/quick_schedule.js']);
+    </script>
+]]>
+        </content>
+    </blankpanel>
 
 </viewport>

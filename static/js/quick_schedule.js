@@ -6,12 +6,18 @@ define(function (require, exports, module) {
     require('lessgo-window');
     require('juicer');
 
-    var dataUrl = '/web/class_schedule_detail/data.json';
+    var dataUrl = '/web/class_schedule_detail/quick_data.json';
 
     var container = $('.fakeContainer');
 
     var process = {
         init : function(){
+            var paramsMap = getParamsMap();
+            var centerId = paramsMap["cid-eq"];
+            var consumerId = paramsMap["consumerId"];
+            $('[name=centerId]').val(centerId);
+            $('[name=consumerId]').val(consumerId);
+
             process.render();
 
             $('input[name=start_time]').zIndex(10);
@@ -27,6 +33,7 @@ define(function (require, exports, module) {
             var allDataTable = $('#schedule');
             $.get(dataUrl,{
                 "date" :  $('[name=firstDayOfWeek]').val(),
+                "centerId" :  $('[name=centerId]').val(),
                 "type" : type
             },function(data){
                 if(data.success){
@@ -100,12 +107,12 @@ define(function (require, exports, module) {
                         allDataTable.find('div:last').append('<p style="color:red;">'+schedule.name+'</p>');
                     }
                     allDataTable.find('div:last').append('<p>人数：'+schedule.signNum+"/"+schedule.personNum+'</p>');
-                    allDataTable.find('div:last').append('<p><a href="/web/wyclass/manageChild?classId='+schedule.classId+'&centerId-eq='+schedule.centerId+'&scheduleId='+schedule.id+'" data-action="openIframeWindow">分配学生</a></p>');
-                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-action="deleteTmpSchedule">删</a>&nbsp;<a href="/web/class_schedule_detail/modify_tmp?scheduleId='+schedule.id+'" data-value="'+schedule.id+'" data-action="openIframeWindow">改</a></p>');
+                    allDataTable.find('div:last').append('<p><a href="/web/wyclass/manageChild?classId='+schedule.classId+'&centerId-eq='+schedule.centerId+'&scheduleId='+schedule.id+'" data-action="openIframeWindow">学生管理</a></p>');
+                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-class-value="'+schedule.classId+'"data-action="quickAdd">加入</a></p>');
                     allDataTable.find('div:last').append('<p></p>');
                 }
             }else{
-                var emptyTdTmp = '<td><div class="schedule-detail"><p><a href="/web/class_schedule_detail/add_normal?roomId=${roomId}&timeId=${timeId}&week=${week}&date=${date}" data-action="openIframeWindow">常</a><br/><a href="/web/class_schedule_detail/add_tmp?roomId=${roomId}&timeId=${timeId}&week=${week}&date=${date}" data-action="openIframeWindow">临</a></p></div></td>'
+                var emptyTdTmp = '<td><div class="schedule-detail"><p>无</p></div></td>'
 
                 allDataTable.find('tr:last').append(juicer(emptyTdTmp,{
                     roomId: roomId,
@@ -142,20 +149,6 @@ define(function (require, exports, module) {
                 $('input[name=start_time]').val('')
             });
 
-            $('a[data-action=createWeekSchedule]').click(function(e){
-                e.preventDefault();
-
-                $.post('/web/class_schedule_detail/createWeekSchedule.json',{
-                    firstDayOfWeek : $('[name=firstDayOfWeek]').val()
-                },function(data){
-                    if(data.success){
-                        process.render();
-                    }else{
-                        alert(data.msg);
-                    }
-                },'json');
-            });
-
             $(document).on('click','a[data-action=openIframeWindow]',function(e){
                 e.preventDefault();
 
@@ -168,20 +161,23 @@ define(function (require, exports, module) {
                 },e);
             });
 
-            $(document).on('click','a[data-action=deleteTmpSchedule]',function(e){
+            $(document).on('click','a[data-action=quickAdd]',function(e){
                 e.preventDefault();
 
                 var sid = $(this).attr('data-value');
+                var classId = $(this).attr('data-class-value');
 
-                if(confirm("确认删除此课表吗?")){
-                    $.post('/web/schedule_detail/deleteSingle.json',{scheduleId:sid},function(data){
-                        if(data.success){
-                            process.render();
-                        }else{
-                            alert(data.msg);
-                        }
-                    },'json');
-                }
+                $.post('/web/wyclass/addChildQuick.json',{
+                    scheduleId:sid,
+                    classId:classId,
+                    consumerId:$('[name=consumerId]').val()
+                },function(data){
+                    if(data.success){
+                        process.render();
+                    }else{
+                        alert(data.msg);
+                    }
+                },'json');
             });
         }
     }
@@ -190,3 +186,22 @@ define(function (require, exports, module) {
 
     window.process = process;
 });
+
+function getParamsMap() {
+    var map = {}
+    if (document.URL.indexOf('?') > -1) {
+        var paramsStr = document.URL.substring(document.URL.indexOf('?') + 1);
+        var paramsArr = paramsStr.split('&');
+        for (var index in paramsArr) {
+            var param = paramsArr[index].split('=');
+            var key = param[0];
+            var value = param[1];
+            var urlParamValue = map[key];
+            if (urlParamValue == null) {
+                urlParamValue = value;
+                map[key] = urlParamValue;
+            }
+        }
+    }
+    return map;
+}

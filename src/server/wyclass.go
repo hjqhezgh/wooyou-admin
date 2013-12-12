@@ -1580,6 +1580,474 @@ func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+//从班级中移除
+func RemoveChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	scheduleId := r.FormValue("scheduleId")
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids, ",") {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该操作只能操作一个学生"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkExistSql := "select count(1) from sign_in where child_id=? and schedule_detail_id=?"
+
+	lessgo.Log.Debug(checkExistSql)
+
+	rows, err := db.Query(checkExistSql, ids,scheduleId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	num := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &num)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if num > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "已签到的人员不能移除"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	deteleSql := "delete from schedule_detail_child where child_id=? and schedule_detail_id=?"
+
+	lessgo.Log.Debug(deteleSql)
+
+	stmt, err := tx.Prepare(deteleSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(ids,scheduleId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+func RemoveChildForNormalAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	scheduleId := r.FormValue("scheduleId")
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids, ",") {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该操作只能操作一个学生"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkExistSql := "select count(1) from sign_in where child_id=? and schedule_detail_id=?"
+
+	lessgo.Log.Debug(checkExistSql)
+
+	rows, err := db.Query(checkExistSql, ids,scheduleId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	num := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &num)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if num > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "已签到的人员不能移除"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	deteleSql := "delete from schedule_detail_child where child_id=? and schedule_detail_id=?"
+
+	lessgo.Log.Debug(deteleSql)
+
+	stmt, err := tx.Prepare(deteleSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(ids,scheduleId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	getTmpIdSql := "select st.id from class_schedule_detail csd left join schedule_template st on csd.center_id=st.center_id and csd.week=st.week and csd.room_id=st.room_id and csd.time_id=st.time_id where csd.id=?"
+	lessgo.Log.Debug(getTmpIdSql)
+
+	rows, err = db.Query(getTmpIdSql, scheduleId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tmpId := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &tmpId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if tmpId!= 0 {
+		deleteTmpChildSql := "delete from schedule_template_child where schedule_template_id=? and child_id=? "
+		lessgo.Log.Debug(deleteTmpChildSql)
+
+		stmt, err = tx.Prepare(deleteTmpChildSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(tmpId,ids)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+func LeaveForChildAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	scheduleId := r.FormValue("scheduleId")
+	ids := r.FormValue("ids")
+
+	if strings.Contains(ids, ",") {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该操作只能操作一个学生"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	checkExistSql := "select count(1) from sign_in where child_id=? and schedule_detail_id=?"
+
+	lessgo.Log.Debug(checkExistSql)
+
+	rows, err := db.Query(checkExistSql, ids,scheduleId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	num := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &num)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if num > 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "已签到的学生不能请假"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	getContractId := "select contract_id from schedule_detail_child where child_id=? and schedule_detail_id=? "
+	lessgo.Log.Debug(checkExistSql)
+
+	rows, err = db.Query(getContractId, ids,scheduleId)
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	contractId := ""
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &contractId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if contractId==""{
+		contractId = "0"
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	insertSql := "insert into sign_in(child_id,sign_time,schedule_detail_id,type,contract_id,employee_id) values(?,?,?,?,?,?)"
+
+	lessgo.Log.Debug(insertSql)
+
+	stmt, err := tx.Prepare(insertSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(ids,time.Now().Format("20060102150405"),scheduleId,2,contractId,employee.UserId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
 //报班
 func AddChildToClassAction(w http.ResponseWriter, r *http.Request) {
 
@@ -1835,24 +2303,44 @@ func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	consumerId := r.FormValue("consumerId")
-	ids := r.FormValue("ids")
-
-	if strings.Contains(ids, ",") {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "只能选择一个班级"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
+	scheduleId := r.FormValue("scheduleId")
+	classId := r.FormValue("classId")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
 	tx, err := db.Begin()
 
-	checkExistSql := "select count(1) from wyclass_free_child where consumer_id=? and wyclass_id=? "
+	getChildIdSql := "select ch.cid from consumer_new cons left join parent p on p.pid=cons.parent_id left join child ch on ch.pid=p.pid where cons.id=?"
+	lessgo.Log.Debug(getChildIdSql)
 
-	rows, err := db.Query(checkExistSql, consumerId, ids)
+	childId := 0
+
+	rows, err := db.Query(getChildIdSql, consumerId)
+	if rows.Next() {
+		err := rows.Scan(&childId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if childId == 0 {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "该客户没有关联小朋友无法排课"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	checkExistSql := "select count(1) from schedule_detail_child where child_id=? and schedule_detail_id=? "
+
+	rows, err = db.Query(checkExistSql, childId, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1886,7 +2374,7 @@ func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertToClassSql := "insert into wyclass_free_child(create_time,create_user,consumer_id,wyclass_id) values(?,?,?,?) "
+	insertToClassSql := "insert into schedule_detail_child(schedule_detail_id,child_id,create_time,create_user,sms_status,wyclass_id) values(?,?,?,?,?,?) "
 	lessgo.Log.Debug(insertToClassSql)
 	stmt, err := tx.Prepare(insertToClassSql)
 
@@ -1900,7 +2388,7 @@ func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(time.Now().Format("20060102150405"), employee.UserId, consumerId, ids)
+	_, err = stmt.Exec(scheduleId,childId,time.Now().Format("20060102150405"), employee.UserId, 1, classId)
 
 	if err != nil {
 		tx.Rollback()
