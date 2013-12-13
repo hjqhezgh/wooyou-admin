@@ -278,7 +278,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(smsStatus, classId, consumerIdList[index],scheduleId)
+			_, err = stmt.Exec(smsStatus, classId, consumerIdList[index], scheduleId)
 			if err != nil {
 				tx.Rollback()
 				lessgo.Log.Warn(err.Error())

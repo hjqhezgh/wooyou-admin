@@ -65,12 +65,13 @@
 
     <customgridpanel url="/contacts/page" pageSize="15" title="联系人列表" id="grid1" height="50" loadUrl="true" mutiSelect="true">
         <toolaction desc="添加" url="/web/contacts/add" colorClass="h-bg-green" linkType="iframeWindow"/>
-        <toolaction desc="删除" url="/contacts/delete.json" colorClass="h-bg-green" linkType="mutiSelect" confirmMsg="确认删除联系人吗？"/>
+        <toolaction desc="删除" url="/contacts/delete.json" colorClass="h-bg-green" linkType="ajax" confirmMsg="确认删除联系人吗？" actionParams="[{name:'id',value:'id'}]"/>
 
         <column field="name" desc="名字"/>
         <column field="telephone" desc="联系电话"/>
         <column field="是否默认联系人" hidden="true" />
         <action desc="修改" url="/web/contacts/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="删除" url="/contacts/delete.json" linkType="ajax" confirmMsg="确认删除联系人吗？" actionParams="[{name:'id',value:'id'}]"/>
     </customgridpanel>
 
 

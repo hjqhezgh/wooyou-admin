@@ -1142,7 +1142,7 @@ func ChildSignInAction(w http.ResponseWriter, r *http.Request) {
 
 		lessgo.Log.Debug(checkExistSql)
 
-		rows, err := db.Query(checkExistSql, id, classId,scheduleId)
+		rows, err := db.Query(checkExistSql, id, classId, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -1189,7 +1189,7 @@ func ChildSignInAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = insertWFSStmt.Exec(id, time.Now().Format("20060102150405"), classId, employee.UserId,scheduleId,1)
+		_, err = insertWFSStmt.Exec(id, time.Now().Format("20060102150405"), classId, employee.UserId, scheduleId, 1)
 		if err != nil {
 			tx.Rollback()
 
@@ -1238,7 +1238,7 @@ func ChildSignInAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if consumerId!=0 {
+		if consumerId != 0 {
 			updateConsuemrStatusSql := "update consumer_new set contact_status=?,sign_in_time=? where id=? "
 
 			lessgo.Log.Debug(updateConsuemrStatusSql)
@@ -1295,6 +1295,226 @@ func ChildSignInAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+	}
+
+	tx.Commit()
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+func ChildSignInWithoutAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行签到"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	ids := r.FormValue("ids")
+
+	idList := strings.Split(ids, ",")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	for _, id := range idList {
+
+		getChildIdSql := "select ch.cid from consumer_new cons left join parent p on p.pid=cons.parent_id left join child ch on ch.pid=p.pid where cons.id=?"
+		lessgo.Log.Debug(getChildIdSql)
+
+		rows, err := db.Query(getChildIdSql, id)
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		chilId := 0;
+		if rows.Next() {
+
+			err = commonlib.PutRecord(rows, &chilId)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if chilId==0{
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "该客户无小孩子关联，无法无班签到"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		checkExistSql := "select count(1) from sign_in where child_id=? and wyclass_id is null and schedule_detail_id is null "
+
+		lessgo.Log.Debug(checkExistSql)
+
+		rows, err = db.Query(checkExistSql, chilId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		num := 0
+
+		if rows.Next() {
+
+			err = commonlib.PutRecord(rows, &num)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if num > 0 {
+			continue
+		}
+
+		insertWFSSql := "insert into sign_in(child_id,sign_time,employee_id,type) values(?,?,?,?)"
+
+		lessgo.Log.Debug(insertWFSSql)
+
+		insertWFSStmt, err := tx.Prepare(insertWFSSql)
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = insertWFSStmt.Exec(chilId, time.Now().Format("20060102150405"), employee.UserId, 1)
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		updateConsuemrStatusSql := "update consumer_new set contact_status=?,sign_in_time=? where id=? "
+
+		lessgo.Log.Debug(updateConsuemrStatusSql)
+
+		updateConsuemrStatusStmt, err := tx.Prepare(updateConsuemrStatusSql)
+
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = updateConsuemrStatusStmt.Exec(CONSUMER_STATUS_SIGNIN, time.Now().Format("20060102150405"), id)
+		if err != nil {
+			tx.Rollback()
+
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		insertLogSql := "insert into consumer_status_log(consumer_id,employee_id,create_time,old_status,new_status) values(?,?,?,?,?)"
+
+		stmt, err := tx.Prepare(insertLogSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(id, employee.UserId, time.Now().Format("20060102150405"), CONSUMER_STATUS_NO_CONTACT, CONSUMER_STATUS_SIGNIN)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
 
 	}
 
@@ -1366,7 +1586,7 @@ func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
 
 	lessgo.Log.Debug(checkExistSql)
 
-	rows, err := db.Query(checkExistSql, ids, classId,scheduleId)
+	rows, err := db.Query(checkExistSql, ids, classId, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1406,7 +1626,7 @@ func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
 
 		lessgo.Log.Debug(selectInviteTmk)
 
-		rows, err = db.Query(selectInviteTmk, ids, classId,scheduleId)
+		rows, err = db.Query(selectInviteTmk, ids, classId, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -1468,7 +1688,7 @@ func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(ids, classId,scheduleId)
+	_, err = stmt.Exec(ids, classId, scheduleId)
 
 	if err != nil {
 		tx.Rollback()
@@ -1517,7 +1737,7 @@ func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if consumerId!= 0 {
+	if consumerId != 0 {
 		updateConsumerSql := "update consumer_new set contact_status=? where id=? "
 		lessgo.Log.Debug(updateConsumerSql)
 		stmt, err = tx.Prepare(updateConsumerSql)
@@ -1624,7 +1844,7 @@ func RemoveChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
 
 	lessgo.Log.Debug(checkExistSql)
 
-	rows, err := db.Query(checkExistSql, ids,scheduleId)
+	rows, err := db.Query(checkExistSql, ids, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1685,7 +1905,7 @@ func RemoveChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(ids,scheduleId)
+	_, err = stmt.Exec(ids, scheduleId)
 
 	if err != nil {
 		tx.Rollback()
@@ -1749,7 +1969,7 @@ func RemoveChildForNormalAction(w http.ResponseWriter, r *http.Request) {
 
 	lessgo.Log.Debug(checkExistSql)
 
-	rows, err := db.Query(checkExistSql, ids,scheduleId)
+	rows, err := db.Query(checkExistSql, ids, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1810,7 +2030,7 @@ func RemoveChildForNormalAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(ids,scheduleId)
+	_, err = stmt.Exec(ids, scheduleId)
 
 	if err != nil {
 		tx.Rollback()
@@ -1852,7 +2072,7 @@ func RemoveChildForNormalAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if tmpId!= 0 {
+	if tmpId != 0 {
 		deleteTmpChildSql := "delete from schedule_template_child where schedule_template_id=? and child_id=? "
 		lessgo.Log.Debug(deleteTmpChildSql)
 
@@ -1868,7 +2088,7 @@ func RemoveChildForNormalAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(tmpId,ids)
+		_, err = stmt.Exec(tmpId, ids)
 
 		if err != nil {
 			tx.Rollback()
@@ -1933,7 +2153,7 @@ func LeaveForChildAction(w http.ResponseWriter, r *http.Request) {
 
 	lessgo.Log.Debug(checkExistSql)
 
-	rows, err := db.Query(checkExistSql, ids,scheduleId)
+	rows, err := db.Query(checkExistSql, ids, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1971,7 +2191,7 @@ func LeaveForChildAction(w http.ResponseWriter, r *http.Request) {
 	getContractId := "select contract_id from schedule_detail_child where child_id=? and schedule_detail_id=? "
 	lessgo.Log.Debug(checkExistSql)
 
-	rows, err = db.Query(getContractId, ids,scheduleId)
+	rows, err = db.Query(getContractId, ids, scheduleId)
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
 		m["success"] = false
@@ -1997,7 +2217,7 @@ func LeaveForChildAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if contractId==""{
+	if contractId == "" {
 		contractId = "0"
 	}
 
@@ -2027,7 +2247,7 @@ func LeaveForChildAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(ids,time.Now().Format("20060102150405"),scheduleId,2,contractId,employee.UserId)
+	_, err = stmt.Exec(ids, time.Now().Format("20060102150405"), scheduleId, 2, contractId, employee.UserId)
 
 	if err != nil {
 		tx.Rollback()
@@ -2089,7 +2309,7 @@ func AddChildToClassAction(w http.ResponseWriter, r *http.Request) {
 
 		checkExistSql := "select count(1) from schedule_detail_child where child_id=? and wyclass_id=? and schedule_detail_id=? "
 
-		rows, err := db.Query(checkExistSql, id, classId,scheduleId)
+		rows, err := db.Query(checkExistSql, id, classId, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -2133,7 +2353,7 @@ func AddChildToClassAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(scheduleId,id,time.Now().Format("20060102150405"), employee.UserId, 1, classId)
+		_, err = stmt.Exec(scheduleId, id, time.Now().Format("20060102150405"), employee.UserId, 1, classId)
 
 		if err != nil {
 			tx.Rollback()
@@ -2182,7 +2402,7 @@ func AddChildToClassAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if consumerId!=0 {
+		if consumerId != 0 {
 			selectContatusSql := "select contact_status from consumer_new where id=? "
 			lessgo.Log.Debug(selectContatusSql)
 
@@ -2388,7 +2608,7 @@ func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(scheduleId,childId,time.Now().Format("20060102150405"), employee.UserId, 1, classId)
+	_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employee.UserId, 1, classId)
 
 	if err != nil {
 		tx.Rollback()
@@ -2703,7 +2923,7 @@ func AddChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
 
 		checkExistSql := "select count(1) from schedule_detail_child where child_id=? and  schedule_detail_id=? "
 
-		rows, err := db.Query(checkExistSql, id,scheduleId)
+		rows, err := db.Query(checkExistSql, id, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -2747,7 +2967,7 @@ func AddChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(scheduleId,id,time.Now().Format("20060102150405"), employee.UserId)
+		_, err = stmt.Exec(scheduleId, id, time.Now().Format("20060102150405"), employee.UserId)
 
 		if err != nil {
 			tx.Rollback()
@@ -2812,7 +3032,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 	scheduleTempId := 0
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows,&scheduleTempId)
+		err := commonlib.PutRecord(rows, &scheduleTempId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -2824,7 +3044,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if scheduleTempId==0 {
+	if scheduleTempId == 0 {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "该课表不是模板课表，无法跟班"
@@ -2836,7 +3056,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 
 		checkExistSql := "select count(1) from schedule_detail_child where child_id=? and  schedule_detail_id=? "
 		lessgo.Log.Debug(checkExistSql)
-		rows, err = db.Query(checkExistSql, id,scheduleId)
+		rows, err = db.Query(checkExistSql, id, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -2877,7 +3097,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(scheduleId,id,time.Now().Format("20060102150405"), employee.UserId)
+			_, err = stmt.Exec(scheduleId, id, time.Now().Format("20060102150405"), employee.UserId)
 
 			if err != nil {
 				tx.Rollback()
@@ -2892,7 +3112,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 
 		checkTempExistSql := "select count(1) from schedule_template_child where child_id=? and  schedule_template_id=? "
 		lessgo.Log.Debug(checkTempExistSql)
-		rows, err = db.Query(checkTempExistSql, id,scheduleTempId)
+		rows, err = db.Query(checkTempExistSql, id, scheduleTempId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -2937,7 +3157,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(scheduleTempId,id)
+		_, err = stmt.Exec(scheduleTempId, id)
 
 		if err != nil {
 			tx.Rollback()

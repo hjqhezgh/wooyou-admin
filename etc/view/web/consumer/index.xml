@@ -22,8 +22,9 @@
 
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
-        <toolaction desc="缴定金" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴定金吗？" colorClass="h-bg-green" params="{status:'1'}"/>
-        <toolaction desc="缴全额" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴全额吗？" colorClass="h-bg-green" params="{status:'2'}"/>
+        <toolaction desc="无班签到" url="/web/wyclass/signInWithoutClass.json" linkType="mutiSelect" confirmMsg="无班签到适合walk in等没有排课的情况，确认无班签到？" colorClass="h-bg-green" params="{}"/>
+        <toolaction desc="缴定金" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴定金吗(同时会为其签到)？" colorClass="h-bg-green" params="{status:'1'}"/>
+        <toolaction desc="缴全额" url="/web/consumer/consumerPay.json" linkType="mutiSelect" confirmMsg="确认为该用户缴全额吗(同时会为其签到)？" colorClass="h-bg-green" params="{status:'2'}"/>
 
         <column field="centerName" desc="所属门店"/>
         <column field="employeeName" desc="TMK"/>
@@ -48,7 +49,7 @@
             ]]>
         </formatter>
         </column>
-        <column field="isAPP" desc="是否APP用户">
+        <column field="isAPP" desc="是否APP用户" hidden="true">
             <formatter>
                 <![CDATA[
                     if(cellvalue){

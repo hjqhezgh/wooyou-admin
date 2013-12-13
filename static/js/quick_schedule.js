@@ -106,7 +106,8 @@ define(function (require, exports, module) {
                     }else{
                         allDataTable.find('div:last').append('<p style="color:red;">'+schedule.name+'</p>');
                     }
-                    allDataTable.find('div:last').append('<p>人数：'+schedule.signNum+"/"+schedule.personNum+'</p>');
+                    allDataTable.find('div:last').append('<p>当前人数：'+schedule.currentTMKPersonNum+"/"+schedule.personNum+'</p>');
+                    allDataTable.find('div:last').append('<p>签到人数：'+schedule.signNum+'</p>');
                     allDataTable.find('div:last').append('<p><a href="/web/wyclass/manageChild?classId='+schedule.classId+'&centerId-eq='+schedule.centerId+'&scheduleId='+schedule.id+'" data-action="openIframeWindow">学生管理</a></p>');
                     allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-class-value="'+schedule.classId+'"data-action="quickAdd">加入</a></p>');
                     allDataTable.find('div:last').append('<p></p>');

@@ -9,7 +9,7 @@
     <customgridpanel url="/consumer/tmkAllConsumer.json" pageSize="15" title="名单总库" id="grid1" pageId="grid1" width="1200" height="200" loadUrl="false" mutiSelect="true">
 
         <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
-        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'},{desc:'已签到',value:'5'}]"/>
+        <search field="status" searchType="eq" inputType="localSelect" desc="状态" localData="[{desc:'未联系',value:'1'},{desc:'待确认',value:'2'},{desc:'已废弃',value:'3'},{desc:'邀约至中心',value:'4'}]"/>
         <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="联系起始时间"/>
         <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="联系结束时间"/>
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
@@ -28,7 +28,7 @@
         </toolaction>
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
 
-        <column field="centerName" desc="所属门店"/>
+        <column field="centerName" desc="门店"/>
         <column field="lastTMK" desc="最后接触的TMK"/>
         <column field="contactName" desc="联系人"/>
         <column field="contactPhone" desc="联系电话"/>
@@ -103,7 +103,7 @@
             </callback>
         </toolaction>
 
-        <column field="centerName" desc="所属门店"/>
+        <column field="centerName" desc="门店"/>
         <column field="contactName" desc="联系人"/>
         <column field="contactPhone" desc="联系电话"/>
         <column field="homePhone" desc="家庭电话"/>

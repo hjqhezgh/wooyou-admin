@@ -71,7 +71,7 @@ on p.pid=ch.pid
 left join center ce
 on ce.cid=ch.center_id
 where ch.center_id=11
- */
+*/
 func ChildInCenterAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})

@@ -20,7 +20,6 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"strings"
 	"text/template"
 )
 
@@ -245,7 +244,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		selectOldPhonesql := "select phone contacts where id=? "
+		selectOldPhonesql := "select phone from contacts where id=? "
 
 		lessgo.Log.Debug(selectOldPhonesql)
 
@@ -255,6 +254,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(selectOldPhonesql, id)
 
 		if err != nil {
+			lessgo.Log.Error(err.Error())
 			m["success"] = false
 			m["code"] = 100
 			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -268,6 +268,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			err = commonlib.PutRecord(rows, &oldPhone)
 
 			if err != nil {
+				lessgo.Log.Error(err.Error())
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -284,6 +285,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			stmt, err := db.Prepare(updateSql)
 
 			if err != nil {
+				lessgo.Log.Error(err.Error())
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -294,6 +296,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			_, err = stmt.Exec(name, isDefault, id)
 
 			if err != nil {
+				lessgo.Log.Error(err.Error())
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -327,6 +330,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			stmt, err := db.Prepare(updateSql)
 
 			if err != nil {
+				lessgo.Log.Error(err.Error())
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -337,6 +341,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 			_, err = stmt.Exec(name, phone, isDefault, id)
 
 			if err != nil {
+				lessgo.Log.Error(err.Error())
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
@@ -375,7 +380,7 @@ func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ids := r.FormValue("ids")
+	id := r.FormValue("id")
 	consumerId := r.FormValue("consumerId")
 
 	db := lessgo.GetMySQL()
@@ -408,9 +413,7 @@ func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	idList := strings.Split(ids, ",")
-
-	if len(idList) == num {
+	if num==1 {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "请至少保留一个联系人"
@@ -431,29 +434,27 @@ func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
 
 	deleteSql := "delete from contacts where id=? "
 
-	for _, id := range idList {
-		stmt, err := tx.Prepare(deleteSql)
-		if err != nil {
-			tx.Rollback()
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
+	stmt, err := tx.Prepare(deleteSql)
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
 
-		_, err = stmt.Exec(id)
+	_, err = stmt.Exec(id)
 
-		if err != nil {
-			tx.Rollback()
-			lessgo.Log.Warn(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "系统发生错误，请联系IT部门"
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
 	}
 
 	tx.Commit()
@@ -526,10 +527,12 @@ func ContactsLoadAction(w http.ResponseWriter, r *http.Request) {
 	h1 := lessgo.LoadFormObject{"name", name}
 	h2 := lessgo.LoadFormObject{"phone", phone}
 	h3 := lessgo.LoadFormObject{"is_default", is_default}
+	h4 := lessgo.LoadFormObject{"id", id}
 
 	loadFormObjects = append(loadFormObjects, h1)
 	loadFormObjects = append(loadFormObjects, h2)
 	loadFormObjects = append(loadFormObjects, h3)
+	loadFormObjects = append(loadFormObjects, h4)
 
 	m["success"] = true
 	m["datas"] = loadFormObjects

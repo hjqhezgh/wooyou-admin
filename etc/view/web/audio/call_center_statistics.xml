@@ -12,14 +12,14 @@
         <search field="endTime" searchType="le" inputType="datetime" desc="结束时间"/>
 
         <column field="centerName" desc="所属中心"/>
-        <column field="totalNum" desc="名单总数（与时间无关）"/>
-        <column field="noContactNum" desc="未联系数（与时间无关）"/>
-        <column field="phoneNum" desc="电话数"/>
-        <column field="inviteNum" desc="邀约数"/>
-        <column field="signNum" desc="签到数"/>
-        <column field="djPayNum" desc="缴定金数"/>
-        <column field="qePayNum" desc="缴全额数"/>
-        <column field="qePayNum" desc="邀约率（邀约数/电话数）">
+        <column field="totalNum" desc="名单总数（与时间无关）" width="100"/>
+        <column field="noContactNum" desc="未联系数（与时间无关）" width="100"/>
+        <column field="phoneNum" desc="电话数" width="50"/>
+        <column field="inviteNum" desc="邀约数" width="50"/>
+        <column field="signNum" desc="签到数" width="50"/>
+        <column field="djPayNum" desc="缴定金数" width="50"/>
+        <column field="qePayNum" desc="缴全额数" width="50"/>
+        <column field="qePayNum" desc="邀约率（邀约数/电话数）" hidden="true">
             <formatter>
                 <![CDATA[
                     var phoneNum = rowObject[3];

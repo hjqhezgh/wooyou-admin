@@ -33,19 +33,20 @@ type Weekdate struct {
 }
 
 type Schedule struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	PersonNum int `json:"personNum"`
-	SignNum   int `json:"signNum"`
-	Teacher   string `json:"teacher"`
-	Assistant string `json:"assistant"`
-	IsNormal  int    `json:"isNormal"`
-	RoomId    int    `json:"roomId"`
-	TimeId    int    `json:"timeId"`
-	Week      int    `json:"week"`
-	ClassId   int    `json:"classId"`
-	CenterId  int    `json:"centerId"`
-	Code      string `json:"code"`
+	Id                  int    `json:"id"`
+	Name                string `json:"name"`
+	PersonNum           int    `json:"personNum"`
+	CurrentTMKPersonNum int    `json:"currentTMKPersonNum"`
+	SignNum             int    `json:"signNum"`
+	Teacher             string `json:"teacher"`
+	Assistant           string `json:"assistant"`
+	IsNormal            int    `json:"isNormal"`
+	RoomId              int    `json:"roomId"`
+	TimeId              int    `json:"timeId"`
+	Week                int    `json:"week"`
+	ClassId             int    `json:"classId"`
+	CenterId            int    `json:"centerId"`
+	Code                string `json:"code"`
 }
 
 /*
@@ -94,10 +95,10 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 		searchDate, _ = time.ParseInLocation("20060102150405", date, time.Local)
 	}
 
-	if dateType== "pre" {
-		searchDate = searchDate.Add(time.Duration(-7*24)*time.Hour)
-	}else if dateType== "next" {
-		searchDate = searchDate.Add(time.Duration(7*24)*time.Hour)
+	if dateType == "pre" {
+		searchDate = searchDate.Add(time.Duration(-7*24) * time.Hour)
+	} else if dateType == "next" {
+		searchDate = searchDate.Add(time.Duration(7*24) * time.Hour)
 	}
 
 	week := 0
@@ -156,7 +157,7 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		room := RoomOrTime{}
-		err = commonlib.PutRecord(rows,&room.Id, &room.Name)
+		err = commonlib.PutRecord(rows, &room.Id, &room.Name)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -188,7 +189,7 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 		timeObject := RoomOrTime{}
 		startTime := ""
 		endTime := ""
-		err = commonlib.PutRecord(rows,&timeObject.Id, &startTime, &endTime)
+		err = commonlib.PutRecord(rows, &timeObject.Id, &startTime, &endTime)
 		timeObject.Name = startTime + "~" + endTime
 
 		if err != nil {
@@ -238,7 +239,7 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=? "
 	lessgo.Log.Debug(getScheduleInfoSql)
 
-	rows, err = db.Query(getScheduleInfoSql,st,et,_employee.CenterId)
+	rows, err = db.Query(getScheduleInfoSql, st, et, _employee.CenterId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -255,7 +256,7 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 		className := ""
 		courseName := ""
 
-		err = commonlib.PutRecord(rows,&schedule.Id, &schedule.RoomId, &schedule.TimeId,&courseId,&schedule.Teacher,&schedule.Assistant,&schedule.PersonNum,&schedule.SignNum,&className,&courseName,&schedule.Week,&schedule.ClassId,&schedule.CenterId,&schedule.Code)
+		err = commonlib.PutRecord(rows, &schedule.Id, &schedule.RoomId, &schedule.TimeId, &courseId, &schedule.Teacher, &schedule.Assistant, &schedule.PersonNum, &schedule.SignNum, &className, &courseName, &schedule.Week, &schedule.ClassId, &schedule.CenterId, &schedule.Code)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -266,14 +267,13 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if courseId!=0 {
+		if courseId != 0 {
 			schedule.IsNormal = 1
 			schedule.Name = courseName
-		}else{
+		} else {
 			schedule.IsNormal = 2
 			schedule.Name = className
 		}
-
 
 		schedules = append(schedules, schedule)
 	}
@@ -326,10 +326,10 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 		searchDate, _ = time.ParseInLocation("20060102150405", date, time.Local)
 	}
 
-	if dateType== "pre" {
-		searchDate = searchDate.Add(time.Duration(-7*24)*time.Hour)
-	}else if dateType== "next" {
-		searchDate = searchDate.Add(time.Duration(7*24)*time.Hour)
+	if dateType == "pre" {
+		searchDate = searchDate.Add(time.Duration(-7*24) * time.Hour)
+	} else if dateType == "next" {
+		searchDate = searchDate.Add(time.Duration(7*24) * time.Hour)
 	}
 
 	week := 0
@@ -378,7 +378,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 
 	for rows.Next() {
 		room := RoomOrTime{}
-		err = commonlib.PutRecord(rows,&room.Id, &room.Name)
+		err = commonlib.PutRecord(rows, &room.Id, &room.Name)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -410,7 +410,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 		timeObject := RoomOrTime{}
 		startTime := ""
 		endTime := ""
-		err = commonlib.PutRecord(rows,&timeObject.Id, &startTime, &endTime)
+		err = commonlib.PutRecord(rows, &timeObject.Id, &startTime, &endTime)
 		timeObject.Name = startTime + "~" + endTime
 
 		if err != nil {
@@ -449,10 +449,11 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 		weekdates = append(weekdates, weekdate)
 	}
 
-	getScheduleInfoSql := "select csd.id,csd.room_id,csd.time_id,csd.course_id,teacher.really_name teaName,assistant.really_name assName,personNum.num perNum,signNum.num sigNum,wc.name,cour.name,csd.week,csd.class_id,csd.center_id,wc.code from class_schedule_detail csd "
+	getScheduleInfoSql := "select csd.id,csd.room_id,csd.time_id,csd.course_id,teacher.really_name teaName,assistant.really_name assName,personNum.num perNum,signNum.num sigNum,wc.name,cour.name,csd.week,csd.class_id,csd.center_id,wc.code,currTMKPersonNum.num from class_schedule_detail csd "
 	getScheduleInfoSql += " left join employee teacher on teacher.user_id=csd.teacher_id  "
 	getScheduleInfoSql += " left join employee assistant on assistant.user_id=csd.assistant_id "
 	getScheduleInfoSql += " left join (select count(1) num,schedule_detail_id from schedule_detail_child group by schedule_detail_id) personNum on personNum.schedule_detail_id = csd.id "
+	getScheduleInfoSql += " left join (select count(1) num,schedule_detail_id from schedule_detail_child where create_user=? group by schedule_detail_id) currTMKPersonNum on currTMKPersonNum.schedule_detail_id = csd.id "
 	getScheduleInfoSql += " left join time_section ts on ts.id=csd.time_id "
 	getScheduleInfoSql += " left join (select count(1) num,schedule_detail_id from sign_in group by schedule_detail_id) signNum on signNum.schedule_detail_id = csd.id "
 	getScheduleInfoSql += " left join wyclass wc on wc.class_id=csd.class_id "
@@ -460,7 +461,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=? and csd.course_id is null"
 	lessgo.Log.Debug(getScheduleInfoSql)
 
-	rows, err = db.Query(getScheduleInfoSql,st,et,centerId)
+	rows, err = db.Query(getScheduleInfoSql, employee.UserId,st, et, centerId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -477,7 +478,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 		className := ""
 		courseName := ""
 
-		err = commonlib.PutRecord(rows,&schedule.Id, &schedule.RoomId, &schedule.TimeId,&courseId,&schedule.Teacher,&schedule.Assistant,&schedule.PersonNum,&schedule.SignNum,&className,&courseName,&schedule.Week,&schedule.ClassId,&schedule.CenterId,&schedule.Code)
+		err = commonlib.PutRecord(rows, &schedule.Id, &schedule.RoomId, &schedule.TimeId, &courseId, &schedule.Teacher, &schedule.Assistant, &schedule.PersonNum, &schedule.SignNum, &className, &courseName, &schedule.Week, &schedule.ClassId, &schedule.CenterId, &schedule.Code,&schedule.CurrentTMKPersonNum)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -488,14 +489,13 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if courseId!=0 {
+		if courseId != 0 {
 			schedule.IsNormal = 1
 			schedule.Name = courseName
-		}else{
+		} else {
 			schedule.IsNormal = 2
 			schedule.Name = className
 		}
-
 
 		schedules = append(schedules, schedule)
 	}
@@ -561,7 +561,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	code := r.FormValue("code")
 
-	date = strings.Replace(date,"-","",-1)
+	date = strings.Replace(date, "-", "", -1)
 
 	timeSection, err := FindTimeSectionById(timeId)
 
@@ -606,7 +606,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(teacherId, assistantId, courseId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1,capacity)
+		_, err = stmt.Exec(teacherId, assistantId, courseId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1, capacity)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -621,7 +621,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 			selectTmpSql := "select id from schedule_template where center_id=? and room_id=? and time_id=? "
 			lessgo.Log.Debug(selectTmpSql)
 
-			rows, err := db.Query(selectTmpSql, _employee.CenterId,roomId,timeId)
+			rows, err := db.Query(selectTmpSql, _employee.CenterId, roomId, timeId)
 
 			scheduleTemplateId := 0
 
@@ -653,7 +653,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				_, err = stmt.Exec(_employee.CenterId,roomId,teacherId, assistantId, timeId, week,courseId)
+				_, err = stmt.Exec(_employee.CenterId, roomId, teacherId, assistantId, timeId, week, courseId)
 
 				if err != nil {
 					lessgo.Log.Warn(err.Error())
@@ -663,7 +663,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 					commonlib.OutputJson(w, m, " ")
 					return
 				}
-			}else{
+			} else {
 				updateScheduleTmpSql := "update schedule_template set teacher_id=?, assistant_id=?,course_id=? where id=? "
 				lessgo.Log.Debug(updateScheduleTmpSql)
 
@@ -676,7 +676,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 					commonlib.OutputJson(w, m, " ")
 					return
 				}
-				_, err = stmt.Exec(teacherId, assistantId,courseId, scheduleTemplateId)
+				_, err = stmt.Exec(teacherId, assistantId, courseId, scheduleTemplateId)
 
 				if err != nil {
 					lessgo.Log.Warn(err.Error())
@@ -694,7 +694,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
-	}else{
+	} else {
 		insertClassSql := "insert into wyclass(name,create_time,center_id,start_time,code) values(?,?,?,?,?)"
 		lessgo.Log.Debug(insertClassSql)
 
@@ -709,7 +709,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := stmt.Exec(name, time.Now().Format("20060102150405"),_employee.CenterId, startTime,code)
+		res, err := stmt.Exec(name, time.Now().Format("20060102150405"), _employee.CenterId, startTime, code)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -720,7 +720,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		classId,err := res.LastInsertId()
+		classId, err := res.LastInsertId()
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -745,7 +745,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(classId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1,capacity)
+		_, err = stmt.Exec(classId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1, capacity)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -762,7 +762,6 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 		commonlib.OutputJson(w, m, " ")
 	}
 }
-
 
 func ClassScheduleDetailModifyAction(w http.ResponseWriter, r *http.Request) {
 
@@ -842,7 +841,7 @@ func ClassScheduleDetailModifyAction(w http.ResponseWriter, r *http.Request) {
 
 		m["success"] = true
 		commonlib.OutputJson(w, m, " ")
-	}else{
+	} else {
 		updateSql := "update wyclass set name=? , code=? where class_id=?"
 		lessgo.Log.Debug(updateSql)
 
@@ -857,7 +856,7 @@ func ClassScheduleDetailModifyAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(name,code,classId)
+		_, err = stmt.Exec(name, code, classId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -906,7 +905,7 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 	timeId := r.FormValue("timeId")
 	week := r.FormValue("week")
 	date := r.FormValue("date")
-//	schedule := r.FormValue("type")
+	//	schedule := r.FormValue("type")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -927,10 +926,10 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var teacherId,assistantId,className,classCode,classId string
+		var teacherId, assistantId, className, classCode, classId string
 
 		if rows.Next() {
-			err = commonlib.PutRecord(rows, &teacherId, &assistantId, &className, &classCode,&classId)
+			err = commonlib.PutRecord(rows, &teacherId, &assistantId, &className, &classCode, &classId)
 
 			if err != nil {
 				m["success"] = false
@@ -956,7 +955,7 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 		loadFormObjects = append(loadFormObjects, h4)
 		loadFormObjects = append(loadFormObjects, h5)
 		loadFormObjects = append(loadFormObjects, h6)
-	}else{
+	} else {
 		roomInfoSql := "select name from room where rid=? "
 		lessgo.Log.Debug(roomInfoSql)
 
@@ -997,10 +996,10 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var startTime,endTime string
+		var startTime, endTime string
 
 		if rows.Next() {
-			err = commonlib.PutRecord(rows, &startTime,&endTime)
+			err = commonlib.PutRecord(rows, &startTime, &endTime)
 
 			if err != nil {
 				m["success"] = false
@@ -1014,29 +1013,28 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 		weekDesc := ""
 		if week == "1" {
 			weekDesc = "星期一"
-		}else if week == "2" {
+		} else if week == "2" {
 			weekDesc = "星期二"
-		}else if week == "3" {
+		} else if week == "3" {
 			weekDesc = "星期三"
-		}else if week == "4" {
+		} else if week == "4" {
 			weekDesc = "星期四"
-		}else if week == "5" {
+		} else if week == "5" {
 			weekDesc = "星期五"
-		}else if week == "6" {
+		} else if week == "6" {
 			weekDesc = "星期六"
-		}else if week == "7" {
+		} else if week == "7" {
 			weekDesc = "星期日"
 		}
 
 		m["success"] = true
 
-
 		h1 := lessgo.LoadFormObject{"id", id}
 		h2 := lessgo.LoadFormObject{"roomId", roomId}
 		h3 := lessgo.LoadFormObject{"timeId", timeId}
 		h4 := lessgo.LoadFormObject{"roomName", roomName}
-		h5 := lessgo.LoadFormObject{"timeDesc", startTime+"~"+endTime}
-		h6 := lessgo.LoadFormObject{"weekDesc", date+"("+weekDesc+")"}
+		h5 := lessgo.LoadFormObject{"timeDesc", startTime + "~" + endTime}
+		h6 := lessgo.LoadFormObject{"weekDesc", date + "(" + weekDesc + ")"}
 		h7 := lessgo.LoadFormObject{"week", week}
 		h8 := lessgo.LoadFormObject{"date", date}
 		h9 := lessgo.LoadFormObject{"capacity", "10"}
@@ -1055,7 +1053,6 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
 }
-
 
 func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 
@@ -1113,7 +1110,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	firstDay,_ := time.ParseInLocation("20060102150405", firstDayOfWeek, time.Local)
+	firstDay, _ := time.ParseInLocation("20060102150405", firstDayOfWeek, time.Local)
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -1126,10 +1123,10 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for rows.Next() {
-		var scheduleTmpId,roomId,teacherId,assistantId,timeId,courseId string
+		var scheduleTmpId, roomId, teacherId, assistantId, timeId, courseId string
 		week := 0
 
-		err = commonlib.PutRecord(rows, &scheduleTmpId,&roomId,&teacherId,&assistantId,&timeId,&week,&courseId)
+		err = commonlib.PutRecord(rows, &scheduleTmpId, &roomId, &teacherId, &assistantId, &timeId, &week, &courseId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -1140,13 +1137,13 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		theDay := firstDay.Add(time.Duration(week-1)*24)
+		theDay := firstDay.Add(time.Duration(week-1) * 24)
 		date := theDay.Format("20060102")
 
 		getScheduleDetailSql := "select id from class_schedule_detail where center_id=? and room_id=? and time_id=? and day_date=?"
 		lessgo.Log.Debug(getScheduleDetailSql)
 
-		scheduleDetailRows, err := db.Query(getScheduleDetailSql, _employee.CenterId,roomId,timeId,date)
+		scheduleDetailRows, err := db.Query(getScheduleDetailSql, _employee.CenterId, roomId, timeId, date)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			m["success"] = false
@@ -1171,7 +1168,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if scheduleDetailId== 0 {
+		if scheduleDetailId == 0 {
 
 			insertScheduleSql := "insert into class_schedule_detail(teacher_id,assistant_id,course_id,center_id,time_id,room_id,day_date,week,start_time,end_time,status,capacity) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 			lessgo.Log.Debug(insertScheduleSql)
@@ -1201,7 +1198,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 			startTime := date + strings.Replace(timeSection.StartTime, ":", "", -1) + "00"
 			endTime := date + strings.Replace(timeSection.EndTime, ":", "", -1) + "00"
 
-			res, err := stmt.Exec(teacherId, assistantId, courseId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1,10)
+			res, err := stmt.Exec(teacherId, assistantId, courseId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1, 10)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -1212,7 +1209,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			newScheduleDetailId,err := res.LastInsertId()
+			newScheduleDetailId, err := res.LastInsertId()
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -1240,7 +1237,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 			for childRows.Next() {
 				var childId string
 				var contractId int
-				err = commonlib.PutRecord(childRows, &childId,&contractId)
+				err = commonlib.PutRecord(childRows, &childId, &contractId)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
@@ -1265,7 +1262,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				_, err = stmt.Exec(newScheduleDetailId,childId,time.Now().Format("20060102150405"),employee.UserId,contractId)
+				_, err = stmt.Exec(newScheduleDetailId, childId, time.Now().Format("20060102150405"), employee.UserId, contractId)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
