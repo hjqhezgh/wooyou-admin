@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customgridpanel url="/web/class_schedule_attach/data.json" pageSize="15" title="附件" id="grid1" width="1200" height="350" loadUrl="true">
+        <column field="url" desc="下载地址" hidden="true"/>
+        <column field="intro" desc="点评" width="300"/>
+        <column field="upload_time" desc="上传时间">
+            <formatter>
+                <![CDATA[
+                       if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="pre" desc="预览" >
+            <formatter>
+                <![CDATA[
+                       if(cellvalue) {
+                            return '<img src="http://'+rowObject[4]+':9101'+cellvalue+'" width="100" height="100"/>';
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="domain_name" desc="域名" hidden="true"/>
+        <action desc="点评" url="/web/class_schedule_attach/modify" actionParams="[{name:'attachId',value:'id'}]" linkType="iframeWindow"/>
+    </customgridpanel>
+
+</viewport>

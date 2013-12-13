@@ -168,6 +168,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/wyclass/removeChildForNormal.json": server.RemoveChildForNormalAction,
 	"/web/wyclass/leaveForChild.json": server.LeaveForChildAction,
 	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
+	"/web/class_schedule_attach/data.json": server.ClassScheduleAttachListAction,
+	"/web/class_schedule_attach/load.json": server.ClassScheduleAttachLoadAction,
+	"/web/class_schedule_attach/save.json": server.ClassScheduleAttachSaveAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,

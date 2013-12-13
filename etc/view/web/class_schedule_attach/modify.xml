@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="点评" saveUrl="/web/class_schedule_attach/save.json" load="true" inwindow="true" loadUrl="/web/class_schedule_attach/load.json">
+        <element field="id" type="hidden" validate="" desc="主键"/>
+        <element field="intro" type="textarea" validate="notNull" desc="点评"/>
+    </customformpanel>
+</viewport>

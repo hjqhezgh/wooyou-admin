@@ -88,4 +88,8 @@
     <url path="/web/class_schedule_detail/modify_normal" view="web/class_schedule_detail/modify_normal.xml" />
     <!--常规班级小孩子分配界面-->
     <url path="/web/wyclass/manageChildForNormal" view="web/wyclass/manageChildForNormal.xml" />
+    <!--附件点评-->
+    <url path="/web/class_schedule_attach" view="web/class_schedule_attach/index.xml" />
+    <!--附件点评-->
+    <url path="/web/class_schedule_attach/modify" view="web/class_schedule_attach/modify.xml" />
 </urls>

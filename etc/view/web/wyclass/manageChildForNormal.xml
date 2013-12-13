@@ -34,6 +34,7 @@
         <action desc="临时剔除" url="/web/wyclass/removeChildForNormalOnce.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="结课" url="/web/wyclass/removeChildForNormal.json" linkType="ajax" confirmMsg="确认结束该学生当前的课程吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="请假" url="/web/wyclass/leaveForChild.json" linkType="ajax" confirmMsg="确认请假该学生吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="点评" url="/web/class_schedule_attach" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
     </customgridpanel>
 
     <customgridpanel url="/web/child/childInCenter.json" pageSize="15" title="选择学生" id="grid2" width="1200" height="250" loadUrl="true" mutiSelect="true" pageId="grid2">
