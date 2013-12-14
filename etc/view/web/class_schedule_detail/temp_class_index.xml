@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<viewport window="true">
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="课程管理" url="javascript:void(0);"/>
+        <crumb text="课表管理" currentPage="true"/>
+    </crumbs>
 
     <blankpanel>
         <content>
-            <![CDATA[
+<![CDATA[
     <div class="block gridpanel" id="gridpanel5425" style="width: 100%;">
         <h4 class="title">
-            <i class="icon-table"></i>调班
+            <i class="icon-table"></i>临时课报名详情
                     <span class="iconright">
                         <!--点击收起的时候用这个<i class="icon-plus-sign"></i>-->
                         <i class="icon-minus-sign"></i>
@@ -17,19 +22,18 @@
             <div class="input-box text-center">
 
                 <form class="form-inline">
+                    <div class="inline form-field" field-desc="所属中心" field-name="cid" field-searchtype="eq" field-inputtype="remoteSelect" field-localdata="" field-url="/web/center/alldata" field-valuefield="cid" field-descfield="name" field-char14="" field-char8="" field-parentselect="">
+                所属中心：<select name="centerId" data-field="" data-desc="所属中心" data-searchtype="eq"><option value="">全部</option></select></div>
 
                     <div class="inline form-field" field-desc="日期" field-name="start_time" field-searchtype="eq" field-inputtype="date" field-localdata="" field-url="" field-valuefield="" field-descfield="" field-char14="" field-char8="" field-parentselect="">
                     日期：<input name="start_time" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="eq" />
-                    <input name="firstDayOfWeek" type="hidden"/>
-                    <input name="centerId" type="hidden"/>
-                    <input name="childId" type="hidden"/>
-                    <input name="oldClassId" type="hidden"/>
                     </div>
 
                     <div class="inline">
                         <a href="javascript:void(0)" data-action="search" class="btn btn-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">搜索</span></a>
                         <a href="javascript:void(0)" data-action="reset" class="btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">重置</span></a>
                     </div>
+                    <input name="firstDayOfWeek" type="hidden"/>
                 </form>
 
                 <div class="btn-box">
@@ -49,10 +53,33 @@
     </div>
 
     <script type="text/javascript">
-            seajs.use(['/js/change_schedule.js']);
+            seajs.use(['/js/temp_schedule.js']);
     </script>
 ]]>
         </content>
     </blankpanel>
 
+    <customgridpanel url="/web/wyclass/wyclass_free.json" pageSize="10" title="学生报班查询" id="grid1" width="1200" height="100" loadUrl="false">
+
+        <search field="cid" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="kw" searchType="eq" inputType="text" desc="手机号/学生名字" char14="true" />
+
+        <column field="centerName" desc="所属中心"/>
+        <column field="couseCode" desc="课程代码"/>
+        <column field="className" desc="班名"/>
+        <column field="start_time" desc="上课时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="scheduleId" desc="课表" hidden="true"/>
+        <column field="centerId" desc="中心id" hidden="true"/>
+        <action desc="学生管理" url="/web/wyclass/manageChild" actionParams="[{name:'scheduleId',value:'id'},{name:'centerId-eq',value:'5'},{name:'classId',value:'4'}]" linkType="iframeWindow"/>
+    </customgridpanel>
 </viewport>

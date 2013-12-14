@@ -1,0 +1,19 @@
+<html>
+<head>
+    <title>视频播放</title>
+    <script type="text/javascript" src="/js/lib/flvplayer/swfobject.js"></script>
+</head>
+<body>
+<p id="player1">
+</p>
+<script type="text/javascript">
+    var s1 = new SWFObject("/js/lib/flvplayer/flvplayer.swf", "single", "960", "576", "7");
+    s1.addParam("allowfullscreen", "true");
+    s1.addVariable("file", "{{.filePath}}");
+    s1.addVariable("image", "preview.jpg");
+    s1.addVariable("width", "960");
+    s1.addVariable("height", "576");
+    s1.write("player1");
+</script>
+</body>
+</html>

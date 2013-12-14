@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"text/template"
 	"strconv"
+	"strings"
 )
 
 func ClassScheduleAttachListAction(w http.ResponseWriter, r *http.Request) {
@@ -312,4 +313,26 @@ func ClassScheduleAttachSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	m["success"] = true
 	commonlib.OutputJson(w, m, " ")
+}
+
+func ClassScheduleAttachVideoPlayAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	url := r.FormValue("url")
+
+	url = strings.Replace(url,".3gp",".flv",-1)
+
+	m["filePath"] = url
+
+	commonlib.RenderTemplate(w, r, "videoplay.html", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../template/videoplay.html")
 }

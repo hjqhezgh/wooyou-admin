@@ -17,11 +17,20 @@
         <column field="pre" desc="预览" >
             <formatter>
                 <![CDATA[
+                       var value = "";
                        if(cellvalue) {
-                            return '<img src="http://'+rowObject[4]+':9101'+cellvalue+'" width="100" height="100"/>';
-                        }else{
+                            value +=  '<img src="http://'+rowObject[4]+':9101'+cellvalue+'" width="100" height="100"/>';
+                       }else{
                             return "";
-                        }
+                       }
+
+                       if(rowObject[0].indexOf('.3gp') > 0){ //视频文件
+                            value += '&nbsp;<a style="color:blue;text-decoration:underline;" href="/web/class_schedule_attach/videoplay.html?url=http://'+rowObject[4]+':9101'+rowObject[0]+'" target="_blank">在线播放</a>';
+                       }else{//图片
+                            value += '&nbsp;<a style="color:blue;text-decoration:underline;" href="http://'+rowObject[4]+':9101'+rowObject[0]+'" target="_blank">查看大图</a>';
+                       }
+
+                       return value;
                 ]]>
             </formatter>
         </column>

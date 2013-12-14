@@ -45,7 +45,7 @@
             </formatter>
         </column>
         <action desc="剔除" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
-        <!--<action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'consumerId',value:'id'},{name:'oldClassId',value:'5'},{name:'cid-eq',value:'7'}]" linkType="iframeWindow"/>-->
+        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldClassId',value:'5'},{name:'cid-eq',value:'7'}]" linkType="iframeWindow"/>
         <toolaction desc="签到" url="/web/wyclass/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
         <toolaction desc="发送邀约短信" url="/web/wyclass/sendSMS"  colorClass="h-bg-green"  linkType="mutiSelectIframeWindow" params="{}"/>
     </customgridpanel>

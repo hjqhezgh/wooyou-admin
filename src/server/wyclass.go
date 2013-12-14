@@ -921,15 +921,13 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 	startTime := r.FormValue("startTime-ge")
 	endTime := r.FormValue("endTime-le")
 	kw := r.FormValue("kw-eq")
-	oldClassId := r.FormValue("oldClassId")
 
 	params := []interface{}{}
 
-	sql := "select class.class_id,ce.name as centerName,class.code,class.name,class.start_time,childNum.num as childNum,signInNum.num as signInNum,class.center_id "
-	sql += " from wyclass class "
-	sql += " left join (select count(1) num,wyclass_id from wyclass_free_child group by wyclass_id) childNum on class.class_id=childNum.wyclass_id "
-	sql += " left join (select count(1) num,wyclass_id from wyclass_free_sign_in group by wyclass_id)signInNum on class.class_id=signInNum.wyclass_id "
-	sql += " left join center ce on ce.cid=class.center_id where 1=1  and class.start_time is not null and class.start_time != '' "
+	sql := "select csd.id,ce.name as centerName,class.code,class.name,csd.start_time,csd.class_id,csd.center_id "
+	sql += " from class_schedule_detail csd "
+	sql += " left join wyclass class on csd.class_id=class.class_id "
+	sql += " left join center ce on ce.cid=csd.center_id where csd.class_id is not null  and csd.start_time is not null and csd.start_time != '' "
 
 	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
@@ -942,36 +940,31 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		params = append(params, _employee.CenterId)
-		sql += " and class.center_id=? "
+		sql += " and csd.center_id=? "
 	}
 
 	if centerId != "" && dataType == "all" {
 		params = append(params, centerId)
-		sql += " and class.center_id=? "
+		sql += " and csd.center_id=? "
 	}
 
 	if startTime != "" {
 		params = append(params, startTime)
-		sql += " and class.start_time>=? "
+		sql += " and csd.start_time>=? "
 	}
 
 	if endTime != "" {
 		params = append(params, endTime)
-		sql += " and class.start_time<=? "
+		sql += " and csd.start_time<=? "
 	}
 
 	if kw != "" {
-		sql += " and class.class_id in (select wfc.wyclass_id from contacts cont left join wyclass_free_child wfc "
-		sql += " on wfc.consumer_id=cont.consumer_id "
-		sql += " left join consumer_new cons on cons.id=cont.consumer_id "
-		sql += " where cons.child=? or cont.phone=?) "
+		sql += " and csd.class_id in (select sdc.wyclass_id from child ch left join schedule_detail_child sdc "
+		sql += " on sdc.child_id=ch.cid "
+		sql += " left join parent p on p.pid=ch.pid "
+		sql += " where ch.name=? or p.telephone=?) "
 		params = append(params, kw)
 		params = append(params, kw)
-	}
-
-	if oldClassId != "" {
-		params = append(params, oldClassId)
-		sql += " and class.class_id!=? "
 	}
 
 	countSql := ""
@@ -1017,7 +1010,7 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " order by class.class_id desc limit ?,?"
+	sql += " order by csd.id desc limit ?,?"
 
 	lessgo.Log.Debug(sql)
 
@@ -1045,7 +1038,7 @@ func WyClassFreeListAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 7; i++ {
+		for i := 0; i < 6; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
@@ -2735,17 +2728,54 @@ func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.FormValue("consumerId")
+	id := r.FormValue("childId")
+	scheduleId := r.FormValue("scheduleId")
 	oldClassId := r.FormValue("oldClassId")
 	newClassId := r.FormValue("newClassId")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	checkExistSql := "select count(1) from wyclass_free_child where wyclass_id=? and consumer_id=? "
+	checkIsSignSql := "select count(1) from sign_in where child_id=? and wyclass_id=?"
+	lessgo.Log.Debug(checkIsSignSql)
+
+	rows, err := db.Query(checkIsSignSql, id,oldClassId)
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	isSign := 0
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &isSign)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	if isSign > 0  {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "已签到的学生无法调班"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	checkExistSql := "select count(1) from schedule_detail_child where wyclass_id=? and schedule_detail_id=? and child_id=? "
 	lessgo.Log.Debug(checkExistSql)
 
-	rows, err := db.Query(checkExistSql, newClassId, id)
+	rows, err = db.Query(checkExistSql, newClassId,scheduleId, id)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -2774,15 +2804,15 @@ func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
 	if totalNum > 0 {
 		m["success"] = false
 		m["code"] = 100
-		m["msg"] = "该学员已经在此班级中，无需重复排班"
+		m["msg"] = "该学生已经在此班级中，无需重复排班"
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
 
-	getInviteEmployeeIdSql := "select create_user from wyclass_free_child where wyclass_id=? "
+	getInviteEmployeeIdSql := "select create_user from schedule_detail_child where wyclass_id=? and child_id=? "
 	lessgo.Log.Debug(getInviteEmployeeIdSql)
 
-	rows, err = db.Query(getInviteEmployeeIdSql, oldClassId)
+	rows, err = db.Query(getInviteEmployeeIdSql, oldClassId,id)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -2818,7 +2848,7 @@ func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deleteOldClassSql := "delete from wyclass_free_child where wyclass_id=? and consumer_id=? "
+	deleteOldClassSql := "delete from schedule_detail_child where wyclass_id=? and child_id=? "
 	lessgo.Log.Debug(deleteOldClassSql)
 
 	stmt, err := tx.Prepare(deleteOldClassSql)
@@ -2847,7 +2877,7 @@ func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertNewClassSql := "insert into wyclass_free_child(create_time,create_user,consumer_id,wyclass_id) values(?,?,?,?)"
+	insertNewClassSql := "insert into schedule_detail_child(create_time,create_user,child_id,wyclass_id,schedule_detail_id) values(?,?,?,?,?)"
 	lessgo.Log.Debug(insertNewClassSql)
 	stmt, err = tx.Prepare(insertNewClassSql)
 
@@ -2862,7 +2892,7 @@ func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = stmt.Exec(time.Now().Format("20060102150405"), inviteEmployeeId, id, newClassId)
+	_, err = stmt.Exec(time.Now().Format("20060102150405"), inviteEmployeeId, id, newClassId,scheduleId)
 
 	if err != nil {
 		tx.Rollback()

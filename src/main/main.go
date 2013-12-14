@@ -148,6 +148,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	//课表相关
 	"/web/class_schedule_detail/data.json": server.ClassScheduleDetailListAction,
 	"/web/class_schedule_detail/quick_data.json": server.ClassScheduleDetailListQuickAction,
+	"/web/class_schedule_detail/temp_data.json": server.ClassScheduleDetailListTempAction,
 	"/web/class_schedule_detail/load.json": server.ClassScheduleDetailLoadAction,
 	"/web/class_schedule_detail/add.json": server.ClassScheduleDetailAddAction,
 	"/web/class_schedule_detail/modify.json": server.ClassScheduleDetailModifyAction,
@@ -171,6 +172,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_attach/data.json": server.ClassScheduleAttachListAction,
 	"/web/class_schedule_attach/load.json": server.ClassScheduleAttachLoadAction,
 	"/web/class_schedule_attach/save.json": server.ClassScheduleAttachSaveAction,
+	"/web/class_schedule_attach/videoplay.html": server.ClassScheduleAttachVideoPlayAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,

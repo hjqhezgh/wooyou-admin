@@ -86,6 +86,10 @@
     <url path="/web/class_schedule_detail/modify_tmp" view="web/class_schedule_detail/modify_tmp.xml" />
     <!--修改常规课程-->
     <url path="/web/class_schedule_detail/modify_normal" view="web/class_schedule_detail/modify_normal.xml" />
+    <!--修改常规课程-->
+    <url path="/web/class_schedule_detail/modify_normal" view="web/class_schedule_detail/modify_normal.xml" />
+    <!--临时课报名查看-->
+    <url path="/web/class_schedule_detail/temp_class_index" view="web/class_schedule_detail/temp_class_index.xml" />
     <!--常规班级小孩子分配界面-->
     <url path="/web/wyclass/manageChildForNormal" view="web/wyclass/manageChildForNormal.xml" />
     <!--附件点评-->
