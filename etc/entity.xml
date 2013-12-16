@@ -365,4 +365,20 @@
         <field name="consumer_id"/>
         <field name="type"/>
     </entity>
+
+    <!--合同-->
+    <entity id="contract">
+        <pk>id</pk>
+        <field name="child_id"/>
+        <field name="apply_time"/>
+        <field name="contract_no"/>
+        <field name="parent_id"/>
+        <field name="price"/>
+        <field name="employee_id"/>
+        <field name="center_id"/>
+        <field name="course_id"/>
+        <field name="left_lesson_num"/>
+        <field name="type"/>
+        <field name="status"/>
+    </entity>
 </entitys>

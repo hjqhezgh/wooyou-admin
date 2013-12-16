@@ -80,13 +80,17 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/consumerLoad.json": server.ConsumerLoadAction,
 	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
 	"/web/consumer/backToAllConsumer.json": server.BackToAllConsumerAction,
-	"/contacts/page": server.ContractsListAction,
-	"/contacts/save.json": server.ContractsSaveAction,
-	"/contacts/delete.json": server.ContractsDeleteAction,
+	"/contacts/page": server.ContactsListAction,
+	"/contacts/save.json": server.ContactsSaveAction,
+	"/contacts/delete.json": server.ContactsDeleteAction,
 	"/web/consumerContactsLog/page.json": server.ConsumerContactLogAction,
 	"/web/consumerContactsLog/save.json": server.ConsumerContactLogSaveAction,
 	"/web/consumerContactsLog/load.json": server.ConsumerContactLogLoadAction,
 	"/web/contacts/contactsLoad.json": server.ContactsLoadAction,
+	"/web/child/data.json": server.ChildListAction,
+	"/web/contract/page.json": server.ContractListAction,
+	"/web/contract/save.json": server.ContractSaveAction,
+	"/web/contract/load.json": server.ContractLoadAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
@@ -173,6 +177,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_attach/load.json": server.ClassScheduleAttachLoadAction,
 	"/web/class_schedule_attach/save.json": server.ClassScheduleAttachSaveAction,
 	"/web/class_schedule_attach/videoplay.html": server.ClassScheduleAttachVideoPlayAction,
+	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,
@@ -181,7 +186,6 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/wyclass/load.json": server.WyClassLoadAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
-	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
 	"/classByCenterId.json": server.ClassByCenterIdAction,
 
 	"/roomByCenterId.json": server.RoomByCenterIdListAction,

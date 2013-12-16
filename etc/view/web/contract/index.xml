@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+
+    <customgridpanel url="/web/contract/page.json" pageSize="15" title="合同记录" id="grid1" height="200" loadUrl="true">
+        <toolaction desc="添加" url="/web/contract/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+
+        <column field="contractNo" desc="合同号"/>
+        <column field="courseName" desc="课程"/>
+        <column field="createTime" desc="签单时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="price" desc="金额"/>
+        <column field="courseNum" desc="合同总课数"/>
+        <column field="employeeName" desc="签单员工"/>
+        <column field="type" desc="类型">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "新单";
+                        }else if(cellvalue=="2") {
+                            return "续单";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="status" desc="状态" hidden="true">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "未上课";
+                        }else if(cellvalue=="2") {
+                            return "上课中";
+                        }else if(cellvalue=="3") {
+                            return "已废弃";
+                        }else if(cellvalue=="4"){
+                            return "已结束";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <action desc="修改" url="/web/contract/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

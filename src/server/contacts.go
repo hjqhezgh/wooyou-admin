@@ -23,7 +23,7 @@ import (
 	"text/template"
 )
 
-func ContractsListAction(w http.ResponseWriter, r *http.Request) {
+func ContactsListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -168,7 +168,7 @@ func ContractsListAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 }
 
-func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
+func ContactsSaveAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
 
 	employee := lessgo.GetCurrentEmployee(r)
@@ -356,7 +356,7 @@ func ContractsSaveAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.OutputJson(w, m, " ")
 }
 
-func ContractsDeleteAction(w http.ResponseWriter, r *http.Request) {
+func ContactsDeleteAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
 
 	employee := lessgo.GetCurrentEmployee(r)

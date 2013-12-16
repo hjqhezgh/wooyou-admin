@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="客户信息" url="javascript:void(0);"/>
+        <crumb text="学生管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/web/child/data.json" pageSize="15" title="学生管理" id="grid1" width="1200" height="400" loadUrl="false">
+
+        <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="contractStatus" searchType="eq" inputType="localSelect" desc="是否签约" localData="[{desc:'是',value:'1'},{desc:'否',value:'2'}]"/>
+        <search field="kw" searchType="like" inputType="text" desc="名字/电话"/>
+
+        <column field="centerName" desc="门店"/>
+        <column field="childName" desc="姓名"/>
+        <column field="phone" desc="APP电话"/>
+        <column field="password" desc="APP密码"/>
+        <column field="cardId" desc="卡号"/>
+        <column field="birthday" desc="生日">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar8Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="sex" desc="性别">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "男";
+                        }else{
+                            return "女";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="regTime" desc="注册时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="haveContract" desc="是否签约">
+            <formatter>
+                <![CDATA[
+                        var value = "";
+                        if(cellvalue) {
+                            value +=  '<span style="color:red;">是</span>';
+                        }else{
+                            value += '否';
+                        }
+
+                        value += '&nbsp;<a style="color:blue;text-decoration: underline;" target="_blank" title="合同管理" href="/web/contract?childId='+options.rowId+'" data-action="openIframeWindow">合同管理</a>';
+
+                        return value;
+                ]]>
+            </formatter>
+        </column>
+
+        <action desc="修改" url="/web/child/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

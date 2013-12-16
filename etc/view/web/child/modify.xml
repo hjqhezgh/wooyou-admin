@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <formpanel entity="child" id="form" load="true" title="学生信息修改" inwindow="true">
+        <element field="name" type="text" validate="notNull" desc="名字"/>
+        <element field="birthday" type="date" validate="" desc="生日" char8="true"/>
+        <element field="sex"  type="localSelect" localData="[{desc:'男', value:'1'},{desc:'女', value:'2'}]" desc="性别"/>
+        <element field="card_id" type="text" validate="" desc="卡号"/>
+
+        <beforeSave>
+            <![CDATA[
+                var cardId = container.find('form').find('[name=card_id]').val()
+
+                if(cardId){
+                    if(cardId.length != 11) {
+                        alert('卡号格式错误');
+                        return false;
+                    }
+
+                    if(cardId.indexOf('A')!= 0){
+                        alert('卡号请以A打头');
+                        return false;
+                    }
+                }
+
+                return true;
+            ]]>
+        </beforeSave>
+    </formpanel>
+</viewport>

@@ -20,6 +20,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 )
 
@@ -535,6 +536,218 @@ func ChildInNormalScheduleAction(w http.ResponseWriter, r *http.Request) {
 		fillObjects = append(fillObjects, &model.Id)
 
 		for i := 0; i < 4; i++ {
+			prop := new(lessgo.Prop)
+			prop.Name = fmt.Sprint(i)
+			prop.Value = ""
+			fillObjects = append(fillObjects, &prop.Value)
+			model.Props = append(model.Props, prop)
+		}
+
+		err = commonlib.PutRecord(rows, fillObjects...)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+
+	pageData := commonlib.BulidTraditionPage(currPageNo, pageSize, totalNum, objects)
+
+	m["PageData"] = pageData
+	m["DataLength"] = len(pageData.Datas) - 1
+	if len(pageData.Datas) > 0 {
+		m["FieldLength"] = len(pageData.Datas[0].(*lessgo.Model).Props) - 1
+	}
+
+	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
+
+}
+
+//小孩子分页数据
+/*
+select ch.name,p.telephone,contract_num.num
+from child ch
+left join parent p on p.pid=ch.pid
+left join (select child_id,count(1) num from contract where price >0 group by child_id) contract_num on contract_num.child_id=ch.cid
+*/
+func ChildListAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	dataType := ""
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "admin" || roleCode == "yyzj" || roleCode == "zjl" || roleCode == "yyzy" || roleCode == "tmk" {
+			dataType = "all"
+			break
+		} else {
+			dataType = "center"
+			break
+		}
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	pageNoString := r.FormValue("page")
+	pageNo := 1
+	if pageNoString != "" {
+		pageNo, err = strconv.Atoi(pageNoString)
+		if err != nil {
+			pageNo = 1
+			lessgo.Log.Warn("错误的pageNo:", pageNo)
+		}
+	}
+
+	pageSizeString := r.FormValue("rows")
+	pageSize := 10
+	if pageSizeString != "" {
+		pageSize, err = strconv.Atoi(pageSizeString)
+		if err != nil {
+			lessgo.Log.Warn("错误的pageSize:", pageSize)
+		}
+	}
+
+	centerId := r.FormValue("centerId-eq")
+	contractStatus := r.FormValue("contractStatus-eq")
+	kw := r.FormValue("kw-like")
+
+	params := []interface{}{}
+
+	sql := " select ch.cid,ce.name centerName,ch.name childName,p.telephone,p.password,ch.card_id,ch.birthday,ch.sex,p.reg_date,contract_num.num "
+	sql += " from child ch "
+	sql += " left join parent p on p.pid=ch.pid "
+	sql += " left join center ce on ce.cid=ch.center_id "
+	sql += " left join (select child_id,count(1) num from contract where price >0 group by child_id) contract_num on contract_num.child_id=ch.cid where 1=1 "
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+		params = append(params, _employee.CenterId)
+		sql += " and ch.center_id=? "
+	}
+
+	if centerId  != "" && dataType == "all" {
+		params = append(params, centerId)
+		sql += " and ch.center_id=? "
+	}
+
+	if contractStatus != "" {
+		sql += " and contract_num.num is not null "
+	}
+
+	if kw != ""{
+		sql += " and ch.name like ? "
+		sql += " and p.telephone like ? "
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+	}
+
+	countSql := ""
+
+	countSql = "select count(1) from (" + sql + ") num"
+
+	lessgo.Log.Debug(countSql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(countSql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	totalPage := int(math.Ceil(float64(totalNum) / float64(pageSize)))
+
+	currPageNo := pageNo
+
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	sql += " order by ch.cid desc limit ?,? "
+
+	lessgo.Log.Debug(sql)
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	rows, err = db.Query(sql, params...)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	objects := []interface{}{}
+
+	for rows.Next() {
+
+		model := new(lessgo.Model)
+
+		fillObjects := []interface{}{}
+
+		fillObjects = append(fillObjects, &model.Id)
+
+		for i := 0; i < 9; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""
