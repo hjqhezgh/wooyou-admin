@@ -670,8 +670,8 @@ func ChildListAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if kw != ""{
-		sql += " and ch.name like ? "
-		sql += " and p.telephone like ? "
+		sql += " and (ch.name like ? "
+		sql += " or p.telephone like ?) "
 		params = append(params, "%"+kw+"%")
 		params = append(params, "%"+kw+"%")
 	}

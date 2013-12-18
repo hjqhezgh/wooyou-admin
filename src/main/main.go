@@ -91,6 +91,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/contract/page.json": server.ContractListAction,
 	"/web/contract/save.json": server.ContractSaveAction,
 	"/web/contract/load.json": server.ContractLoadAction,
+	"/web/contract/contractOfChild.json": server.ContractOfChildAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
@@ -178,6 +179,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_attach/save.json": server.ClassScheduleAttachSaveAction,
 	"/web/class_schedule_attach/videoplay.html": server.ClassScheduleAttachVideoPlayAction,
 	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
+	"/web/wyclass/contractCheckInSave.json": server.ContractCheckInSaveAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,

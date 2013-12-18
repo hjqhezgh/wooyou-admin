@@ -61,7 +61,8 @@ define(function (require, exports, module) {
 
                     new superTable("schedule", {
                         cssSkin : "sDefault",
-                        fixedCols : 1
+                        fixedCols : 1,
+                        headerRows : 2
                     });
 
                 }else{

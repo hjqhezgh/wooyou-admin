@@ -32,7 +32,7 @@
 
         <toolaction desc="添加" url="/web/course/add" colorClass="h-bg-green" linkType="iframeWindow"/>
         <action desc="修改" url="/web/course/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
-        <action desc="配置课节" url="/web/lesson" actionParams="[{name:'course_id-eq',value:'id'}]" linkType="iframeWindow"/>
+        <!--<action desc="配置课节" url="/web/lesson" actionParams="[{name:'course_id-eq',value:'id'}]" linkType="iframeWindow"/>-->
     </customgridpanel>
 
 </viewport>

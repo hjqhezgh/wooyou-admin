@@ -47,11 +47,11 @@
                 ]]>
             </formatter>
         </column>
-        <column field="qePayNum" desc="签到率（签到数/邀约数）">
+        <column field="qePayNum" desc="签到率（签到数/电话数）" width="150">
             <formatter>
                 <![CDATA[
                     var signNum = rowObject[4];
-                    var inviteNum = rowObject[3];
+                    var inviteNum = rowObject[1];
 
                     if(!inviteNum){
                         return "无效";
@@ -67,7 +67,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="qePayNum" desc="报名率（缴费数/签到数）">
+        <column field="qePayNum" desc="报名率（缴费数/签到数）" width="150">
             <formatter>
                 <![CDATA[
                     var signNum = rowObject[4];

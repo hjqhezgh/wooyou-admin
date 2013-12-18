@@ -230,6 +230,7 @@ jQuery.fn.form = function (opts) {
             var url = $(element).attr('field-url');
             var valueField = $(element).attr('field-valueField');
             var descField = $(element).attr('field-descField');
+            var params = $(element).attr('field-params');
 
             var select = $(element).find('select');
             var value = $(element).attr('field-value');
@@ -239,8 +240,22 @@ jQuery.fn.form = function (opts) {
                 desc:'全部'
             }));
 
-            if($(element).attr('field-parentSelect')){
+            if(params){
+                paramsList = eval("("+params+")");
+                for(var i=0;i<paramsList.length;i++){
+                    if(url.lastIndexOf('?')>-1){
+                        url += "&";
+                    }else{
+                        url += "?";
+                    }
+                    url += paramsList[i].name+"=";
+                    if(paramsList[i].value.indexOf('$')==0){
+                        url+=getParamsMap()[paramsList[i].value.substr(1,paramsList[i].value.length)];
+                    }
+                }
+            }
 
+            if($(element).attr('field-parentSelect')){
                 if(value){
                     var parentValue = value.split(',')[0];
                     var thisValue = value.split(',')[1];
@@ -685,4 +700,22 @@ jQuery.fn.form = function (opts) {
     return this;
 }
 
+function getParamsMap() {
+    var map = {}
+    if (document.URL.indexOf('?') > -1) {
+        var paramsStr = document.URL.substring(document.URL.indexOf('?') + 1);
+        var paramsArr = paramsStr.split('&');
+        for (var index in paramsArr) {
+            var param = paramsArr[index].split('=');
+            var key = param[0];
+            var value = param[1];
+            var urlParamValue = map[key];
+            if (urlParamValue == null) {
+                urlParamValue = value;
+                map[key] = urlParamValue;
+            }
+        }
+    }
+    return map;
+}
 

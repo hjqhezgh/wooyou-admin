@@ -3046,23 +3046,33 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scheduleId := r.FormValue("scheduleId")
-	ids := r.FormValue("ids")
+	id := r.FormValue("ids")
 
-	idList := strings.Split(ids, ",")
+	if strings.Contains(id, ",") {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "只能操作一个学生"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
 	tx, err := db.Begin()
 
-	getScheduleTempId := "select st.id from class_schedule_detail csd left join schedule_template st on csd.center_id=st.center_id and csd.room_id=st.room_id and csd.time_id=st.time_id and csd.week=st.week where csd.id=? "
+	getScheduleTempId := "select st.id,st.room_id,st.time_id,st.week,csd.start_time from class_schedule_detail csd left join schedule_template st on csd.center_id=st.center_id and csd.room_id=st.room_id and csd.time_id=st.time_id and csd.week=st.week where csd.id=? "
 	lessgo.Log.Debug(getScheduleTempId)
 	rows, err := db.Query(getScheduleTempId, scheduleId)
 
 	scheduleTempId := 0
+	stRoomId := 0
+	stTimeId := 0
+	stWeek := 0
+	scdStartTime := ""
 
 	if rows.Next() {
-		err := commonlib.PutRecord(rows, &scheduleTempId)
+		err := commonlib.PutRecord(rows, &scheduleTempId,&stRoomId,&stTimeId,&stWeek,&scdStartTime)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -3082,9 +3092,35 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, id := range idList {
+	getFurtherScheduleSql := "select id from class_schedule_detail where time_id=? and room_id=? and week=? and start_time>=? "
+	lessgo.Log.Debug(getFurtherScheduleSql)
+	scheduleRows, err := db.Query(getFurtherScheduleSql, stTimeId,stRoomId,stWeek,scdStartTime)
 
-		checkExistSql := "select count(1) from schedule_detail_child where child_id=? and  schedule_detail_id=? "
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	for scheduleRows.Next() {
+
+		scheduleId := 0
+
+		err := commonlib.PutRecord(scheduleRows, &scheduleId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		checkExistSql := "select count(1) from schedule_detail_child where child_id=? and schedule_detail_id=? "
 		lessgo.Log.Debug(checkExistSql)
 		rows, err = db.Query(checkExistSql, id, scheduleId)
 
@@ -3139,10 +3175,25 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+	}
 
-		checkTempExistSql := "select count(1) from schedule_template_child where child_id=? and  schedule_template_id=? "
-		lessgo.Log.Debug(checkTempExistSql)
-		rows, err = db.Query(checkTempExistSql, id, scheduleTempId)
+	checkTempExistSql := "select count(1) from schedule_template_child where child_id=? and  schedule_template_id=? "
+	lessgo.Log.Debug(checkTempExistSql)
+	rows, err = db.Query(checkTempExistSql, id, scheduleTempId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	totalNum := 0
+
+	if rows.Next() {
+		err := rows.Scan(&totalNum)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -3152,26 +3203,9 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 			commonlib.OutputJson(w, m, " ")
 			return
 		}
+	}
 
-		totalNum = 0
-
-		if rows.Next() {
-			err := rows.Scan(&totalNum)
-
-			if err != nil {
-				lessgo.Log.Warn(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "系统发生错误，请联系IT部门"
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-		}
-
-		if totalNum > 0 {
-			continue
-		}
-
+	if totalNum == 0 {
 		insertToTempSql := "insert into schedule_template_child(schedule_template_id,child_id) values(?,?) "
 		lessgo.Log.Debug(insertToTempSql)
 
@@ -3199,7 +3233,6 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 	tx.Commit()
 
 	m["success"] = true

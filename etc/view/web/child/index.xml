@@ -28,7 +28,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="sex" desc="性别">
+        <column field="sex" desc="性别" width="50">
             <formatter>
                 <![CDATA[
                         if(cellvalue=="1") {
@@ -50,7 +50,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="haveContract" desc="是否签约">
+        <column field="haveContract" desc="是否签约" width="80">
             <formatter>
                 <![CDATA[
                         var value = "";

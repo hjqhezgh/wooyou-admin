@@ -96,4 +96,6 @@
     <url path="/web/class_schedule_attach" view="web/class_schedule_attach/index.xml" />
     <!--附件点评-->
     <url path="/web/class_schedule_attach/modify" view="web/class_schedule_attach/modify.xml" />
+    <!--合同登记-->
+    <url path="/web/wyclass/contractCheckIn" view="web/wyclass/contractCheckIn.xml" />
 </urls>

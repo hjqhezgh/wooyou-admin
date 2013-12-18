@@ -539,3 +539,258 @@ func ContactsLoadAction(w http.ResponseWriter, r *http.Request) {
 	commonlib.OutputJson(w, m, " ")
 
 }
+
+func ContractOfChildAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	childId := r.FormValue("childId")
+
+	sql := "select contr.id,contr.contract_no,cour.name,contr.apply_time from contract contr left join course cour on cour.cid=contr.course_id where contr.child_id=? "
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, childId)
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "系统发生错误，请联系IT部门"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	type Result struct {
+		Value string `json:"value"`
+		Desc  string `json:"desc"`
+	}
+
+	objects := []*Result{}
+
+	for rows.Next() {
+
+		model := new(Result)
+
+		var contractNo,courseName,applyTime string
+
+		err = commonlib.PutRecord(rows, &model.Value, &contractNo,&courseName,&applyTime)
+
+		model.Desc = contractNo+"-"+courseName+"-"+commonlib.Substr(applyTime,0,8)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		objects = append(objects, model)
+	}
+	m["success"] = true
+	m["datas"] = objects
+
+	commonlib.OutputJson(w, m, " ")
+	return
+}
+
+func ContractCheckInSaveAction(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	childId := r.FormValue("childId")
+	scheduleId := r.FormValue("scheduleId")
+	contractId := r.FormValue("contractId")
+	actionType := r.FormValue("type")
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+
+	if actionType == "temp" {
+		updateSql := "update schedule_detail_child set contract_id=? where child_id=? and schedule_detail_id=? "
+
+		lessgo.Log.Debug(updateSql)
+
+		stmt, err := db.Prepare(updateSql)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(contractId,childId,scheduleId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	} else {
+		getScheduleTempId := "select st.id,st.room_id,st.time_id,st.week,csd.start_time from class_schedule_detail csd left join schedule_template st on csd.center_id=st.center_id and csd.room_id=st.room_id and csd.time_id=st.time_id and csd.week=st.week where csd.id=? "
+		lessgo.Log.Debug(getScheduleTempId)
+		rows, err := db.Query(getScheduleTempId, scheduleId)
+
+		scheduleTempId := 0
+		stRoomId := 0
+		stTimeId := 0
+		stWeek := 0
+		scdStartTime := ""
+
+		if rows.Next() {
+			err := commonlib.PutRecord(rows, &scheduleTempId,&stRoomId,&stTimeId,&stWeek,&scdStartTime)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "系统发生错误，请联系IT部门"
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		if scheduleTempId == 0 {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "该课表不是模板课表，无法登记跟班合同"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		getFurtherScheduleSql := "select id from class_schedule_detail where time_id=? and room_id=? and week=? and start_time>=? "
+		lessgo.Log.Debug(getFurtherScheduleSql)
+		scheduleRows, err := db.Query(getFurtherScheduleSql, stTimeId,stRoomId,stWeek,scdStartTime)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		tx, err := db.Begin()
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "系统发生错误，请联系IT部门"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		for scheduleRows.Next() {
+			err := commonlib.PutRecord(scheduleRows, &scheduleId)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			updateSql := "update schedule_detail_child set contract_id=? where child_id=? and schedule_detail_id=? "
+
+			lessgo.Log.Debug(updateSql)
+
+			stmt, err := tx.Prepare(updateSql)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(contractId,childId,scheduleId)
+
+			if err != nil {
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+		}
+
+		updateTempSql := "update schedule_template_child set contract_id=? where schedule_template_id=? and child_id=?"
+		lessgo.Log.Debug(updateTempSql)
+		stmt, err := tx.Prepare(updateTempSql)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(contractId,scheduleTempId,childId)
+
+		if err != nil {
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		tx.Commit()
+	}
+
+	m["success"] = true
+	commonlib.OutputJson(w, m, " ")
+}

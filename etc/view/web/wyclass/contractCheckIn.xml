@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form1" saveUrl="/web/wyclass/contractCheckInSave.json" load="false" title="合同登记" inwindow="true">
+        <element field="childId"  type="hidden" defaultValue="$childId" desc="学生id"/>
+        <element field="scheduleId"  type="hidden" defaultValue="$scheduleId" desc="课表id"/>
+        <element field="contractId"  type="remoteSelect" url="/web/contract/contractOfChild.json" params="[{name:'childId',value:'$childId'}]" valueField="value" descField="desc" desc="合同" validate="notNull"/>
+        <element field="type"  type="localSelect" validate="notNull" localData="[{desc:'跟班', value:'normal'},{desc:'临时', value:'temp'}]" defaultValue="normal" desc="类型"/>
+    </customformpanel>
+</viewport>
