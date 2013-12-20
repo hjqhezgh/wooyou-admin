@@ -92,6 +92,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/contract/save.json": server.ContractSaveAction,
 	"/web/contract/load.json": server.ContractLoadAction,
 	"/web/contract/contractOfChild.json": server.ContractOfChildAction,
+	"/web/child/signInData.json": server.ChildSignInLogListAction,
+	"/web/child/addCardToSignIn.json": server.AddCardToSignInAction,
+	"/web/child/addContractToSignIn.json": server.AddContractToSignInAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,

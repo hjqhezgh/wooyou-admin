@@ -455,12 +455,16 @@ func ChildInNormalScheduleAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select sdc.child_id,ch.name,p.telephone,si.type,si.sign_time "
-	sql += " from schedule_detail_child sdc "
-	sql += " left join child ch on ch.cid=sdc.child_id "
-	sql += " left join parent p on p.pid=ch.pid "
-	sql += " left join sign_in si on si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id "
-	sql += " where sdc.schedule_detail_id=? "
+	sql := `
+	select sdc.child_id,ch.name,p.telephone,si.type,si.sign_time,cour.name courseName,contr.contract_no,contr.apply_time
+	 		from schedule_detail_child sdc
+	 				left join child ch on ch.cid=sdc.child_id
+	 				left join parent p on p.pid=ch.pid
+	 				left join sign_in si on si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
+	 				left join class_schedule_detail csd on csd.id=sdc.schedule_detail_id
+	 				left join contract contr on contr.id=sdc.contract_id
+	 				left join course cour on cour.cid=contr.course_id
+	 		where sdc.schedule_detail_id=? `
 
 	params = append(params, scheduleId)
 
@@ -535,7 +539,7 @@ func ChildInNormalScheduleAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 4; i++ {
+		for i := 0; i < 7; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

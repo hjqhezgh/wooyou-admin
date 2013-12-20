@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form1" saveUrl="/web/child/addContractToSignIn.json" load="false" title="合同登记" inwindow="true">
+        <element field="childId"  type="hidden" defaultValue="$childId" desc="学生id"/>
+        <element field="ids"  type="hidden" defaultValue="$ids" desc="签到记录id"/>
+        <element field="contractId"  type="remoteSelect" url="/web/contract/contractOfChild.json" params="[{name:'childId',value:'$childId'}]" valueField="value" descField="desc" desc="合同" validate="notNull"/>
+    </customformpanel>
+</viewport>

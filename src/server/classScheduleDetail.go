@@ -889,10 +889,10 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if isTmp == "1" {
-			selectTmpSql := "select id from schedule_template where center_id=? and room_id=? and time_id=? "
+			selectTmpSql := "select id from schedule_template where center_id=? and room_id=? and time_id=? and week=? "
 			lessgo.Log.Debug(selectTmpSql)
 
-			rows, err := db.Query(selectTmpSql, _employee.CenterId, roomId, timeId)
+			rows, err := db.Query(selectTmpSql, _employee.CenterId, roomId, timeId,week)
 
 			scheduleTemplateId := 0
 

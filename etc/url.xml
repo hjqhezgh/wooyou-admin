@@ -98,4 +98,8 @@
     <url path="/web/class_schedule_attach/modify" view="web/class_schedule_attach/modify.xml" />
     <!--合同登记-->
     <url path="/web/wyclass/contractCheckIn" view="web/wyclass/contractCheckIn.xml" />
+    <!--学生模块进入签到记录详情-->
+    <url path="/web/child/signInData" view="web/child/signInData.xml" />
+    <!--学生模块，签到记录批量合同补登-->
+    <url path="/web/child/addContractToSignIn" view="web/child/addContractToSignIn.xml" />
 </urls>

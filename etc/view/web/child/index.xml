@@ -68,5 +68,6 @@
         </column>
 
         <action desc="修改" url="/web/child/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="签到记录" url="/web/child/signInData" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
     </customgridpanel>
 </viewport>

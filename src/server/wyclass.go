@@ -1286,6 +1286,34 @@ func ChildSignInAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
+
+			insertConsumerContactLogSql := `insert into consumer_contact_log(create_user,create_time,note,consumer_id,type)
+											select ?,?,concat('签到',wc.start_time,wc.name),?,3 from wyclass wc where wc.class_id=?`
+			lessgo.Log.Debug(insertConsumerContactLogSql)
+
+			stmt, err = tx.Prepare(insertConsumerContactLogSql)
+
+			if err != nil {
+				tx.Rollback()
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), consumerId, classId)
+
+			if err != nil {
+				tx.Rollback()
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
 		}
 
 	}
@@ -1391,11 +1419,11 @@ func ChildSignInWithoutAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		checkExistSql := "select count(1) from sign_in where child_id=? and wyclass_id is null and schedule_detail_id is null "
+		checkExistSql := "select contact_status from consumer_new where id=? "
 
 		lessgo.Log.Debug(checkExistSql)
 
-		rows, err = db.Query(checkExistSql, chilId)
+		rows, err = db.Query(checkExistSql, id)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -1406,11 +1434,11 @@ func ChildSignInWithoutAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		num := 0
+		nowStatus := "1"
 
 		if rows.Next() {
 
-			err = commonlib.PutRecord(rows, &num)
+			err = commonlib.PutRecord(rows, &nowStatus)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -1422,7 +1450,7 @@ func ChildSignInWithoutAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if num > 0 {
+		if nowStatus == CONSUMER_STATUS_SIGNIN {
 			continue
 		}
 
@@ -1509,6 +1537,34 @@ func ChildSignInWithoutAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+
+		insertConsumerContactLogSql := `insert into consumer_contact_log(create_user,create_time,note,consumer_id,type)
+											values(?,?,'无班签到',?,3)`
+		lessgo.Log.Debug(insertConsumerContactLogSql)
+
+		stmt, err = tx.Prepare(insertConsumerContactLogSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), id)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
 	}
 
 	tx.Commit()
@@ -1772,6 +1828,34 @@ func RemoveChildFromClassAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		_, err = stmt.Exec(consumerId, employee.UserId, time.Now().Format("20060102150405"), CONSUMER_STATUS_NO_SIGNIN, CONSUMER_STATUS_WAIT)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		insertConsumerContactLogSql := `insert into consumer_contact_log(create_user,create_time,note,consumer_id,type)
+											select ?,?,concat('从',wc.start_time,wc.name,'中剔除'),?,3 from wyclass wc where wc.class_id=?`
+		lessgo.Log.Debug(insertConsumerContactLogSql)
+
+		stmt, err = tx.Prepare(insertConsumerContactLogSql)
+
+		if err != nil {
+			tx.Rollback()
+			lessgo.Log.Warn(err.Error())
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), consumerId, classId)
 
 		if err != nil {
 			tx.Rollback()
@@ -2476,6 +2560,35 @@ func AddChildToClassAction(w http.ResponseWriter, r *http.Request) {
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
+
+			insertConsumerContactLogSql := `insert into consumer_contact_log(create_user,create_time,note,consumer_id,type)
+											select ?,?,concat('邀约至',wc.start_time,wc.name,'中'),?,3 from wyclass wc where wc.class_id=?`
+			lessgo.Log.Debug(insertConsumerContactLogSql)
+
+			stmt, err = tx.Prepare(insertConsumerContactLogSql)
+
+			if err != nil {
+				tx.Rollback()
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
+			_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), consumerId, classId)
+
+			if err != nil {
+				tx.Rollback()
+				lessgo.Log.Warn(err.Error())
+				m["success"] = false
+				m["code"] = 100
+				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+				commonlib.OutputJson(w, m, " ")
+				return
+			}
+
 		}
 
 	}
@@ -2693,6 +2806,35 @@ func AddChildToClassQuickAction(w http.ResponseWriter, r *http.Request) {
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
+
+	insertConsumerContactLogSql := `insert into consumer_contact_log(create_user,create_time,note,consumer_id,type)
+											select ?,?,concat('邀约至',wc.start_time,wc.name,'中'),?,3 from wyclass wc where wc.class_id=?`
+	lessgo.Log.Debug(insertConsumerContactLogSql)
+
+	stmt, err = tx.Prepare(insertConsumerContactLogSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), consumerId, classId)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
 	tx.Commit()
 
 	m["success"] = true
@@ -2904,6 +3046,37 @@ func WyClassChangeClassAction(w http.ResponseWriter, r *http.Request) {
 		commonlib.OutputJson(w, m, " ")
 		return
 	}
+
+	insertConsumerContactLogSql := `insert into consumer_contact_log(create_user,create_time,note,consumer_id,type)
+											select ?,?,concat('从',wc1.start_time,wc1.name,'中调至',wc2.start_time,wc2.name,'中'),cons.id,3
+											from wyclass wc1,wyclass wc2,consumer_new cons,child ch
+											where wc1.class_id=? and wc2.class_id=? and ch.cid=? and ch.pid=cons.parent_id`
+	lessgo.Log.Debug(insertConsumerContactLogSql)
+
+	stmt, err = tx.Prepare(insertConsumerContactLogSql)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	_, err = stmt.Exec(employee.UserId, time.Now().Format("20060102150405"), oldClassId,newClassId,id)
+
+	if err != nil {
+		tx.Rollback()
+		lessgo.Log.Warn(err.Error())
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
 
 	tx.Commit()
 

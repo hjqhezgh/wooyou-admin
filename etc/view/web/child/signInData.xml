@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customgridpanel url="/web/child/signInData.json" pageSize="15" title="签到记录查询" id="grid1" width="1200" height="400" loadUrl="true" mutiSelect="true">
+
+        <search field="startTime" searchType="ge" inputType="datetime" desc="起始时间"/>
+        <search field="endTime" searchType="le" inputType="datetime" desc="结束时间"/>
+
+        <column field="signTime" desc="签到时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="contract_no" desc="合同">
+            <formatter>
+                <![CDATA[
+                        if(rowObject[4]) {
+                            return cellvalue+"-"+rowObject[3]+"-"+rowObject[4];
+                        }else{
+                            return '<span style="color:red">未关联合同</span>';
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="cardId" desc="卡号"/>
+        <column field="courseName" desc="课程名" hidden="true"/>
+        <column field="apply_time" desc="签单时间" hidden="true"/>
+        <column field="courseName1" desc="签到课程"/>
+
+        <toolaction desc="补当前卡号" url="/web/child/addCardToSignIn.json"  colorClass="h-bg-green" linkType="mutiSelect"/>
+        <toolaction desc="补登合同" url="/web/child/addContractToSignIn"  colorClass="h-bg-green" linkType="mutiSelectIframeWindow" params="{}"/>
+    </customgridpanel>
+</viewport>

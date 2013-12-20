@@ -671,7 +671,7 @@ func ContractCheckInSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		getScheduleTempId := "select st.id,st.room_id,st.time_id,st.week,csd.start_time from class_schedule_detail csd left join schedule_template st on csd.center_id=st.center_id and csd.room_id=st.room_id and csd.time_id=st.time_id and csd.week=st.week where csd.id=? "
+		getScheduleTempId := "select st.id,st.room_id,st.time_id,st.week,csd.start_time,csd.course_id from class_schedule_detail csd left join schedule_template st on csd.center_id=st.center_id and csd.room_id=st.room_id and csd.time_id=st.time_id and csd.week=st.week where csd.id=? "
 		lessgo.Log.Debug(getScheduleTempId)
 		rows, err := db.Query(getScheduleTempId, scheduleId)
 
@@ -680,9 +680,10 @@ func ContractCheckInSaveAction(w http.ResponseWriter, r *http.Request) {
 		stTimeId := 0
 		stWeek := 0
 		scdStartTime := ""
+		scdCourseId := ""
 
 		if rows.Next() {
-			err := commonlib.PutRecord(rows, &scheduleTempId,&stRoomId,&stTimeId,&stWeek,&scdStartTime)
+			err := commonlib.PutRecord(rows, &scheduleTempId,&stRoomId,&stTimeId,&stWeek,&scdStartTime,&scdCourseId)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -702,9 +703,9 @@ func ContractCheckInSaveAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		getFurtherScheduleSql := "select id from class_schedule_detail where time_id=? and room_id=? and week=? and start_time>=? "
+		getFurtherScheduleSql := "select id from class_schedule_detail where time_id=? and room_id=? and week=? and start_time>=? and course_id=? "
 		lessgo.Log.Debug(getFurtherScheduleSql)
-		scheduleRows, err := db.Query(getFurtherScheduleSql, stTimeId,stRoomId,stWeek,scdStartTime)
+		scheduleRows, err := db.Query(getFurtherScheduleSql, stTimeId,stRoomId,stWeek,scdStartTime,scdCourseId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
