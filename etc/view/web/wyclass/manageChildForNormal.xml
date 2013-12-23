@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="100">
+    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="150">
 
         <column field="childName" desc="学生"/>
         <column field="phone" desc="联系电话"/>

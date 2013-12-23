@@ -166,6 +166,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
 	"/web/child/childInNormalSchedule.json": server.ChildInNormalScheduleAction,
 	"/web/wyclass/signIn.json": server.ChildSignInAction,
+	"/web/wyclass/pay.json": server.ClassPayAction,
 	"/web/wyclass/signInWithoutClass.json": server.ChildSignInWithoutAction,
 	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
 	"/web/wyclass/addChild.json": server.AddChildToClassAction,
