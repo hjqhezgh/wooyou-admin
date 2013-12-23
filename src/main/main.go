@@ -198,4 +198,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//员工签到表
 	"/employee_sign_in.json": server.EmployeeSignInListAction,
+	//试听课程，添加至客户库中
+	"/web/apply_log/addToConsumer.json": server.ApplyLogAddToConsumerAction,
+
+
 }

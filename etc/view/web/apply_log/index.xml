@@ -36,9 +36,8 @@
                 ]]>
             </formatter>
         </column>
-
-        <!--<action desc="添加" url="/web/apply_log/add" linkType="newPage"/>-->
-        <!--<action desc="修改" url="/web/apply_log/modify" linkType="newPage" actionParams="[{name:'id',value:'id'}]"/>-->
+        <column field="center_id" desc="中心id" hidden="true"/>
+        <action desc="添加至总库" url="/web/apply_log/addToConsumer.json" linkType="ajax" actionParams="[{name:'year',value:'0'},{name:'month',value:'1'},{name:'childName',value:'2'},{name:'phone',value:'3'},{name:'comeFrom',value:'6'},{name:'centerId',value:'8'},{name:'createTime',value:'4'},{name:'type',value:'7'}]"/>
     </gridpanel>
 
 </viewport>
