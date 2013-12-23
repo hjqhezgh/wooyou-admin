@@ -36,7 +36,7 @@
         </div>
         <!--E right-text-->
         <div class="right-text">
-            <a href="javascript:void(0);">修改密码</a>
+            <a href="javascript:void(0);" data-action="changePwd">修改密码</a>
         </div>
         <!--E right-text-->
         <div class="right-text">
@@ -97,7 +97,7 @@
 <script type="text/javascript">
     var windowNum = 0;
     window.name = "viewport";
-    seajs.use(['jquery','juicer'],function(){
+    seajs.use(['jquery','juicer','lessgo-window'],function(){
         $.get('/queryMenus',{username:'{{.Employee.UserName}}'},function(data){
             var menus = data.menus;
             for (var i=0;i<menus.length;i++){
@@ -126,6 +126,16 @@
                     }
                 }
             }
+        });
+
+        $('a[data-action=changePwd]').click(function(e){
+            e.preventDefault();
+
+            $.openIframeWindow({
+                url : '/employee/password',
+                parentComponent : "",
+                parentWindowName : window.name
+            },e);
         });
 
         {{.CustomJs}}
