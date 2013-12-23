@@ -23,10 +23,34 @@
         </column>
         <column field="phoneNum" desc="电话数"/>
         <column field="consumerNum" desc="名单数"/>
-        <column field="inviteNum" desc="邀约数"/>
-        <column field="signNum" desc="签到数"/>
-        <column field="djPayNum" desc="已缴定金数"/>
-        <column field="qePayNum" desc="已缴全额数"/>
+        <column field="inviteNum" desc="邀约数">
+            <formatter>
+                <![CDATA[
+                   return '<a href="/web/consumer/tmk_detail?tmkId-eq='+options.rowId+'&status-eq=4" style="color:blue;text-decoration: underline;" target="_blank" data-action="openIframeWindow">'+cellvalue+'</a>'
+                ]]>
+            </formatter>
+        </column>
+        <column field="signNum" desc="签到数">
+            <formatter>
+                <![CDATA[
+                   return '<a href="/web/consumer/tmk_detail?tmkId-eq='+options.rowId+'&status-eq=5" style="color:blue;text-decoration: underline;" target="_blank" data-action="openIframeWindow">'+cellvalue+'</a>'
+                ]]>
+            </formatter>
+        </column>
+        <column field="djPayNum" desc="已缴定金数">
+            <formatter>
+                <![CDATA[
+                   return '<a href="/web/consumer/tmk_detail?tmkId-eq='+options.rowId+'&payStatus-eq=1" style="color:blue;text-decoration: underline;" target="_blank" data-action="openIframeWindow">'+cellvalue+'</a>'
+                ]]>
+            </formatter>
+        </column>
+        <column field="qePayNum" desc="已缴全额数">
+            <formatter>
+                <![CDATA[
+                   return '<a href="/web/consumer/tmk_detail?tmkId-eq='+options.rowId+'&payStatus-eq=2" style="color:blue;text-decoration: underline;" target="_blank" data-action="openIframeWindow">'+cellvalue+'</a>'
+                ]]>
+            </formatter>
+        </column>
         <column field="qePayNum" desc="邀约率（邀约数/电话数）" hidden="true">
             <formatter>
                 <![CDATA[
@@ -94,5 +118,6 @@
                 ]]>
             </formatter>
         </column>
+        <column field="employeeId" desc="员工id" hidden="true"/>
     </customgridpanel>
 </viewport>

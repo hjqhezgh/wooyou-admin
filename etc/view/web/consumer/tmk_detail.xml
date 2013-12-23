@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customgridpanel url="/consumer.json" pageSize="15" title="客户列表" id="grid1" width="1200" height="400" loadUrl="true" inwindow="true">
+
+        <search field="centerId" searchType="eq" inputType="remoteSelect" desc="客户所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="timeType" searchType="eq" inputType="localSelect" desc="时间查询类型" localData="[{desc:'按签到时间',value:'1'},{desc:'按缴费时间',value:'2'}]"/>
+        <search field="lastContractStartTime" searchType="ge" inputType="datetime" char14="true" desc="起始时间"/>
+        <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
+        <search field="kw" searchType="like" inputType="text" desc="关键字"/>
+        <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
+        <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
+
+        <column field="centerName" desc="所属门店"/>
+        <column field="employeeName" desc="TMK"/>
+        <column field="contactName" desc="联系人"/>
+        <column field="contactPhone" desc="联系电话"/>
+        <column field="homePhone" desc="家庭电话"/>
+        <column field="child" desc="孩子姓名"/>
+        <column field="status" desc="状态">
+        <formatter>
+            <![CDATA[
+                if(cellvalue==1){
+                    return '<span style="color:red;">未联系</span>';
+                }else if(cellvalue==2){
+                    return '<span>待确认</span>';
+                }else if(cellvalue==3){
+                    return '<span style="color:#ccc;">已废弃</span>';
+                }else if(cellvalue==4){
+                    return '<span style="color:blue;">已邀约至中心</span>';
+                }else if(cellvalue==5){
+                    return '<span style="color:green;">签到成功</span>';
+                }
+            ]]>
+        </formatter>
+        </column>
+        <column field="isAPP" desc="是否APP用户" hidden="true">
+            <formatter>
+                <![CDATA[
+                    if(cellvalue){
+                        return '是';
+                    }else{
+                        return '<a style="color:blue;text-decoration: underline;" target="_blank" title="APP开户" href="/web/consumer/add_app_account?id='+options.rowId+'" data-action="openIframeWindow">开户</a>';
+                    }
+                ]]>
+            </formatter>
+        </column>
+        <column field="remark" desc="备注"/>
+        <column field="payStatus" desc="缴费状态">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return '<span style="color:blue;">缴定金</span>';
+                        }else if(cellvalue=="2") {
+                            return '<span style="color:green;">缴全额</span>';
+                        }else if(cellvalue== "") {
+                            return "未缴费";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="paytime" desc="缴费时间">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="comefrom" desc="来源">
+            <formatter>
+                <![CDATA[
+                    var value = cellvalue;
+                    if(rowObject[12]){
+                        value += '('+rowObject[12]+')';
+                    }
+
+                    return value;
+                ]]>
+            </formatter>
+        </column>
+        <column field="parttimeName" desc="兼职人员姓名" hidden="true"/>
+    </customgridpanel>
+</viewport>

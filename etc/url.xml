@@ -54,6 +54,8 @@
     <url path="/web/audio/tmk_statistics" view="web/audio/tmk_statistics.xml" />
     <!--tmk运营报表详情-->
     <url path="/web/audio/tmk_statistics_detail" view="web/audio/tmk_statistics_detail.xml" />
+    <!--tmk报表，详情弹窗-->
+    <url path="/web/consumer/tmk_detail" view="web/consumer/tmk_detail.xml" />
 
     <!--app开户-->
     <url path="/web/consumer/add_app_account" view="web/consumer/add_app_account.xml" />

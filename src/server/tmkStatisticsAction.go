@@ -113,7 +113,7 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '定金',ff.num as '全额',1,2,3 "
+	sql := "select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '定金',ff.num as '全额',1,2,3"
 	sql += " from employee em left join "
 	sql += " (select count(1) num,e.user_id from audio a left join employee e on a.cid=e.center_id and a.localphone=e.phone_in_center "
 	sql += " where e.user_id is not null and start_time >=? and start_time<=?  group by e.user_id ) aa on em.user_id= aa.user_id "
