@@ -27,6 +27,21 @@
                     }
                 }
 
+                var phone = container.find('form').find('[name=phone]').val();
+                if(phone.length!=11){
+                    alert('请输入11位手机号');
+                    return false;
+                }
+
+                var birthday = container.find('form').find('[name=birthday]').val();
+                if(birthday){
+                    var a = /^(\d{4})-(\d{2})-(\d{2})$/;
+                    if (!a.test(birthday)) {
+                        alert("生日格式不正确!")
+                        return false
+                    }
+                }
+
                 return true;
             ]]>
         </beforeSave>

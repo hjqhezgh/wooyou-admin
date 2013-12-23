@@ -7,7 +7,7 @@
         <element field="child" type="text" validate="notNull" desc="小孩姓名"/>
         <element field="year" type="text" desc="出生年份" tip="格式：2013,2014,1987，四位数年份"/>
         <element field="month"  type="localSelect" localData="[{desc:'1月', value:'1'},{desc:'2月', value:'2'},{desc:'3月', value:'3'},{desc:'4月', value:'4'},{desc:'5月', value:'5'},{desc:'6月', value:'6'},{desc:'7月', value:'7'},{desc:'8月', value:'8'},{desc:'9月', value:'9'},{desc:'10月', value:'10'},{desc:'11月', value:'11'},{desc:'12月', value:'12'}]" desc="出生月份"/>
-        <element field="birthday" type="date" desc="出生日期" tip="如果填写此项，则年月无需填写" char8="true"/>
+        <element field="birthday" type="date" desc="出生日期" tip="如果填写此项，则年月无需填写，格式：2013-01-01" char8="true"/>
         <element field="come_from_id" type="remoteSelect" validate="notNull" url="/web/come_from/alldata" valueField="id" descField="name" desc="来源"/>
         <element field="parttimeName" type="text" validate="" desc="兼职人员姓名"/>
         <element field="center_id" type="remoteSelect" validate="notNull" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
@@ -16,14 +16,29 @@
         </afterRender>
         <beforeSave>
             <![CDATA[
-                var comFrom = container.find('form').find('[name=come_from_id]').val()
-                var parttimeName = container.find('form').find('[name=parttimeName]').val()
+                var comFrom = container.find('form').find('[name=come_from_id]').val();
+                var parttimeName = container.find('form').find('[name=parttimeName]').val();
 
 
                 if(comFrom=="4"){
                     if(!parttimeName){
                         alert('请填写兼职人员姓名');
                         return false;
+                    }
+                }
+
+                var phone = container.find('form').find('[name=phone]').val();
+                if(phone.length!=11){
+                    alert('请输入11位手机号');
+                    return false;
+                }
+
+                var birthday = container.find('form').find('[name=birthday]').val();
+                if(birthday){
+                    var a = /^(\d{4})-(\d{2})-(\d{2})$/;
+                    if (!a.test(birthday)) {
+                        alert("生日格式不正确!")
+                        return false
                     }
                 }
 
