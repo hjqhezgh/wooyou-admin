@@ -12,17 +12,9 @@ define(function (require, exports, module) {
 
     var process = {
         init : function(){
-            process.render();
 
-            $('input[name=start_time]').zIndex(10);
+            $('select[name=centerId]').html('<option value="">全部</option></select>');
 
-            $('input[name=start_time]').datepicker({
-                dateFormat : 'yy-mm-dd'
-            });
-
-            process.bind();
-        },
-        render : function(type){
             $.get('/web/center/alldata',function(data){
                 var optionTemp = '<option value="${value}">${desc}</option>';
 
@@ -41,6 +33,17 @@ define(function (require, exports, module) {
                 }
             },'json');
 
+            process.render();
+
+            $('input[name=start_time]').zIndex(10);
+
+            $('input[name=start_time]').datepicker({
+                dateFormat : 'yy-mm-dd'
+            });
+
+            process.bind();
+        },
+        render : function(type){
 
             container.html('<table border="1" id="schedule" width="100%" border="0" cellpadding="0" cellspacing="0"></table>');
             var allDataTable = $('#schedule');
