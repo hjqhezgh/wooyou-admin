@@ -1408,7 +1408,7 @@ func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		theDay := firstDay.Add(time.Duration(week-1) * 24)
+		theDay := firstDay.Add(time.Duration((week-1) * 24)*time.Hour)
 		date := theDay.Format("20060102")
 
 		getScheduleDetailSql := "select id from class_schedule_detail where center_id=? and room_id=? and time_id=? and day_date=?"
