@@ -24,13 +24,19 @@ import (
 )
 
 /*
-select a.aid,cons.child,cont.name contName,a.remotephone,,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,b.remark,cons.id,a.filename,a.cid  from audio a
+select a.aid,cons.child,b.remark,cont.name contName,a.remotephone,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.id,a.filename,a.cid,e1.really_name
+from
+(
+	select au.* from audio au
+	left join employee e on e.phone_in_center=au.localphone and e.center_id=au.cid
+	where e.user_id=37 and au.remotephone != '' and  au.remotephone is not null order by au.aid desc,au.start_time desc  limit 0,20
+) a
 left join contacts cont on a.remotephone=cont.phone
 left join consumer_new cons on cont.consumer_id=cons.id
-left join employee e on e.phone_in_center=a.localphone and e.center_id=a.cid
+left join employee e2 on e2.phone_in_center=a.localphone and e2.center_id=a.cid
 left join center ce on ce.cid=cons.center_id
-left join (select consumer_id,GROUP_CONCAT(concat(create_time,':',note) remark SEPARATOR "\n") note from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id
-where e.user_id=1 and a.remotephone != '' and  a.remotephone is not null
+left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id
+left join  employee e1 on e1.user_id=cons.current_tmk_id
 */
 func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
@@ -101,39 +107,47 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select a.aid,cons.child,b.remark,cont.name contName,a.remotephone,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.id,a.filename,a.cid,e1.really_name  from audio a "
-	sql += " left join contacts cont on a.remotephone=cont.phone "
-	sql += " left join consumer_new cons on cont.consumer_id=cons.id "
-	sql += " left join employee e on e.phone_in_center=a.localphone and e.center_id=a.cid "
-	sql += " left join center ce on ce.cid=cons.center_id "
-	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
-	sql += " left join  employee e1 on e1.user_id=cons.current_tmk_id "
-	sql += " where e.user_id=? and a.remotephone != '' and  a.remotephone is not null "
+	sql := `select a.aid,cons.child,b.remark,cont.name contName,a.remotephone,ce.name centerName,a.start_time,a.seconds,a.inout,a.is_upload_finish,cons.id,a.filename,a.cid,e1.really_name
+			from
+			(
+				select au.* from audio au
+				left join employee e on e.phone_in_center=au.localphone and e.center_id=au.cid
+				where e.user_id=? and au.remotephone != '' and  au.remotephone is not null %v order by au.aid desc,au.start_time desc  limit ?,?
+			) a
+			left join contacts cont on a.remotephone=cont.phone
+			left join consumer_new cons on cont.consumer_id=cons.id
+			left join employee e2 on e2.phone_in_center=a.localphone and e2.center_id=a.cid
+			left join center ce on ce.cid=cons.center_id
+			%v
+			left join  employee e1 on e1.user_id=cons.current_tmk_id`
 
 	params = append(params, eid)
 
+	whereSql := ""
+
 	if flag {
 		if st != "" && et != "" {
-			sql += " and a.start_time >= ? and a.start_time<= ?"
+			whereSql += " and au.start_time >= ? and au.start_time<= ?"
 			params = append(params, st)
 			params = append(params, et)
 		}
 	} else { //找不到相应的时间区间
-		sql += " and a.start_time >= ? and a.start_time<= ?"
+		whereSql += " and au.start_time >= ? and au.start_time<= ?"
 		params = append(params, "2000-01-01 00:00:00")
 		params = append(params, "2000-01-01 00:00:01")
 	}
 
-	countSql := ""
+	countSql := `select count(1) from (
+			select au.* from audio au
+			left join employee e on e.phone_in_center=au.localphone and e.center_id=au.cid
+			where e.user_id=? and au.remotephone != '' and  au.remotephone is not null %v) num`
 
-	countSql = "select count(1) from (" + sql + ") num"
-
-	lessgo.Log.Debug(countSql)
+	lessgo.Log.Debug(fmt.Sprintf(countSql,whereSql))
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql, params...)
+	rows, err := db.Query(fmt.Sprintf(countSql,whereSql), params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -167,14 +181,12 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	sql += " order by aid desc,a.start_time desc limit ?,?"
-
-	lessgo.Log.Debug(sql)
+	lessgo.Log.Debug(fmt.Sprintf(sql,whereSql,"left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id"))
 
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
 
-	rows, err = db.Query(sql, params...)
+	rows, err = db.Query(fmt.Sprintf(sql,whereSql,"left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id"), params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
