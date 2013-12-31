@@ -1355,32 +1355,24 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	centerId1 := r.FormValue("centerId-eq")
 	status := r.FormValue("status-eq")
-	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
-	lastContractEndTime := r.FormValue("lastContractEndTime-le")
+//	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
+//	lastContractEndTime := r.FormValue("lastContractEndTime-le")
 	kw := r.FormValue("kw-like")
 	partTimeName := r.FormValue("partTimeName-eq")
 	level := r.FormValue("level-eq")
 
 	params := []interface{}{}
+	paramsForCount := []interface{}{}
 
-	sql := " select cons.id,ce.name as centerName,e.really_name,cons.level,cont.name,cont.phone,cons.child,cons.birthday,cons.year,cons.contact_status,cons.parent_id,b.remark,cf.name comeFromName,cons.parttime_name"
-	sql += " from "
-	sql += " (select c.consumer_id,min(c.id) contacts_id from contacts c  "
-	if kw != "" {
-		sql += "left join consumer_new b on b.id=c.consumer_id where c.phone like ? or c.name like ? or b.child like ? or b.remark like ? or b.home_phone like ? "
-		params = append(params, "%"+kw+"%")
-		params = append(params, "%"+kw+"%")
-		params = append(params, "%"+kw+"%")
-		params = append(params, "%"+kw+"%")
-		params = append(params, "%"+kw+"%")
-	}
-	sql += " group by c.consumer_id)a "
-	sql += " left join consumer_new cons on cons.id=a.consumer_id "
-	sql += " left join contacts cont on cont.id=a.contacts_id "
-	sql += " left join center ce on ce.cid=cons.center_id "
-	sql += " left join come_from cf on cf.id=cons.come_from_id "
-	sql += " left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id "
-	sql += " left join employee e on e.user_id=cons.last_tmk_id where 1=1 and cons.is_own_by_tmk=2 and pay_time is null and contact_status!=5 "//已缴费用户和已签到用户将不再显示
+	sql := `select cons.id,ce.name as centerName,e.really_name,cons.level,cont.name,cont.phone,cons.child,cons.birthday,cons.year,cons.contact_status,cons.parent_id,d.remark,cf.name comeFromName,cons.parttime_name
+			from
+			(select a.consumer_id,min(a.id) contacts_id from contacts a left join consumer_new b on a.consumer_id=b.id
+			where (a.name like ? or b.child like ? or a.phone like ? or b.home_phone like ?) and b.is_own_by_tmk=2 and b.pay_time is null and b.contact_status!=5 `
+
+	params = append(params, "%"+kw+"%")
+	params = append(params, "%"+kw+"%")
+	params = append(params, "%"+kw+"%")
+	params = append(params, "%"+kw+"%")
 
 	if dataType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
@@ -1395,49 +1387,89 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		params = append(params, _employee.CenterId)
-		sql += " and cons.center_id=? "
+		sql += " and b.center_id=? "
 	}
 
 	if status != "" {
 		params = append(params, status)
-		sql += " and cons.contact_status=? "
-	}
-
-	if lastContractStartTime != "" {
-		params = append(params, lastContractStartTime)
-		sql += " and cons.last_contact_time>=? "
-	}
-
-	if lastContractEndTime != "" {
-		params = append(params, lastContractEndTime)
-		sql += " and cons.last_contact_time<=? "
+		sql += " and b.contact_status=? "
 	}
 
 	if centerId1 != "" && dataType == "all" {
 		params = append(params, centerId1)
-		sql += " and cons.center_id=? "
+		sql += " and b.center_id=? "
 	}
 
 	if partTimeName != "" {
 		params = append(params, partTimeName)
-		sql += " and cons.parttime_name=? "
+		sql += " and b.parttime_name=? "
 	}
 
 	if level != ""{
 		params = append(params, level)
-		sql += " and cons.level=? "
+		sql += " and b.level=? "
 	}
 
-	countSql := ""
+	sql += `group by a.consumer_id order by b.id desc  limit ?,?) c
+	left join consumer_new cons on cons.id=c.consumer_id
+	left join contacts cont on cont.id=c.contacts_id
+	left join center ce on ce.cid=cons.center_id
+	left join come_from cf on cf.id=cons.come_from_id
+	left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) d on d.consumer_id=cons.id
+	left join employee e on e.user_id=cons.last_tmk_id	`
 
-	countSql = "select count(1) from (" + sql + ") num"
+	countSql := `select count(1) from(select a.consumer_id,min(a.id) contacts_id from contacts a left join consumer_new b on a.consumer_id=b.id
+	where (a.name like ? or b.child like ? or a.phone like ? or b.home_phone like ?) and b.is_own_by_tmk=2 and b.pay_time is null and b.contact_status!=5 `
+
+	paramsForCount = append(paramsForCount, "%"+kw+"%")
+	paramsForCount = append(paramsForCount, "%"+kw+"%")
+	paramsForCount = append(paramsForCount, "%"+kw+"%")
+	paramsForCount = append(paramsForCount, "%"+kw+"%")
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employee.UserId)
+		_employee, err := FindEmployeeById(userId)
+
+		if err != nil {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+
+		paramsForCount = append(paramsForCount, _employee.CenterId)
+		countSql += " and b.center_id=? "
+	}
+
+	if status != "" {
+		paramsForCount = append(paramsForCount, status)
+		countSql += " and b.contact_status=? "
+	}
+
+	if centerId1 != "" && dataType == "all" {
+		paramsForCount = append(paramsForCount, centerId1)
+		countSql += " and b.center_id=? "
+	}
+
+	if partTimeName != "" {
+		paramsForCount = append(paramsForCount, partTimeName)
+		countSql += " and b.parttime_name=? "
+	}
+
+	if level != ""{
+		paramsForCount = append(paramsForCount, level)
+		countSql += " and b.level=? "
+	}
+
+	countSql += " group by a.consumer_id) aa "
 
 	lessgo.Log.Debug(countSql)
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(countSql, params...)
+	rows, err := db.Query(countSql, paramsForCount...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -1470,8 +1502,6 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	if currPageNo > totalPage {
 		currPageNo = totalPage
 	}
-
-	sql += " order by cons.id desc  limit ?,? "
 
 	lessgo.Log.Debug(sql)
 
