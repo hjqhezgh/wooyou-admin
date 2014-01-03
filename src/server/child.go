@@ -456,7 +456,7 @@ func ChildInNormalScheduleAction(w http.ResponseWriter, r *http.Request) {
 	params := []interface{}{}
 
 	sql := `
-	select sdc.child_id,ch.name,p.telephone,si.type,si.sign_time,cour.name courseName,contr.contract_no,contr.apply_time
+	select sdc.child_id,ch.name,p.telephone,si.type,si.sign_time,cour.name courseName,contr.id as contractId,contr.contract_no,contr.apply_time
 	 		from schedule_detail_child sdc
 	 				left join child ch on ch.cid=sdc.child_id
 	 				left join parent p on p.pid=ch.pid
@@ -539,7 +539,7 @@ func ChildInNormalScheduleAction(w http.ResponseWriter, r *http.Request) {
 
 		fillObjects = append(fillObjects, &model.Id)
 
-		for i := 0; i < 7; i++ {
+		for i := 0; i < 8; i++ {
 			prop := new(lessgo.Prop)
 			prop.Name = fmt.Sprint(i)
 			prop.Value = ""

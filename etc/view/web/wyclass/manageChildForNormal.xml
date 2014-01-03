@@ -35,13 +35,14 @@
             <formatter>
                 <![CDATA[
                         if(rowObject[5]) {
-                            return rowObject[5]+"-"+cellvalue+"-"+rowObject[6];
+                            return rowObject[6]+"-"+cellvalue+"-"+rowObject[7];
                         }else{
                             return '<span style="color:red">未关联合同</span>';
                         }
                 ]]>
             </formatter>
         </column>
+        <column field="contractId" desc="合同id" hidden="true"/>
         <column field="contract_no" desc="合同号" hidden="true"/>
         <column field="apply_time" desc="签单时间" hidden="true"/>
         <action desc="临时剔除" url="/web/wyclass/removeChildForNormalOnce.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'ids',value:'id'}]"/>
