@@ -329,7 +329,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 //获取短信模板文本
 func getSmsTmpText(employeeName, child, centerIntro, startTime string) string {
 	st, _ := time.ParseInLocation("20060102150405", startTime, time.Local)
-	content := child + "家长，您好，我是您吾幼儿童社区的老师" + employeeName + "。咱们约定的时间：" + st.Format("2006-01-02 15:04") + "。咱们" + centerIntro + "到时找不到地址直接打中心电话确认。咱们官网：www.wooyou.com.cn您可以提前上网了解。祝生活愉快！"
+	content := child + "家长，您好，我是您吾幼儿童社区的老师" + employeeName + "。咱们约定的时间：" + st.Format("2006-01-02 15:04") + "。" + centerIntro + "到时找不到地址直接打中心电话确认。咱们官网：www.wooyou.com.cn您可以提前上网了解。祝生活愉快！"
 	content += "【吾幼英语美术社区】"
 	return content
 }
