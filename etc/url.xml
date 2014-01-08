@@ -104,4 +104,9 @@
     <url path="/web/child/signInData" view="web/child/signInData.xml" />
     <!--学生模块，签到记录批量合同补登-->
     <url path="/web/child/addContractToSignIn" view="web/child/addContractToSignIn.xml" />
+
+    <!--课件分页-->
+    <url path="/web/courseware" view="web/courseware/index.xml" />
+    <url path="/web/courseware/add" view="web/courseware/add.xml" />
+    <url path="/web/courseware/modify" view="web/courseware/modify.xml" />
 </urls>

@@ -1,0 +1,18 @@
+{{$dataLength := .DataLength}}
+{
+    "page": "{{.PageData.CurrPageNo}}",
+    "total": "{{.PageData.TotalPage}}",
+    "records": "{{.PageData.TotalNum}}",
+    "rows": [
+        {{ range $modelIndex,$model:= .PageData.Datas}}
+        {
+            "id": "{{$model.Id}}",
+            {{range $propIndex,$prop := $model.Props}}
+            {{$propValue := getPropValue $model $prop.Name}}
+            "{{$prop.Name}}":"{{dealJsonString $propValue}}",
+            {{end}}
+            "操作" : "操作"
+        }{{if compareInt $modelIndex $dataLength "lt"}},{{end}}
+        {{end}}
+    ]
+}

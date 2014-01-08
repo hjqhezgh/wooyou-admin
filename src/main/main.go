@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"net/http"
 	"server"
+	"web"
 	"wooyousite"
 //	"test"
 )
@@ -76,7 +77,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//客户相关服务
 	"/consumer.json":     server.ConsumerListAction,
-	"/consumerSave.json": server.ConsumerSaveAction,
+	"/consumerSave.json": web.ConsumerSaveAction,
 	"/consumerLoad.json": server.ConsumerLoadAction,
 	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
 	"/web/consumer/backToAllConsumer.json": server.BackToAllConsumerAction,
@@ -202,4 +203,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/apply_log/addToConsumer.json": server.ApplyLogAddToConsumerAction,
 
 
+	//课件管理
+	"/web/courseware/page.json": web.CoursewareListAction,
+	"/web/courseware/save.json": web.CoursewareSaveAction,
+	"/web/courseware/load.json": web.CoursewareLoadAction,
 }

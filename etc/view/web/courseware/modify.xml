@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="修改课件" saveUrl="/web/courseware/save.json" load="true" loadUrl="/web/courseware/load.json" inwindow="true">
+        <element field="id"  type="hidden" desc="主键"/>
+        <element field="name"  type="text" desc="课件名" validate="notNull"/>
+        <element field="intro"  type="textarea" desc="描述" validate="notNull"/>
+    </customformpanel>
+
+    <customgridpanel url="/web/coursefile/pageOfcourseware.json" pageSize="15" title="文件列表" id="grid1" height="50" loadUrl="true" mutiSelect="true">
+        <toolaction desc="添加" url="/web/contacts/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <toolaction desc="删除" url="/contacts/delete.json" colorClass="h-bg-green" linkType="ajax" confirmMsg="确认删除联系人吗？" actionParams="[{name:'id',value:'id'}]"/>
+
+        <column field="商城" desc="描述"/>
+        <column field="telephone" desc="联系电话"/>
+        <column field="是否默认联系人" hidden="true" />
+        <action desc="修改" url="/web/contacts/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="删除" url="/contacts/delete.json" linkType="ajax" confirmMsg="确认删除联系人吗？" actionParams="[{name:'id',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

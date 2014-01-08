@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="课程管理" url="javascript:void(0);"/>
+        <crumb text="课件管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/web/courseware/page.json" pageSize="15" title="课件信息管理" id="grid1" width="1200" height="350" loadUrl="false">
+
+        <search field="kw" searchType="like" inputType="text" desc="关键字" />
+
+        <column field="name" desc="课件名"/>
+        <column field="intro" desc="课件描述"/>
+
+        <toolaction desc="添加" url="/web/courseware/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/courseware/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+        <!--<action desc="配置课节" url="/web/lesson" actionParams="[{name:'course_id-eq',value:'id'}]" linkType="iframeWindow"/>-->
+    </customgridpanel>
+
+</viewport>

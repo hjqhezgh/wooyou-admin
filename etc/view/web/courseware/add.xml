@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="添加课件" saveUrl="/web/courseware/save.json" load="false" loadUrl="" inwindow="true">
+        <element field="name"  type="text" desc="课件名" validate="notNull"/>
+        <element field="intro"  type="textarea" desc="描述" validate="notNull"/>
+    </customformpanel>
+</viewport>

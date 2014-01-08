@@ -124,7 +124,7 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 	sql += " left join "
 	sql += " (select count(1) num,tmk_id from( select tc.tmk_id,si.sid from tmk_consumer tc "
 	sql += " left join consumer_new cons on tc.consumer_id=cons.id left join parent p  on p.pid=cons.parent_id  left join child ch on ch.pid=p.pid left join sign_in si on si.child_id=ch.cid "
-	sql += " where si.type=1 and  (wyclass_id is not null or (wyclass_id is null and schedule_detail_id is null	)) and sign_time>=? and sign_time<=? ) a group by tmk_id )dd on em.user_id=dd.tmk_id "
+	sql += " where si.type=1 and  (wyclass_id is not null or (wyclass_id is null and schedule_detail_id is null)) and sign_time>=? and sign_time<=? ) a group by tmk_id )dd on em.user_id=dd.tmk_id "
 	sql += " left join "
 	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id "
 	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=1 ) b group by tmk_id) ee on em.user_id=ee.tmk_id "
