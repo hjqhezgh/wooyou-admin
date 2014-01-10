@@ -388,6 +388,11 @@ jQuery.fn.form = function (opts) {
             new ImageUploader($(this),$(this).attr('field-name'));
         });
 
+        //文件上传
+        myform.find('[field-type=file]').each(function(index,element){
+            new FileUploader($(this),$(this).attr('field-name'));
+        });
+
         //html编辑框
         myform.find('[field-type=htmleditor]').each(function(index,element){
             $(element).append(juicer(textAreaTemp,{
@@ -711,24 +716,5 @@ jQuery.fn.form = function (opts) {
     }
 
     return this;
-}
-
-function getParamsMap() {
-    var map = {}
-    if (document.URL.indexOf('?') > -1) {
-        var paramsStr = document.URL.substring(document.URL.indexOf('?') + 1);
-        var paramsArr = paramsStr.split('&');
-        for (var index in paramsArr) {
-            var param = paramsArr[index].split('=');
-            var key = param[0];
-            var value = param[1];
-            var urlParamValue = map[key];
-            if (urlParamValue == null) {
-                urlParamValue = value;
-                map[key] = urlParamValue;
-            }
-        }
-    }
-    return map;
 }
 

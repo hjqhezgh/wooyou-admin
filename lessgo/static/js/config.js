@@ -33,6 +33,9 @@ define(function (require, exports, module) {
                 src: productUrl + '/lib/bootstrap/2.3.2/bootstrap.min.js',
                 deps: ['jquery']
             },
+            'url-utils' : {
+                src: productUrl + '/lib/utils/url_utils.js'
+            },
             'juicer':{//模板合成
                 src: productUrl + '/lib/juicer/v0.6.5-stable/juicer-min.js'
             },
@@ -52,6 +55,10 @@ define(function (require, exports, module) {
                 src: productUrl + '/lib/lessgo-form/imageuploader.js',
                 deps: ['jquery','juicer','ajaxfileupload']
             },
+            'fileuploader':{
+                src: productUrl + '/lib/lessgo-form/fileuploader.js',
+                deps: ['jquery','juicer','ajaxfileupload']
+            },
             'kindeditor' : {
                 src: productUrl + '/lib/kindeditor/4.1.7/lang/zh_CN.js',
                 deps: ['jquery',productUrl + '/lib/kindeditor/4.1.7/kindeditor-min.js',productUrl + '/lib/kindeditor/4.1.7/themes/default/default.css']
@@ -67,8 +74,10 @@ define(function (require, exports, module) {
                        'jq-ui',
                        'juicer',
                        'imageuploader',
+                       'fileuploader',
                        'kindeditor',
                        'timepicker',
+                       'url-utils',
                        productUrl + '/lib/lessgo-form/area.js',
                        productUrl + '/lib/lessgo-form/timedim-week.js',
                        'lessgo-window'
@@ -84,7 +93,7 @@ define(function (require, exports, module) {
             },
             'lessgo-grid' : {
                 src: productUrl + '/lib/lessgo-grid/lessgo.grid.js',
-                deps: ['jq-grid','juicer','timepicker','lessgo-window']
+                deps: ['jq-grid','juicer','timepicker','lessgo-window','url-utils']
             },
             'lessgo-window' : {
                 src: productUrl + '/lib/lessgo-window/lessgo.window.js',

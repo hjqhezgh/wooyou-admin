@@ -565,14 +565,18 @@ function gridActionRender(cellvalue, options, rowObject,action,componentId) {
                 params += options.rowId;
             }else{
                 var reg = new RegExp("^[0-9]*$");
-                if(!reg.test(action.actionParams[i].value)){//支持列名形式
-                    //todo 发现行不通。控件还没加载到相应数据
-                    /*
-                    for (var j in rowObject){
-                        alert(j)
+                if(!reg.test(action.actionParams[i].value)){
+                    if(action.actionParams[i].value.charAt(0)=="$"){//获取url地址中的参数
+                        var key = action.actionParams[i].value.substr(1);
+                        params += getParamsMap()[key];
+                    }else if(action.actionParams[i].value.charAt(0)=="@"){//获取表格中的field
+                        var key = action.actionParams[i].value.substr(1);
+                        params += rowObject[key];
+                    }else if(action.actionParams[i].value.charAt(0)=="%"){//数字常量
+                        params += action.actionParams[i].value.substr(1);
+                    }else{//常量字符串
+                        params += action.actionParams[i].value;
                     }
-                    params += window[componentId].grid.jqGrid('getRowData',10)['name'];*/
-                    params += action.actionParams[i].value;
                 }else{//支持索引形式
                     params += rowObject[action.actionParams[i].value];
                 }

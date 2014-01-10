@@ -1,21 +1,3 @@
-//为fileupload插件打一个补丁
-jQuery.extend({
-    handleError: function (s, xhr, status, e) {
-        if (s.error)
-            s.error(xhr, status, e);
-        if (s.global)
-            jQuery.event.trigger("ajaxError", [xhr, s, e]);
-    },
-    active: 0,
-    httpSuccess: function (xhr) {
-        try {
-            return!xhr.status && location.protocol == "file:" || (xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || xhr.status == 1223 || jQuery.browser.safari && xhr.status == undefined;
-        } catch (e) {
-        }
-        return false;
-    }
-});
-
 /*****
  * 图片上传预览控件、
  */
