@@ -105,8 +105,11 @@
     <!--学生模块，签到记录批量合同补登-->
     <url path="/web/child/addContractToSignIn" view="web/child/addContractToSignIn.xml" />
 
-    <!--课件分页-->
+    <!--课件-->
     <url path="/web/courseware" view="web/courseware/index.xml" />
     <url path="/web/courseware/add" view="web/courseware/add.xml" />
     <url path="/web/courseware/modify" view="web/courseware/modify.xml" />
+
+    <!--课件附件-->
+    <url path="/web/coursefile/add" view="web/coursefile/add.xml" />
 </urls>

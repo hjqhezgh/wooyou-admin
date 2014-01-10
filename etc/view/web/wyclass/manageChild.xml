@@ -6,7 +6,7 @@
         <column field="childName" desc="学员姓名"/>
         <column field="phone" desc="联系电话"/>
         <column field="tmkName" desc="邀约人" width="50"/>
-        <column field="inviteTIme" desc="邀约时间">
+        <column field="inviteTime" desc="邀约时间">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -17,7 +17,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="signInTime" desc="签到时间">
+        <column field="signTime" desc="签到时间">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -29,7 +29,7 @@
             </formatter>
         </column>
         <column field="classId" desc="班级ID" hidden="true"/>
-        <column field="tmkId" desc="tmkid" hidden="true"/>
+        <column field="inviteUser" desc="tmkid" hidden="true"/>
         <column field="centerId" desc="centerId" hidden="true"/>
         <column field="smsStatus" desc="短信发送状态" width="50">
             <formatter>
@@ -44,10 +44,16 @@
                 ]]>
             </formatter>
         </column>
+        <column field="level" desc="星级"/>
+        <column field="remark" desc="备注"/>
+        <column field="consumerId" desc="consumerId" hidden="true"/>
+
         <action desc="剔除" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
-        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldClassId',value:'5'},{name:'cid-eq',value:'7'}]" linkType="iframeWindow"/>
-        <action desc="缴定金" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'5'},{name:'type',value:'part'}]" linkType="ajax" confirmMsg="确认为该用户缴定金？"/>
-        <action desc="缴全额" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'5'},{name:'type',value:'all'}]" linkType="ajax" confirmMsg="确认为该用户缴全额？"/>
+        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldClassId',value:'@classId'},{name:'cid-eq',value:'@centerId'}]" linkType="iframeWindow"/>
+        <action desc="缴定金" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'part'}]" linkType="ajax" confirmMsg="确认为该用户缴定金？"/>
+        <action desc="缴全额" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'all'}]" linkType="ajax" confirmMsg="确认为该用户缴全额？"/>
+        <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@cosumerId'}]" linkType="iframeWindow"/>
+
         <toolaction desc="签到" url="/web/wyclass/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
         <toolaction desc="发送邀约短信" url="/web/wyclass/sendSMS"  colorClass="h-bg-green"  linkType="mutiSelectIframeWindow" params="{}"/>
     </customgridpanel>
@@ -55,9 +61,13 @@
     <customgridpanel url="/web/child/childInCenter.json" pageSize="15" title="选择学生" id="grid2" width="1200" height="250" loadUrl="true" mutiSelect="true" pageId="grid2">
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
 
-        <column field="centerName" desc="所属门店"/>
-        <column field="contactPhone" desc="学生姓名"/>
-        <column field="child" desc="联系电话"/>
+        <column field="childName" desc="学生姓名"/>
+        <column field="phone" desc="联系电话"/>
+        <column field="level" desc="星级"/>
+        <column field="remark" desc="备注"/>
+        <column field="consumerId" desc="consumerId" hidden="true"/>
+
+        <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
 
         <toolaction desc="加入当前班级" url="/web/wyclass/addChild.json"  colorClass="h-bg-green" linkType="mutiSelect">
             <callback>

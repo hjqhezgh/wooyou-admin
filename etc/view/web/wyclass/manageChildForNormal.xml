@@ -5,7 +5,7 @@
 
         <column field="childName" desc="学生"/>
         <column field="phone" desc="联系电话"/>
-        <column field="signInType" desc="签到状态">
+        <column field="signType" desc="签到状态">
             <formatter>
                 <![CDATA[
                         if(cellvalue==1) {
@@ -20,7 +20,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="signInTime" desc="签到时间">
+        <column field="signTime" desc="签到时间">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -43,21 +43,30 @@
             </formatter>
         </column>
         <column field="contractId" desc="合同id" hidden="true"/>
-        <column field="contract_no" desc="合同号" hidden="true"/>
-        <column field="apply_time" desc="签单时间" hidden="true"/>
+        <column field="contractNo" desc="合同号" hidden="true"/>
+        <column field="applyTime" desc="签单时间" hidden="true"/>
+        <column field="level" desc="星级"/>
+        <column field="remark" desc="备注"/>
+        <column field="consumerId" desc="consumerId" hidden="true"/>
+
         <action desc="临时剔除" url="/web/wyclass/removeChildForNormalOnce.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="结课" url="/web/wyclass/removeChildForNormal.json" linkType="ajax" confirmMsg="确认结束该学生当前的课程吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="请假" url="/web/wyclass/leaveForChild.json" linkType="ajax" confirmMsg="确认请假该学生吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="合同登记" url="/web/wyclass/contractCheckIn" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="点评" url="/web/class_schedule_attach" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
+        <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
     </customgridpanel>
 
     <customgridpanel url="/web/child/childInCenter.json" pageSize="15" title="选择学生" id="grid2" width="1200" height="250" loadUrl="true" mutiSelect="true" pageId="grid2">
         <search field="kw" searchType="like" inputType="text" desc="名字/电话"/>
 
-        <column field="centerName" desc="门店"/>
-        <column field="contactPhone" desc="学生"/>
-        <column field="child" desc="联系电话"/>
+        <column field="childName" desc="学生姓名"/>
+        <column field="phone" desc="联系电话"/>
+        <column field="level" desc="星级"/>
+        <column field="remark" desc="备注"/>
+        <column field="consumerId" desc="consumerId" hidden="true"/>
+
+        <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
 
         <toolaction desc="跟班" url="/web/wyclass/addChildForNormalTempelate.json"  colorClass="h-bg-green" linkType="mutiSelect">
             <callback>

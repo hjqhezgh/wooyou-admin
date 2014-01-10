@@ -21,26 +21,6 @@ import (
 	"time"
 )
 
-type Consumer struct {
-	Id            string
-	CenterId      string
-	ContactStatus string
-	HomePhone     string
-	ParentId      string
-	Child         string
-	Year          string
-	Month         string
-	Birthday      string
-	LastTmkId     string
-	IsOwnByTMK    string
-	ComeFormId    string
-	CurrentTMKId  string
-	SignInTime    string
-	PayTime       string
-	ParttimeName  string
-	Level		  string
-}
-
 const (
 	CONSUMER_STATUS_NO_CONTACT = "1" //未联系
 	CONSUMER_STATUS_WAIT       = "2" //待确认
