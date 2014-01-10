@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"fmt"
 )
 
 func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +208,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 
 	for index, phone := range phoneList {
 		if phone != "" {
-			getConsumerInfo := "select child from consumer_new  where id=?"
+			getConsumerInfo := "select name from child  where cid=?"
 			lessgo.Log.Debug(getConsumerInfo)
 			rows, err := db.Query(getConsumerInfo, consumerIdList[index])
 
@@ -236,8 +237,9 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 			}
 
 			contentDetail := getSmsContent(content, childName)
-			smsResult, err := SendMessage(phone, contentDetail)
-
+			smsResult := SmsResult{Msg:"asdas",Result:0}
+			//smsResult, err := SendMessage(phone, contentDetail)
+			fmt.Println(contentDetail)
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
 				m["success"] = false

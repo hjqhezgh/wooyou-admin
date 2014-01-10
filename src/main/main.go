@@ -59,6 +59,8 @@ func main() {
 
 //URL映射列表
 var handlers = map[string]func(http.ResponseWriter, *http.Request){
+	"/hehe": server.HeHe,
+
 	"/login": server.LoginAction,
 
 	//根据角色ID获取员工列表
@@ -162,10 +164,10 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_detail/add.json": server.ClassScheduleDetailAddAction,
 	"/web/class_schedule_detail/modify.json": server.ClassScheduleDetailModifyAction,
 	"/web/class_schedule_detail/createWeekSchedule.json": server.CreateWeekScheduleAction,
-	"/web/child/childInCenter.json": server.ChildInCenterAction,
-	"/web/child/childInClass.json": server.ChildInClassListAction,
+	"/web/child/childInCenter.json": web.ChildInCenterAction,
+	"/web/child/childInClass.json": web.ChildInClassListAction,
+	"/web/child/childInNormalSchedule.json": web.ChildInNormalScheduleAction,
 	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
-	"/web/child/childInNormalSchedule.json": server.ChildInNormalScheduleAction,
 	"/web/wyclass/signIn.json": server.ChildSignInAction,
 	"/web/wyclass/pay.json": server.ClassPayAction,
 	"/web/wyclass/signInWithoutClass.json": server.ChildSignInWithoutAction,
