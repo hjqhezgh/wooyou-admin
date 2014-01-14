@@ -190,3 +190,38 @@ func CoursewareLoadAction(w http.ResponseWriter, r *http.Request) {
 	m["datas"] = loadFormObjects
 	commonlib.OutputJson(w, m, " ")
 }
+
+func CoursewareUploadCallBack(w http.ResponseWriter, r *http.Request) {
+
+	m := make(map[string]interface{})
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	state := r.FormValue("state")
+	suffix := r.FormValue("suffix")
+	fileName := r.FormValue("fileName")
+	srcFileName := r.FormValue("srcFileName")
+	fileSize := r.FormValue("fileSize")
+
+	if state == "SUCCESS" {
+		m["success"] = true
+		m["suffix"] = suffix
+		m["fileName"] = fileName
+		m["srcFileName"] = srcFileName
+		m["fileSize"] = fileSize
+	}else{
+		m["success"] = false
+		m["msg"] = "文件上传发生错误，请重试"
+	}
+
+	commonlib.OutputJson(w, m, " ")
+	return
+}

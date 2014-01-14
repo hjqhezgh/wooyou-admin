@@ -59,7 +59,6 @@ func main() {
 
 //URL映射列表
 var handlers = map[string]func(http.ResponseWriter, *http.Request){
-	"/hehe": server.HeHe,
 
 	"/login": server.LoginAction,
 
@@ -78,7 +77,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/audioNoteSave.json":                server.AudioNoteSaveAction,
 
 	//客户相关服务
-	"/consumer.json":     server.ConsumerListAction,
+	"/consumer.json":     web.ConsumerListAction,
 	"/consumerSave.json": web.ConsumerSaveAction,
 	"/consumerLoad.json": server.ConsumerLoadAction,
 	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
@@ -209,4 +208,5 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/courseware/page.json": web.CoursewareListAction,
 	"/web/courseware/save.json": web.CoursewareSaveAction,
 	"/web/courseware/load.json": web.CoursewareLoadAction,
+	"/web/courseware/uploadCallBack": web.CoursewareUploadCallBack,
 }

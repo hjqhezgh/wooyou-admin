@@ -19,6 +19,7 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"time"
+	"strconv"
 )
 
 const (
@@ -369,14 +370,131 @@ func updateConsumer(tx *sql.Tx,consumerDataMap map[string]interface {},id string
 	return nil
 }
 
-func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {/*
+func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	countSql := " select count(1) from consumer_new cons where 1=1 "
-	countParams := []interface{}{scheduleId}
-	lessgo.Log.Debug(countSql)
+	whereSql := ""
 
+	countSql := `
+		select count(1) from (
+			select c.consumer_id from contacts c
+			left join consumer_new b on b.id=c.consumer_id
+			where (c.phone like ? or c.name like ? or b.child like ?) %v
+			group by c.consumer_id
+		) num
+	`
+	countParams := []interface{}{"%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%"}
+
+	dataSql := `
+		select cons.id id,ce.name as centerName,e.really_name tmkName,cont.name contactName,cont.phone phone ,cons.home_phone homePhone,cons.child childName,cons.contact_status contactStatus,cons.parent_id parentId,b.remark remark,cons.pay_status payStatus,cons.pay_time payTime,cf.name comeFromName, cons.parttime_name partTimeName
+		from (
+			select c.consumer_id,min(c.id) contacts_id from contacts c
+			left join consumer_new b on b.id=c.consumer_id
+			where (c.phone like ? or c.name like ? or b.child like ?) %v
+			group by c.consumer_id %v limit ?,?)a
+		left join consumer_new cons on cons.id=a.consumer_id
+		left join contacts cont on cont.id=a.contacts_id
+		left join center ce on ce.cid=cons.center_id
+		left join employee e on e.user_id=cons.current_tmk_id
+		left join come_from cf on cf.id=cons.come_from_id
+	`
+	dataParams := []interface{}{"%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%"}
+
+	if paramsMap["status"] != "" {
+		countParams = append(countParams, paramsMap["status"])
+		dataParams = append(dataParams, paramsMap["status"])
+		whereSql += " and b.contact_status=? "
+	}
+
+	if paramsMap["lastContractStartTime"] != "" && paramsMap["timeType"] == "1" {
+		countParams = append(countParams, paramsMap["lastContractStartTime"])
+		dataParams = append(dataParams, paramsMap["lastContractStartTime"])
+		whereSql += " and b.sign_in_time>=? "
+	}
+
+	if paramsMap["lastContractStartTime"] != "" && paramsMap["timeType"] == "2" {
+		countParams = append(countParams, paramsMap["lastContractStartTime"])
+		dataParams = append(dataParams, paramsMap["lastContractStartTime"])
+		whereSql += " and b.pay_time>=? "
+	}
+
+	if paramsMap["lastContractEndTime"] != "" && paramsMap["timeType"] == "1" {
+		countParams = append(countParams, paramsMap["lastContractEndTime"])
+		dataParams = append(dataParams, paramsMap["lastContractEndTime"])
+		whereSql += " and b.sign_in_time<=? "
+	}
+
+	if paramsMap["lastContractEndTime"] != "" && paramsMap["timeType"] == "2" {
+		countParams = append(countParams, paramsMap["lastContractEndTime"])
+		dataParams = append(dataParams, paramsMap["lastContractEndTime"])
+		whereSql += " and b.pay_time<=? "
+	}
+
+	if paramsMap["payStatus"] == "1" {
+		whereSql += " and b.pay_time is not null and b.pay_time != '' and b.pay_status=1 "
+	} else if paramsMap["payStatus"] == "2" {
+		whereSql += " and b.pay_time is not null and b.pay_time != '' and b.pay_status=2 "
+	} else if paramsMap["payStatus"] == "3" {
+		whereSql += " and (b.pay_time is null or b.pay_time ='')"
+	}
+
+	if paramsMap["tmkId1"] != "" {
+		countParams = append(countParams, paramsMap["tmkId1"])
+		dataParams = append(dataParams, paramsMap["tmkId1"])
+		whereSql += " and b.current_tmk_id=? "
+	}
+
+	if paramsMap["tmkId2"] != "" {
+		countParams = append(countParams, paramsMap["tmkId2"])
+		dataParams = append(dataParams, paramsMap["tmkId2"])
+		whereSql += " and b.current_tmk_id=? "
+	}
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employeeId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			return nil,err
+		}
+		countParams = append(countParams, _employee.CenterId)
+		dataParams = append(dataParams, _employee.CenterId)
+		whereSql += " and b.center_id=? "
+	}
+
+	if paramsMap["centerId1"] != "" && dataType == "all" {
+		countParams = append(countParams, paramsMap["centerId1"])
+		dataParams = append(dataParams, paramsMap["centerId1"])
+		whereSql += " and b.center_id=? "
+	}
+
+	if paramsMap["centerId2"] != "" && dataType == "all" {
+		countParams = append(countParams, paramsMap["centerId2"])
+		dataParams = append(dataParams, paramsMap["centerId2"])
+		whereSql += " and b.center_id=? "
+	}
+
+	if paramsMap["parttimeName"] != "" {
+		countParams = append(countParams, paramsMap["parttimeName"])
+		dataParams = append(dataParams, paramsMap["parttimeName"])
+		whereSql += " and b.parttime_name=? "
+	}
+
+	orderSql := ""
+
+	if paramsMap["sort"] == "" || paramsMap["sort"] == "create_time" {
+		orderSql += " order by b.id desc "
+	} else if paramsMap["sort"] == "last_time" {
+		orderSql += " order by b.last_contact_time desc "
+	}
+
+	countSql = fmt.Sprintf(countSql,whereSql)
+	dataSql = fmt.Sprintf(dataSql,whereSql,orderSql)
+
+	dataSql += ` left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id `
+
+	lessgo.Log.Debug(countSql)
 	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, countParams)
 
 	if err != nil {
@@ -388,26 +506,14 @@ func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo
 		currPageNo = totalPage
 	}
 
-	dataSql := `
-				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark
-	 		    from (select * from schedule_detail_child where schedule_detail_id=? order by id desc limit ?,?) sdc
-	 			left join child ch on ch.cid=sdc.child_id
-	 			left join parent p on p.pid=ch.pid
-	 			left join consumer_new cons on cons.parent_id=ch.pid
-	            left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) d on d.consumer_id=cons.id
-	 			left join sign_in si on si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
-	 			left join class_schedule_detail csd on csd.id=sdc.schedule_detail_id
-	 			left join contract contr on contr.id=sdc.contract_id
-	 			left join course cour on cour.cid=contr.course_id`
+	dataParams = append(dataParams, (currPageNo-1)*pageSize, pageSize)
+
 	lessgo.Log.Debug(dataSql)
-
-	dataParams := []interface{}{scheduleId, (currPageNo-1)*pageSize, pageSize}
-
 	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, dataParams)
 
 	if err != nil {
 		return nil, err
-	}*/
+	}
 
-	return nil, nil
+	return pageData, nil
 }
