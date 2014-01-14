@@ -66,10 +66,9 @@ func ChildInClassListAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	classId := r.FormValue("classId")
 	scheduleId := r.FormValue("scheduleId")
 
-	pageData,err := logic.ChildInClassPage(classId,scheduleId,pageNo,pageSize)
+	pageData,err := logic.ChildInClassPage(scheduleId,pageNo,pageSize)
 
 	if err != nil {
 		m["success"] = false

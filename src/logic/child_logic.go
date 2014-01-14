@@ -160,14 +160,14 @@ func getChildByParentId(pid string) (int64, error) {
 	return id, nil
 }
 
-func ChildInClassPage(classId,scheduleId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+func ChildInClassPage(scheduleId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	countSql := " select count(1) from schedule_detail_child where wyclass_id=? and schedule_detail_id=? "
+	countSql := " select count(1) from schedule_detail_child where schedule_detail_id=? "
 	lessgo.Log.Debug(countSql)
-	countParams := []interface{}{classId,scheduleId}
+	countParams := []interface{}{scheduleId}
 
 	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, countParams)
 
@@ -189,11 +189,10 @@ func ChildInClassPage(classId,scheduleId string, pageNo, pageSize int) (*commonl
 	            left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) d on d.consumer_id=cons.id
 				left join employee e on e.user_id=sdc.create_user
 				left join sign_in si on sdc.wyclass_id=si.wyclass_id and si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
-				where sdc.wyclass_id=? and sdc.schedule_detail_id=? order by sdc.id desc limit ?,?`
+				where sdc.schedule_detail_id=? order by sdc.id desc limit ?,?`
 	lessgo.Log.Debug(dataSql)
 
 	dataParams := []interface{}{}
-	dataParams = append(dataParams, classId)
 	dataParams = append(dataParams, scheduleId)
 	dataParams = append(dataParams, (currPageNo-1)*pageSize)
 	dataParams = append(dataParams, pageSize)
