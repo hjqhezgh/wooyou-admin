@@ -16,10 +16,10 @@ package web
 import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
-	"net/http"
 	"logic"
-	"strings"
+	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 )
 
@@ -65,7 +65,7 @@ func ConsumerSaveAction(w http.ResponseWriter, r *http.Request) {
 	paramsMap["level"] = r.FormValue("level")
 	paramsMap["createUser"] = employee.UserId
 
-	flag,msg,err := logic.SaveConsumer(paramsMap)
+	flag, msg, err := logic.SaveConsumer(paramsMap)
 
 	if err != nil {
 		m["success"] = false
@@ -163,7 +163,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	paramsMap["timeType"] = r.FormValue("timeType-eq")
 	paramsMap["parttimeName"] = r.FormValue("partTimeName-eq")
 
-	pageData,err := logic.ConsumerPage(paramsMap,dataType,employee.UserId,pageNo,pageSize)
+	pageData, err := logic.ConsumerPage(paramsMap, dataType, employee.UserId, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false
@@ -178,4 +178,3 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.RenderTemplate(w, r, "page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/page.json")
 }
-

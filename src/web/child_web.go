@@ -16,8 +16,8 @@ package web
 import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
-	"net/http"
 	"logic"
+	"net/http"
 	"strconv"
 	"text/template"
 )
@@ -68,7 +68,7 @@ func ChildInClassListAction(w http.ResponseWriter, r *http.Request) {
 
 	scheduleId := r.FormValue("scheduleId")
 
-	pageData,err := logic.ChildInClassPage(scheduleId,pageNo,pageSize)
+	pageData, err := logic.ChildInClassPage(scheduleId, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false
@@ -130,7 +130,7 @@ func ChildInCenterAction(w http.ResponseWriter, r *http.Request) {
 	centerId := r.FormValue("centerId-eq")
 	kw := r.FormValue("kw-like")
 
-	pageData,err := logic.ChildInCenterPage(centerId,kw,pageNo,pageSize)
+	pageData, err := logic.ChildInCenterPage(centerId, kw, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false
@@ -191,7 +191,7 @@ func ChildInNormalScheduleAction(w http.ResponseWriter, r *http.Request) {
 
 	scheduleId := r.FormValue("scheduleId")
 
-	pageData,err := logic.ChildInNormalSchedulePage(scheduleId,pageNo,pageSize)
+	pageData, err := logic.ChildInNormalSchedulePage(scheduleId, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false

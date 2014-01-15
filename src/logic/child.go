@@ -15,10 +15,10 @@ package logic
 
 import (
 	"database/sql"
-	"github.com/hjqhezgh/lessgo"
-	"github.com/hjqhezgh/commonlib"
-	"strconv"
 	"fmt"
+	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
+	"strconv"
 )
 
 func insertChild(tx *sql.Tx, name, pid, sex, birthday, year, month, centerId string) (id int64, err error) {
@@ -37,11 +37,11 @@ func insertChild(tx *sql.Tx, name, pid, sex, birthday, year, month, centerId str
 		childBirthday = birthday
 	} else {
 		if year != "" && month != "" {
-			monthInt,_ := strconv.Atoi(month)
+			monthInt, _ := strconv.Atoi(month)
 			if monthInt > 9 {
 				childBirthday = year + month + "01"
-			}else{
-				childBirthday = year + "0" +month + "01"
+			} else {
+				childBirthday = year + "0" + month + "01"
 			}
 		} else if year != "" {
 			childBirthday = year + "0101"
@@ -67,7 +67,7 @@ func insertChild(tx *sql.Tx, name, pid, sex, birthday, year, month, centerId str
 /*
 select cid id,name,card_id cardId,pid,sex,birthday,center_id centerId,avatar from child where cid=?
 */
-func findChildById(id string) (map[string]string,error)  {
+func findChildById(id string) (map[string]string, error) {
 
 	sql := `select cid id,name,card_id cardId,pid,sex,birthday,center_id centerId,avatar
 	        from child where cid=?`
@@ -84,31 +84,31 @@ func findChildById(id string) (map[string]string,error)  {
 		return nil, err
 	}
 
-	dataMap,err := lessgo.GetDataMap(rows)
+	dataMap, err := lessgo.GetDataMap(rows)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return dataMap,nil
+	return dataMap, nil
 }
 
-func updateChild(tx *sql.Tx,childDataMap map[string]interface {},id string) error{
+func updateChild(tx *sql.Tx, childDataMap map[string]interface{}, id string) error {
 	sql := "update child set %v where cid=?"
-	params := []interface {}{}
+	params := []interface{}{}
 
 	setSql := ""
 
-	for key,value := range childDataMap{
-		setSql += key+"=?,"
-		params = append(params,value)
+	for key, value := range childDataMap {
+		setSql += key + "=?,"
+		params = append(params, value)
 	}
 
-	params = append(params,id)
+	params = append(params, id)
 
-	setSql = commonlib.Substr(setSql,0,len(setSql)-1)
+	setSql = commonlib.Substr(setSql, 0, len(setSql)-1)
 
-	sql = fmt.Sprintf(sql,setSql)
+	sql = fmt.Sprintf(sql, setSql)
 	lessgo.Log.Debug(sql)
 
 	stmt, err := tx.Prepare(sql)
@@ -139,6 +139,38 @@ func getChildByParentId(pid string) (int64, error) {
 	lessgo.Log.Debug(sql)
 
 	rows, err := db.Query(sql, pid)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	var id int64
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &id)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return 0, err
+		}
+	}
+
+	return id, nil
+}
+
+//todo 目前只返回第一个孩子的id，逻辑有待优化
+func getChildByConsumerId(consumerId string) (int64, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select ch.cid from child ch left join consumer_new cons on cons.parent_id=ch.pid where cons.id=?"
+
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, consumerId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -206,13 +238,13 @@ func ChildInClassPage(scheduleId string, pageNo, pageSize int) (*commonlib.Tradi
 	return pageData, nil
 }
 
-func ChildInCenterPage(centerId,kw string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+func ChildInCenterPage(centerId, kw string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
 	countSql := " select count(1) from child ch left join parent p on p.pid=ch.pid where ch.center_id=? and (ch.name like ? or p.telephone like ?) "
-	countParams := []interface{}{centerId,"%"+kw+"%","%"+kw+"%"}
+	countParams := []interface{}{centerId, "%" + kw + "%", "%" + kw + "%"}
 	lessgo.Log.Debug(countSql)
 
 	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, countParams)
@@ -233,7 +265,7 @@ func ChildInCenterPage(centerId,kw string, pageNo, pageSize int) (*commonlib.Tra
 	            left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) d on d.consumer_id=cons.id`
 	lessgo.Log.Debug(dataSql)
 
-	dataParams := []interface{}{centerId,"%"+kw+"%","%"+kw+"%", (currPageNo-1)*pageSize, pageSize}
+	dataParams := []interface{}{centerId, "%" + kw + "%", "%" + kw + "%", (currPageNo - 1) * pageSize, pageSize}
 
 	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, dataParams)
 
@@ -277,7 +309,7 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	 			left join course cour on cour.cid=contr.course_id`
 	lessgo.Log.Debug(dataSql)
 
-	dataParams := []interface{}{scheduleId, (currPageNo-1)*pageSize, pageSize}
+	dataParams := []interface{}{scheduleId, (currPageNo - 1) * pageSize, pageSize}
 
 	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, dataParams)
 

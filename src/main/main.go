@@ -21,13 +21,10 @@ import (
 	"server"
 	"web"
 	"wooyousite"
-//	"test"
 )
 
 
 func main() {
-
-//	test.ImportParttimeNameData()
 
 	r := lessgo.ConfigLessgo()
 
@@ -163,15 +160,16 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_detail/add.json": server.ClassScheduleDetailAddAction,
 	"/web/class_schedule_detail/modify.json": server.ClassScheduleDetailModifyAction,
 	"/web/class_schedule_detail/createWeekSchedule.json": server.CreateWeekScheduleAction,
+	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
 	"/web/child/childInCenter.json": web.ChildInCenterAction,
 	"/web/child/childInClass.json": web.ChildInClassListAction,
 	"/web/child/childInNormalSchedule.json": web.ChildInNormalScheduleAction,
-	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
 	"/web/wyclass/signIn.json": server.ChildSignInAction,
 	"/web/wyclass/pay.json": server.ClassPayAction,
 	"/web/wyclass/signInWithoutClass.json": server.ChildSignInWithoutAction,
 	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
-	"/web/wyclass/addChild.json": server.AddChildToClassAction,
+	"/web/wyclass/addChild.json": web.AddChildToClassAction,
+	"/web/wyclass/addChildQuick.json": web.AddChildToClassQuickAction,
 	"/web/wyclass/addChildForNormalOnce.json": server.AddChildForNormalOnceAction,
 	"/web/wyclass/addChildForNormalTempelate.json": server.AddChildForNormalTempelateAction,
 	"/web/wyclass/sendSMS/load.json": server.WyClassSendSMSLoadAction,
@@ -179,13 +177,12 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/wyclass/removeChildForNormalOnce.json": server.RemoveChildForNormalOnceAction,
 	"/web/wyclass/removeChildForNormal.json": server.RemoveChildForNormalAction,
 	"/web/wyclass/leaveForChild.json": server.LeaveForChildAction,
-	"/web/wyclass/addChildQuick.json": server.AddChildToClassQuickAction,
+	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
+	"/web/wyclass/contractCheckInSave.json": server.ContractCheckInSaveAction,
 	"/web/class_schedule_attach/data.json": server.ClassScheduleAttachListAction,
 	"/web/class_schedule_attach/load.json": server.ClassScheduleAttachLoadAction,
 	"/web/class_schedule_attach/save.json": server.ClassScheduleAttachSaveAction,
 	"/web/class_schedule_attach/videoplay.html": server.ClassScheduleAttachVideoPlayAction,
-	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
-	"/web/wyclass/contractCheckInSave.json": server.ContractCheckInSaveAction,
 
 	//班级相关服务
 	"/wyclass.json": server.WyClassListAction,

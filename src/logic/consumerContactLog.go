@@ -19,7 +19,13 @@ import (
 	"time"
 )
 
-func insertConsumerContactsLog(tx *sql.Tx, createUser, note, consumerId,contactsType string) (id int64, err error) {
+const (
+	CONTACTS_LOG_TYPE_PHONE  = "1" //电话
+	CONTACTS_LOG_TYPE_FACE   = "2" //当面
+	CONTACTS_LOG_TYPE_SYSTEM = "3" //系统自动生成
+)
+
+func insertConsumerContactsLog(tx *sql.Tx, createUser, note, consumerId, contactsType string) (id int64, err error) {
 
 	sql := "insert into consumer_contact_log(create_user,create_time,note,consumer_id,type) values(?,?,?,?,?) "
 	lessgo.Log.Debug(sql)

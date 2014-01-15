@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
-	"time"
 	"strconv"
+	"time"
 )
 
 const (
@@ -103,7 +103,7 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 		}
 
 		if remark != "" {
-			_, err = insertConsumerContactsLog(tx, createUser, remark, fmt.Sprint(consumerId),"1")
+			_, err = insertConsumerContactsLog(tx, createUser, remark, fmt.Sprint(consumerId), CONTACTS_LOG_TYPE_PHONE)
 
 			if err != nil {
 				return false, "", err
@@ -134,25 +134,25 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 				return false, "", err
 			}
 
-			updateConsumerMap := make(map[string]interface {})
+			updateConsumerMap := make(map[string]interface{})
 			updateConsumerMap["parent_id"] = parentId
 
-			err = updateConsumer(tx,updateConsumerMap,fmt.Sprint(consumerId))
+			err = updateConsumer(tx, updateConsumerMap, fmt.Sprint(consumerId))
 			if err != nil {
 				return false, "", err
 			}
 		} else {
-			updateConsumerMap := make(map[string]interface {})
+			updateConsumerMap := make(map[string]interface{})
 			updateConsumerMap["parent_id"] = parentId
 
-			err = updateConsumer(tx,updateConsumerMap,fmt.Sprint(consumerId))
+			err = updateConsumer(tx, updateConsumerMap, fmt.Sprint(consumerId))
 			if err != nil {
 				return false, "", err
 			}
 		}
 
 	} else {
-		consumerDataMap,err := findConsumerById(id)
+		consumerDataMap, err := findConsumerById(id)
 
 		if err != nil {
 			return false, "", err
@@ -171,7 +171,7 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 			}
 		}
 
-		updateConsumerMap := make(map[string]interface {})
+		updateConsumerMap := make(map[string]interface{})
 		updateConsumerMap["child"] = child
 		updateConsumerMap["year"] = year
 		updateConsumerMap["month"] = month
@@ -181,20 +181,20 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 		updateConsumerMap["parttime_name"] = parttimeName
 		updateConsumerMap["level"] = level
 
-		err = updateConsumer(tx,updateConsumerMap,id)
+		err = updateConsumer(tx, updateConsumerMap, id)
 		if err != nil {
 			return false, "", err
 		}
 
-		childId,err := getChildByParentId(consumerDataMap["parentId"])
+		childId, err := getChildByParentId(consumerDataMap["parentId"])
 		if err != nil {
 			return false, "", err
 		}
 
-		updateChildMap := make(map[string]interface {})
+		updateChildMap := make(map[string]interface{})
 		updateChildMap["name"] = child
 
-		err = updateChild(tx,updateChildMap,fmt.Sprint(childId))
+		err = updateChild(tx, updateChildMap, fmt.Sprint(childId))
 		if err != nil {
 			return false, "", err
 		}
@@ -306,7 +306,7 @@ select id,center_id centerId,contact_status contactStatus,home_phone homePhone,p
 	    	       pay_time,payTime,pay_status payStatus,parttime_name parttimeName,level
 	        from consumer_new where id=?
 */
-func findConsumerById(id string) (map[string]string,error)  {
+func findConsumerById(id string) (map[string]string, error) {
 
 	sql := `select id,center_id centerId,contact_status contactStatus,home_phone homePhone,parent_id parentId,child,year,month,birthday,
 	    	       last_tmk_id lastTMKId,is_own_by_tmk isOwnByTmk,come_from_id comeFromId,current_tmk_id currentTMKId,sign_in_time signInTime,
@@ -325,32 +325,32 @@ func findConsumerById(id string) (map[string]string,error)  {
 		return nil, err
 	}
 
-	dataMap,err := lessgo.GetDataMap(rows)
+	dataMap, err := lessgo.GetDataMap(rows)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return dataMap,nil
+	return dataMap, nil
 }
 
 //更新consumer
-func updateConsumer(tx *sql.Tx,consumerDataMap map[string]interface {},id string) error{
+func updateConsumer(tx *sql.Tx, consumerDataMap map[string]interface{}, id string) error {
 	sql := "update consumer_new set %v where id=?"
-	params := []interface {}{}
+	params := []interface{}{}
 
 	setSql := ""
 
-	for key,value := range consumerDataMap{
-		setSql += key+"=?,"
-		params = append(params,value)
+	for key, value := range consumerDataMap {
+		setSql += key + "=?,"
+		params = append(params, value)
 	}
 
-	params = append(params,id)
+	params = append(params, id)
 
-	setSql = commonlib.Substr(setSql,0,len(setSql)-1)
+	setSql = commonlib.Substr(setSql, 0, len(setSql)-1)
 
-	sql = fmt.Sprintf(sql,setSql)
+	sql = fmt.Sprintf(sql, setSql)
 	lessgo.Log.Debug(sql)
 
 	stmt, err := tx.Prepare(sql)
@@ -370,7 +370,7 @@ func updateConsumer(tx *sql.Tx,consumerDataMap map[string]interface {},id string
 	return nil
 }
 
-func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -385,7 +385,7 @@ func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo
 			group by c.consumer_id
 		) num
 	`
-	countParams := []interface{}{"%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%"}
+	countParams := []interface{}{"%" + paramsMap["kw"] + "%", "%" + paramsMap["kw"] + "%", "%" + paramsMap["kw"] + "%"}
 
 	dataSql := `
 		select cons.id id,ce.name as centerName,e.really_name tmkName,cont.name contactName,cont.phone phone ,cons.home_phone homePhone,cons.child childName,cons.contact_status contactStatus,cons.parent_id parentId,b.remark remark,cons.pay_status payStatus,cons.pay_time payTime,cf.name comeFromName, cons.parttime_name partTimeName
@@ -400,7 +400,7 @@ func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo
 		left join employee e on e.user_id=cons.current_tmk_id
 		left join come_from cf on cf.id=cons.come_from_id
 	`
-	dataParams := []interface{}{"%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%","%"+paramsMap["kw"]+"%"}
+	dataParams := []interface{}{"%" + paramsMap["kw"] + "%", "%" + paramsMap["kw"] + "%", "%" + paramsMap["kw"] + "%"}
 
 	if paramsMap["status"] != "" {
 		countParams = append(countParams, paramsMap["status"])
@@ -456,7 +456,7 @@ func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo
 		userId, _ := strconv.Atoi(employeeId)
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
 		countParams = append(countParams, _employee.CenterId)
 		dataParams = append(dataParams, _employee.CenterId)
@@ -489,8 +489,8 @@ func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo
 		orderSql += " order by b.last_contact_time desc "
 	}
 
-	countSql = fmt.Sprintf(countSql,whereSql)
-	dataSql = fmt.Sprintf(dataSql,whereSql,orderSql)
+	countSql = fmt.Sprintf(countSql, whereSql)
+	dataSql = fmt.Sprintf(dataSql, whereSql, orderSql)
 
 	dataSql += ` left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note)  ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id `
 
@@ -516,4 +516,37 @@ func ConsumerPage(paramsMap map[string]string,dataType,employeeId string, pageNo
 	}
 
 	return pageData, nil
+}
+
+//根据id获取consumer数据Map
+/*
+select cons.id,cons.center_id centerId,cons.contact_status contactStatus,cons.home_phone homePhone,cons.parent_id parentId,cons.child,cons.year,cons.month,cons.birthday,cons.last_tmk_id lastTMKId,cons.is_own_by_tmk isOwnByTmk,cons.come_from_id comeFromId,cons.current_tmk_id currentTMKId,cons.sign_in_time signInTime,cons.pay_time payTime,cons.pay_status payStatus,cons.parttime_name parttimeName,cons.level
+	    	from consumer_new cons left join child ch on ch.pid=cons.parent_id where ch.cid=?
+*/
+func findConsumerByChildId(id string) (map[string]string, error) {
+
+	sql := `
+			select cons.id,cons.center_id centerId,cons.contact_status contactStatus,cons.home_phone homePhone,cons.parent_id parentId,cons.child,cons.year,cons.month,cons.birthday,cons.last_tmk_id lastTMKId,cons.is_own_by_tmk isOwnByTmk,cons.come_from_id comeFromId,cons.current_tmk_id currentTMKId,cons.sign_in_time signInTime,cons.pay_time payTime,cons.pay_status payStatus,cons.parttime_name parttimeName,cons.level
+	    	from consumer_new cons left join child ch on ch.pid=cons.parent_id where ch.cid=?
+	    	`
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, id)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return nil, err
+	}
+
+	dataMap, err := lessgo.GetDataMap(rows)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return dataMap, nil
 }

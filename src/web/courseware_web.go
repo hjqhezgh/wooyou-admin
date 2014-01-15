@@ -16,9 +16,9 @@ package web
 import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
+	"logic"
 	"net/http"
 	"strconv"
-	"logic"
 	"text/template"
 )
 
@@ -79,7 +79,7 @@ func CoursewareListAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pageData,err := logic.CoursewareList(_employee.CenterId,kw,pageNo,pageSize)
+	pageData, err := logic.CoursewareList(_employee.CenterId, kw, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false
@@ -135,7 +135,7 @@ func CoursewareSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flag,msg,err := logic.SaveCourseware(id,_employee.CenterId,name,intro)
+	flag, msg, err := logic.SaveCourseware(id, _employee.CenterId, name, intro)
 
 	if err != nil {
 		m["success"] = false
@@ -176,7 +176,7 @@ func CoursewareLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	loadFormObjects,err := logic.LoadCourseware(id)
+	loadFormObjects, err := logic.LoadCourseware(id)
 
 	if err != nil {
 		m["success"] = false
@@ -217,7 +217,7 @@ func CoursewareUploadCallBack(w http.ResponseWriter, r *http.Request) {
 		m["fileName"] = fileName
 		m["srcFileName"] = srcFileName
 		m["fileSize"] = fileSize
-	}else{
+	} else {
 		m["success"] = false
 		m["msg"] = "文件上传发生错误，请重试"
 	}
