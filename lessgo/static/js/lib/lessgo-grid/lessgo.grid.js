@@ -28,6 +28,8 @@ jQuery.fn.grid = function (opts) {
 
     this.render = function () {
 
+        this.renderToolBar();
+
         this.grid = $('#' + opts.tableId).jqGrid({
             url: opts.dataurl,
             datatype: 'json',
@@ -61,6 +63,33 @@ jQuery.fn.grid = function (opts) {
         this.renderSearchForm();
 
         this.bindButtonEvent();
+
+
+    }
+
+    this.renderToolBar = function(){
+        var currentRoleCode = opts.currentRoleCode;
+        currentRoleCode = currentRoleCode.substring(0,currentRoleCode.length-1);
+        currentRoleCodes = currentRoleCode.split(',');
+
+        _this.find('.btn-box a').each(function(){
+            var thisButton = $(this);
+            if($(this).attr('data-roles').trim()!=''){
+                var buttonPrivileges = $(this).attr('data-roles').split(',');
+                var flag = false;
+                for(var i=0;i<currentRoleCodes.length;i++){
+                    for(var k=0;k<buttonPrivileges.length;k++){
+                        if(buttonPrivileges[k]==currentRoleCodes[i]){
+                            flag = true;
+                        }
+                    }
+                }
+                if(!flag){//可以显示
+                    thisButton.remove();
+                }
+            }
+        });
+
     }
 
     this.loadCheckboxContainer = function(){
