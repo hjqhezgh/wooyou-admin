@@ -103,7 +103,7 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 		}
 
 		if remark != "" {
-			_, err = insertConsumerContactsLog(tx, createUser, remark, fmt.Sprint(consumerId))
+			_, err = insertConsumerContactsLog(tx, createUser, remark, fmt.Sprint(consumerId),"1")
 
 			if err != nil {
 				return false, "", err

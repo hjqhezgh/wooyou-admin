@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-func insertConsumerContactsLog(tx *sql.Tx, createUser, note, consumerId string) (id int64, err error) {
+func insertConsumerContactsLog(tx *sql.Tx, createUser, note, consumerId,contactsType string) (id int64, err error) {
 
 	sql := "insert into consumer_contact_log(create_user,create_time,note,consumer_id,type) values(?,?,?,?,?) "
 	lessgo.Log.Debug(sql)
@@ -29,7 +29,7 @@ func insertConsumerContactsLog(tx *sql.Tx, createUser, note, consumerId string) 
 		return 0, err
 	}
 
-	res, err := stmt.Exec(createUser, time.Now().Format("20060102150405"), note, consumerId, 1)
+	res, err := stmt.Exec(createUser, time.Now().Format("20060102150405"), note, consumerId, contactsType)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
