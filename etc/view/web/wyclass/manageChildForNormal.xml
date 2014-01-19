@@ -48,12 +48,24 @@
         <column field="level" desc="星级"/>
         <column field="remark" desc="备注"/>
         <column field="consumerId" desc="consumerId" hidden="true"/>
+        <column field="isFree" desc="是否试听">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return '<span style="color:red;">是</span>';
+                        }else if(cellvalue=="2"){
+                            return "否";
+                        }
+                ]]>
+            </formatter>
+        </column>
 
-        <action desc="临时剔除" url="/web/wyclass/removeChildForNormalOnce.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <toolaction desc="签到" url="/web/class_schedule_detail/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
+
+        <action desc="临时剔除" url="/web/class_schedule_detail/removeChild.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="结课" url="/web/wyclass/removeChildForNormal.json" linkType="ajax" confirmMsg="确认结束该学生当前的课程吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="请假" url="/web/class_schedule_detail/leave.json" linkType="ajax" confirmMsg="确认请假该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="旷课" url="/web/class_schedule_detail/truant.json" linkType="ajax" confirmMsg="确认旷课该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
-        <action desc="签到" url="/web/class_schedule_detail/signIn.json" linkType="ajax" confirmMsg="确认签到该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="合同登记" url="/web/wyclass/contractCheckIn" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="点评" url="/web/class_schedule_attach" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
@@ -70,7 +82,7 @@
 
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
 
-        <toolaction desc="跟班" url="/web/wyclass/addChildForNormalTempelate.json"  colorClass="h-bg-green" linkType="mutiSelect">
+        <toolaction desc="跟班" url="/web/class_schedule_detail/addChildForNormalTempelate.json"  colorClass="h-bg-green" linkType="mutiSelect">
             <callback>
                 <![CDATA[
                      if(!data.success){
@@ -81,7 +93,18 @@
             </callback>
         </toolaction>
 
-        <toolaction desc="临时插班" url="/web/wyclass/addChildForNormalOnce.json"  colorClass="h-bg-green" linkType="mutiSelect">
+        <toolaction desc="临时插班" url="/web/class_schedule_detail/addChildForNormalOnce.json"  colorClass="h-bg-green" linkType="mutiSelect">
+            <callback>
+                <![CDATA[
+                     if(!data.success){
+                        alert(data.msg)
+                     }
+                     grid1.grid.trigger("reloadGrid");
+                ]]>
+            </callback>
+        </toolaction>
+
+        <toolaction desc="免费试听" url="/web/class_schedule_detail/addChild.json"  colorClass="h-bg-org" linkType="mutiSelect">
             <callback>
                 <![CDATA[
                      if(!data.success){

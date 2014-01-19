@@ -67,7 +67,7 @@ func insertChild(tx *sql.Tx, name, pid, sex, birthday, year, month, centerId str
 /*
 select cid id,name,card_id cardId,pid,sex,birthday,center_id centerId,avatar from child where cid=?
 */
-func findChildById(id string) (map[string]string, error) {
+func getChildById(id string) (map[string]string, error) {
 
 	sql := `select cid id,name,card_id cardId,pid,sex,birthday,center_id centerId,avatar
 	        from child where cid=?`
@@ -301,7 +301,7 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	}
 
 	dataSql := `
-				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark
+				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark,sdc.is_free isFree
 	 		    from (select * from schedule_detail_child where schedule_detail_id=? order by id desc limit ?,?) sdc
 	 			left join child ch on ch.cid=sdc.child_id
 	 			left join parent p on p.pid=ch.pid
@@ -332,7 +332,7 @@ func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pa
 	params := []interface{}{}
 
 	dataSql :=  `
-				select ch.cid id,ce.name centerName,ch.name childName,p.telephone phone,p.password,ch.card_id cardId,ch.birthday,ch.sex,p.reg_date regTime,contract_num.num haveContract,totalNum.num totalNum,usedNum.num usedNum,cons.pay_status payStatus
+				select ch.cid id,ce.name centerName,ch.name childName,p.telephone phone,p.password,ch.card_id cardId,ch.birthday,ch.sex,p.reg_date regTime,contract_num.num haveContract,totalNum.num totalNum,usedNum.num usedNum
 				from child ch
 				left join parent p on p.pid=ch.pid
 				left join center ce on ce.cid=ch.center_id

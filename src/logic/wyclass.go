@@ -20,7 +20,7 @@ import (
 /*
 select class_id id,name,start_time,end_time,code,center_id,child_num from wyclass where class_id=?
 */
-func findWyClassById(id string) (map[string]string, error) {
+func getWyClassById(id string) (map[string]string, error) {
 
 	sql := `
 			select class_id id,name,start_time,end_time,code,center_id,child_num from wyclass where class_id=?

@@ -175,9 +175,9 @@ func checkContractValid(expireDateString string) (bool, error) {
 /*
 select id,child_id,apply_time,contract_no,parent_id,price,employee_id,center_id,course_id,left_lesson_num,type,status,expire_date from contract where id=?
 */
-func getContractIdByChildIdAndScheduleId(childId, scheduleId string) (string, error) {
+func getContractIdByChildIdAndScheduleId(childId, scheduleId string) (contractId,isFree string,err error) {
 
-	sql := `select contract_id from schedule_detail_child where child_id=? and schedule_detail_id=?`
+	sql := `select contract_id,is_free from schedule_detail_child where child_id=? and schedule_detail_id=?`
 	lessgo.Log.Debug(sql)
 
 	db := lessgo.GetMySQL()
@@ -187,21 +187,19 @@ func getContractIdByChildIdAndScheduleId(childId, scheduleId string) (string, er
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return "0", err
+		return "0","", err
 	}
 
-	var id string
-
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &id)
+		err = commonlib.PutRecord(rows, &contractId, &isFree)
 	}
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return "0", err
+		return "0","", err
 	}
 
-	return id, nil
+	return contractId,isFree, nil
 }
 
 func ContractList(childId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {

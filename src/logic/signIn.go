@@ -31,16 +31,30 @@ const (
 	IS_FREE_NO  = "2" //不是试听课
 )
 
+//如果scheduleId=“”，则视为无班签到的判断
 func checkSignInExist(childId, scheduleId string) (bool, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	sql := "select count(1) from sign_in where child_id=? and schedule_detail_id=?"
+	dataSql := ""
 
-	lessgo.Log.Debug(sql)
+	if scheduleId=="" {
+		dataSql = "select count(1) from sign_in where child_id=? and schedule_detail_id is null "
+	}else{
+		dataSql = "select count(1) from sign_in where child_id=? and schedule_detail_id=? "
+	}
 
-	rows, err := db.Query(sql, childId, scheduleId)
+	lessgo.Log.Debug(dataSql)
+
+	var rows *sql.Rows
+	var err error
+
+	if scheduleId=="" {
+		rows, err = db.Query(dataSql, childId)
+	}else{
+		rows, err = db.Query(dataSql, childId, scheduleId)
+	}
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -66,9 +80,17 @@ func checkSignInExist(childId, scheduleId string) (bool, error) {
 	return false, nil
 }
 
+//scheduleId==""为无班签到
 func insertSignIn(tx *sql.Tx, scheduleId, childId, signType, contractId, cardId, employeeId, isFree string) (err error) {
 
-	sql := "insert into sign_in(child_id,sign_time,schedule_detail_id,type,contract_id,card_id,employee_id,is_free) values(?,?,?,?,?,?,?,?)"
+	sql := ""
+
+	if scheduleId == ""{
+		sql = "insert into sign_in(child_id,sign_time,type,contract_id,card_id,employee_id,is_free) values(?,?,?,?,?,?,?)"
+	}else{
+		sql = "insert into sign_in(child_id,sign_time,schedule_detail_id,type,contract_id,card_id,employee_id,is_free) values(?,?,?,?,?,?,?,?)"
+	}
+
 	lessgo.Log.Debug(sql)
 
 	stmt, err := tx.Prepare(sql)
@@ -78,7 +100,11 @@ func insertSignIn(tx *sql.Tx, scheduleId, childId, signType, contractId, cardId,
 		return err
 	}
 
-	_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), scheduleId, signType, contractId, cardId, employeeId, isFree)
+	if scheduleId == ""{
+		_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), signType, contractId, cardId, employeeId, isFree)
+	}else{
+		_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), scheduleId, signType, contractId, cardId, employeeId, isFree)
+	}
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())

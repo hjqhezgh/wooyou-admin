@@ -48,13 +48,13 @@
         <column field="remark" desc="备注"/>
         <column field="consumerId" desc="consumerId" hidden="true"/>
 
-        <action desc="剔除" url="/web/wyclass/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="剔除" url="/web/class_schedule_detail/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldClassId',value:'@classId'},{name:'cid-eq',value:'@centerId'}]" linkType="iframeWindow"/>
         <action desc="缴定金" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'part'}]" linkType="ajax" confirmMsg="确认为该用户缴定金？"/>
         <action desc="缴全额" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'all'}]" linkType="ajax" confirmMsg="确认为该用户缴全额？"/>
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@cosumerId'}]" linkType="iframeWindow"/>
 
-        <toolaction desc="签到" url="/web/wyclass/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
+        <toolaction desc="签到" url="/web/class_schedule_detail/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
         <toolaction desc="发送邀约短信" url="/web/wyclass/sendSMS"  colorClass="h-bg-green"  linkType="mutiSelectIframeWindow" params="{}"/>
     </customgridpanel>
 
@@ -69,14 +69,13 @@
 
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
 
-        <toolaction desc="加入当前班级" url="/web/wyclass/addChild.json"  colorClass="h-bg-green" linkType="mutiSelect">
+        <toolaction desc="加入当前班级" url="/web/class_schedule_detail/addChild.json"  colorClass="h-bg-green" linkType="mutiSelect">
             <callback>
                 <![CDATA[
                      if(!data.success){
                         alert(data.msg)
                      }
                      grid1.grid.trigger("reloadGrid");
-                     grid2.grid.trigger("reloadGrid");
                 ]]>
             </callback>
         </toolaction>

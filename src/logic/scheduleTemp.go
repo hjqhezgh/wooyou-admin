@@ -15,6 +15,8 @@ package logic
 
 import (
 	"github.com/hjqhezgh/lessgo"
+	"github.com/hjqhezgh/commonlib"
+	"database/sql"
 )
 
 /*
@@ -115,4 +117,60 @@ func getChildAndContractByScheduleTempId(tempId string) ([]map[string]string, er
 	}
 
 	return datas, nil
+}
+
+func checkScheduleTempChildExist(childId,scheduleTempId string)(flag bool,err error){
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := " select count(1) from schedule_template_child where child_id=? and  schedule_template_id=? "
+
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, childId,scheduleTempId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, err
+	}
+
+	num := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &num)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, err
+		}
+	}
+
+	if num > 0 {
+		return true,nil
+	}
+
+	return false,nil
+}
+
+func insertScheduleTempChild(tx *sql.Tx,childId,scheduleTempId string) error {
+	sql := "insert into schedule_template_child(schedule_template_id,child_id) values(?,?) "
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(scheduleTempId,childId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
 }

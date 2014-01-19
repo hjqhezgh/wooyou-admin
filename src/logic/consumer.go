@@ -522,7 +522,7 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 	return pageData, nil
 }
 
-//根据id获取consumer数据Map
+//根据ChildId获取consumer数据Map
 /*
 select cons.id,cons.center_id centerId,cons.contact_status contactStatus,cons.home_phone homePhone,cons.parent_id parentId,cons.child,cons.year,cons.month,cons.birthday,cons.last_tmk_id lastTMKId,cons.is_own_by_tmk isOwnByTmk,cons.come_from_id comeFromId,cons.current_tmk_id currentTMKId,cons.sign_in_time signInTime,cons.pay_time payTime,cons.pay_status payStatus,cons.parttime_name parttimeName,cons.level
 	    	from consumer_new cons left join child ch on ch.pid=cons.parent_id where ch.cid=?
