@@ -14,14 +14,14 @@
 package server
 
 import (
+	"fmt"
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
-	"net/http"
 	"math"
-	"fmt"
-	"text/template"
+	"net/http"
 	"strconv"
 	"strings"
+	"text/template"
 )
 
 func ClassScheduleAttachListAction(w http.ResponseWriter, r *http.Request) {
@@ -183,9 +183,7 @@ func ClassScheduleAttachListAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.RenderTemplate(w, r, "entity_page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/entity_page.json")
 
-
 }
-
 
 func ClassScheduleAttachLoadAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface{})
@@ -330,7 +328,7 @@ func ClassScheduleAttachVideoPlayAction(w http.ResponseWriter, r *http.Request) 
 
 	url := r.FormValue("url")
 
-	url = strings.Replace(url,".3gp",".flv",-1)
+	url = strings.Replace(url, ".3gp", ".flv", -1)
 
 	m["filePath"] = url
 

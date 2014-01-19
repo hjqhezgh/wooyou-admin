@@ -82,10 +82,10 @@ func ConsumerLoadAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var center_id, home_phone, child, year, month, birthday, come_from_id, remark, parttimeName,level string
+		var center_id, home_phone, child, year, month, birthday, come_from_id, remark, parttimeName, level string
 
 		if rows.Next() {
-			err = commonlib.PutRecord(rows, &center_id, &home_phone, &child, &year, &month, &birthday, &come_from_id, &remark, &parttimeName,&level)
+			err = commonlib.PutRecord(rows, &center_id, &home_phone, &child, &year, &month, &birthday, &come_from_id, &remark, &parttimeName, &level)
 
 			if err != nil {
 				m["success"] = false
@@ -619,8 +619,8 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 
 	centerId1 := r.FormValue("centerId-eq")
 	status := r.FormValue("status-eq")
-//	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
-//	lastContractEndTime := r.FormValue("lastContractEndTime-le")
+	//	lastContractStartTime := r.FormValue("lastContractStartTime-ge")
+	//	lastContractEndTime := r.FormValue("lastContractEndTime-le")
 	kw := r.FormValue("kw-like")
 	partTimeName := r.FormValue("partTimeName-eq")
 	level := r.FormValue("level-eq")
@@ -669,7 +669,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and b.parttime_name=? "
 	}
 
-	if level != ""{
+	if level != "" {
 		params = append(params, level)
 		sql += " and b.level=? "
 	}
@@ -721,7 +721,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		countSql += " and b.parttime_name=? "
 	}
 
-	if level != ""{
+	if level != "" {
 		paramsForCount = append(paramsForCount, level)
 		countSql += " and b.level=? "
 	}
@@ -1135,7 +1135,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and cons.center_id=? "
 	}
 
-	if level != ""{
+	if level != "" {
 		params = append(params, level)
 		sql += " and cons.level=? "
 	}
@@ -1352,7 +1352,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	getOldStatusSql := "select contact_status from consumer_new where id=? "
 	lessgo.Log.Debug(getOldStatusSql)
 
-	rows, err := db.Query(getOldStatusSql,ids)
+	rows, err := db.Query(getOldStatusSql, ids)
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
 		m["success"] = false
@@ -1393,7 +1393,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(CONSUMER_STATUS_SIGNIN,time.Now().Format("20060102150405"), ids)
+		_, err = stmt.Exec(CONSUMER_STATUS_SIGNIN, time.Now().Format("20060102150405"), ids)
 
 		if err != nil {
 			tx.Rollback()
@@ -1419,7 +1419,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(ids,employee.UserId,time.Now().Format("20060102150405"),oldStatus, CONSUMER_STATUS_SIGNIN)
+		_, err = stmt.Exec(ids, employee.UserId, time.Now().Format("20060102150405"), oldStatus, CONSUMER_STATUS_SIGNIN)
 
 		if err != nil {
 			tx.Rollback()
@@ -1434,7 +1434,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		getChildId := "select ch.cid from consumer_new cons left join child ch on ch.pid=cons.parent_id where cons.id=?"
 		lessgo.Log.Debug(getChildId)
 
-		rows, err = db.Query(getChildId,ids)
+		rows, err = db.Query(getChildId, ids)
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
 			m["success"] = false
@@ -1459,7 +1459,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if childId ==0 {
+		if childId == 0 {
 			m["success"] = false
 			m["code"] = 100
 			m["msg"] = "该客户没有与小孩子关联，无法缴费"
@@ -1468,7 +1468,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		getClassIdSql := "select wyclass_id,schedule_detail_id from schedule_detail_child where child_id=? and wyclass_id is not null order by id desc "
-		rows, err = db.Query(getClassIdSql,childId)
+		rows, err = db.Query(getClassIdSql, childId)
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
 			m["success"] = false
@@ -1482,7 +1482,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 		scheduleId := 0
 
 		if rows.Next() {
-			err := rows.Scan(&classId,&scheduleId)
+			err := rows.Scan(&classId, &scheduleId)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -1494,7 +1494,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if classId==0 {//找不到班级，就进行无班签到
+		if classId == 0 { //找不到班级，就进行无班签到
 			checkExistSql := "select count(1) from sign_in where child_id=? and wyclass_id is null and schedule_detail_id is null "
 
 			lessgo.Log.Debug(checkExistSql)
@@ -1526,7 +1526,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			if num==0 {
+			if num == 0 {
 				insertWFSSql := "insert into sign_in(child_id,sign_time,employee_id,type) values(?,?,?,?)"
 				lessgo.Log.Debug(insertWFSSql)
 
@@ -1556,9 +1556,9 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 
 			}
 
-		}else{
+		} else {
 			checkSignSql := "select count(1) from sign_in where child_id=? and wyclass_id=? "
-			rows, err = db.Query(checkSignSql,childId,classId)
+			rows, err = db.Query(checkSignSql, childId, classId)
 
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -1599,7 +1599,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				_, err = stmt.Exec(childId,time.Now().Format("20060102150405"),scheduleId,1,classId,employee.UserId)
+				_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), scheduleId, 1, classId, employee.UserId)
 
 				if err != nil {
 					tx.Rollback()

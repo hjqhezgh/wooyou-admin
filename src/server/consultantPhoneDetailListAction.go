@@ -142,12 +142,12 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 			left join employee e on e.phone_in_center=au.localphone and e.center_id=au.cid
 			where e.user_id=? and au.remotephone != '' and  au.remotephone is not null %v) num`
 
-	lessgo.Log.Debug(fmt.Sprintf(countSql,whereSql))
+	lessgo.Log.Debug(fmt.Sprintf(countSql, whereSql))
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf(countSql,whereSql), params...)
+	rows, err := db.Query(fmt.Sprintf(countSql, whereSql), params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())
@@ -181,12 +181,12 @@ func ConsultantPhoneDetailListAction(w http.ResponseWriter, r *http.Request) {
 		currPageNo = totalPage
 	}
 
-	lessgo.Log.Debug(fmt.Sprintf(sql,whereSql,"left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id"))
+	lessgo.Log.Debug(fmt.Sprintf(sql, whereSql, "left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id"))
 
 	params = append(params, (currPageNo-1)*pageSize)
 	params = append(params, pageSize)
 
-	rows, err = db.Query(fmt.Sprintf(sql,whereSql,"left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id"), params...)
+	rows, err = db.Query(fmt.Sprintf(sql, whereSql, "left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id  SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) b on b.consumer_id=cons.id"), params...)
 
 	if err != nil {
 		lessgo.Log.Warn(err.Error())

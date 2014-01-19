@@ -4,27 +4,22 @@
 //
 // Author:black
 //
-// Createtime:2014-01-15 21:19
+// Createtime:2014-01-17 17:02
 //
 // Version:1.0
 //
 // 修改历史:版本号 修改日期 修改人 修改说明
 //
-// 1.0 2014-01-15 21:19 black 创建文档
+// 1.0 2014-01-17 17:02 black 创建文档
 package logic
 
 import (
 	"github.com/hjqhezgh/lessgo"
 )
 
-/*
-select class_id id,name,start_time,end_time,code,center_id,child_num from wyclass where class_id=?
-*/
-func findWyClassById(id string) (map[string]string, error) {
+func getTimeSectionById(id string) (map[string]string, error) {
 
-	sql := `
-			select class_id id,name,start_time,end_time,code,center_id,child_num from wyclass where class_id=?
-	    	`
+	sql := `select id,center_id,start_time,end_time,lesson_no from time_section where id=?`
 
 	lessgo.Log.Debug(sql)
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="150">
+    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="200">
 
         <column field="childName" desc="学生"/>
         <column field="phone" desc="联系电话"/>
@@ -34,8 +34,8 @@
         <column field="courseName" desc="合同">
             <formatter>
                 <![CDATA[
-                        if(rowObject[5]) {
-                            return rowObject[6]+"-"+cellvalue+"-"+rowObject[7];
+                        if(rowObject['contractId']) {
+                            return rowObject['contractNo']+"-"+cellvalue+"-"+rowObject['applyTime'];
                         }else{
                             return '<span style="color:red">未关联合同</span>';
                         }
@@ -51,7 +51,9 @@
 
         <action desc="临时剔除" url="/web/wyclass/removeChildForNormalOnce.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'ids',value:'id'}]"/>
         <action desc="结课" url="/web/wyclass/removeChildForNormal.json" linkType="ajax" confirmMsg="确认结束该学生当前的课程吗？" actionParams="[{name:'ids',value:'id'}]"/>
-        <action desc="请假" url="/web/wyclass/leaveForChild.json" linkType="ajax" confirmMsg="确认请假该学生吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="请假" url="/web/class_schedule_detail/leave.json" linkType="ajax" confirmMsg="确认请假该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
+        <action desc="旷课" url="/web/class_schedule_detail/truant.json" linkType="ajax" confirmMsg="确认旷课该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
+        <action desc="签到" url="/web/class_schedule_detail/signIn.json" linkType="ajax" confirmMsg="确认签到该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="合同登记" url="/web/wyclass/contractCheckIn" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="点评" url="/web/class_schedule_attach" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>

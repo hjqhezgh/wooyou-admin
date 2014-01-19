@@ -21,8 +21,8 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"time"
 	"strings"
+	"time"
 )
 
 /*****
@@ -50,7 +50,7 @@ func NewsImageUplaodAction(w http.ResponseWriter, r *http.Request) {
 	_, err := os.Stat(newsImgDir)
 
 	if err != nil && os.IsNotExist(err) {
-		lessgo.Log.Info(newsImgDir,"，创建")
+		lessgo.Log.Info(newsImgDir, "，创建")
 		os.Mkdir(newsImgDir, 0777)
 	}
 
@@ -66,9 +66,9 @@ func NewsImageUplaodAction(w http.ResponseWriter, r *http.Request) {
 
 	suffix := commonlib.Substr(header.Filename, strings.LastIndex(header.Filename, ".")+1, len(header.Filename))
 
-	newFileName := findRandomFileName(header.Filename)+"."+suffix
+	newFileName := findRandomFileName(header.Filename) + "." + suffix
 
-	f, err := os.Create(newsImgDir+"/" + newFileName)
+	f, err := os.Create(newsImgDir + "/" + newFileName)
 
 	if err != nil {
 		m["error"] = 1

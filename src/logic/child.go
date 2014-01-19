@@ -84,7 +84,11 @@ func findChildById(id string) (map[string]string, error) {
 		return nil, err
 	}
 
-	dataMap, err := lessgo.GetDataMap(rows)
+	var dataMap map[string]string
+
+	if rows.Next() {
+		dataMap, err = lessgo.GetDataMap(rows)
+	}
 
 	if err != nil {
 		return nil, err
@@ -312,6 +316,78 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	dataParams := []interface{}{scheduleId, (currPageNo - 1) * pageSize, pageSize}
 
 	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, dataParams)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pageData, nil
+}
+
+func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	params := []interface{}{}
+
+	dataSql :=  `
+				select ch.cid id,ce.name centerName,ch.name childName,p.telephone phone,p.password,ch.card_id cardId,ch.birthday,ch.sex,p.reg_date regTime,contract_num.num haveContract,totalNum.num totalNum,usedNum.num usedNum,cons.pay_status payStatus
+				from child ch
+				left join parent p on p.pid=ch.pid
+				left join center ce on ce.cid=ch.center_id
+				left join (select sum(left_lesson_num) num,child_id from contract group by child_id) totalNum on totalNum.child_id=ch.cid
+				left join (select count(1) num,child_id from sign_in where (type=1 or type=3) and contract_id!=0 and contract_id is not null group by child_id) usedNum on usedNum.child_id=ch.cid
+				left join (select child_id,count(1) num from contract where price >0 group by child_id) contract_num on contract_num.child_id=ch.cid where 1=1
+	`
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employeeId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return nil,err
+		}
+		params = append(params, _employee.CenterId)
+		dataSql += " and ch.center_id=? "
+	}
+
+	if centerId != "" && dataType == "all" {
+		params = append(params, centerId)
+		dataSql += " and ch.center_id=? "
+	}
+
+	if contractStatus != "" {
+		dataSql += " and contract_num.num is not null "
+	}
+
+	if kw != "" {
+		dataSql += " and (ch.name like ? "
+		dataSql += " or p.telephone like ?) "
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+	}
+
+	countSql := "select count(1) from (" + dataSql + ") num"
+	lessgo.Log.Debug(countSql)
+	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	currPageNo := pageNo
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	dataSql += " order by ch.cid desc limit ?,? "
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	lessgo.Log.Debug(dataSql)
+	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, params)
 
 	if err != nil {
 		return nil, err

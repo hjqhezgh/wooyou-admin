@@ -24,7 +24,6 @@ import (
 	"text/template"
 )
 
-
 func ChildSignInLogListAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
@@ -228,7 +227,7 @@ func AddCardToSignInAction(w http.ResponseWriter, r *http.Request) {
 	ids := r.FormValue("ids")
 	childId := r.FormValue("childId")
 
-	signInIdList := strings.Split(ids,",")
+	signInIdList := strings.Split(ids, ",")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -252,7 +251,7 @@ func AddCardToSignInAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if cardId == "00000000" || cardId == ""{
+	if cardId == "00000000" || cardId == "" {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "当前学生没有配置卡号，请配置后再补登"
@@ -270,7 +269,7 @@ func AddCardToSignInAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _,signInId := range signInIdList {
+	for _, signInId := range signInIdList {
 		updateSql := "update sign_in set card_id=? where sid=? "
 		lessgo.Log.Debug(updateSql)
 
@@ -285,7 +284,7 @@ func AddCardToSignInAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(cardId,signInId)
+		_, err = stmt.Exec(cardId, signInId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())
@@ -333,7 +332,7 @@ func AddContractToSignInAction(w http.ResponseWriter, r *http.Request) {
 	ids := r.FormValue("ids")
 	contractId := r.FormValue("contractId")
 
-	signInIdList := strings.Split(ids,",")
+	signInIdList := strings.Split(ids, ",")
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -348,7 +347,7 @@ func AddContractToSignInAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _,signInId := range signInIdList {
+	for _, signInId := range signInIdList {
 		updateSql := "update sign_in set contract_id=? where sid=? "
 		lessgo.Log.Debug(updateSql)
 
@@ -363,7 +362,7 @@ func AddContractToSignInAction(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = stmt.Exec(contractId,signInId)
+		_, err = stmt.Exec(contractId, signInId)
 
 		if err != nil {
 			lessgo.Log.Warn(err.Error())

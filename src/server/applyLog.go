@@ -17,8 +17,8 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"net/http"
-	"time"
 	"strings"
+	"time"
 )
 
 func ApplyLogAddToConsumerAction(w http.ResponseWriter, r *http.Request) {
@@ -54,23 +54,23 @@ func ApplyLogAddToConsumerAction(w http.ResponseWriter, r *http.Request) {
 	centerId := r.FormValue("centerId")
 	createTime := r.FormValue("createTime")
 	applyType := r.FormValue("type")
-	contactsName := childName+"家长"
+	contactsName := childName + "家长"
 
 	remark := ""
 
-	if comeFrom=="网站"{
+	if comeFrom == "网站" {
 		comeFrom = "5"
 		remark += "通过网站报名"
-	}else if comeFrom=="微信"{
+	} else if comeFrom == "微信" {
 		comeFrom = "6"
 		remark += "通过微信报名"
-	}else{
+	} else {
 		comeFrom = "8"
 	}
 
-	if applyType == "2"{
+	if applyType == "2" {
 		remark += "美术课程"
-	}else if applyType=="1"{
+	} else if applyType == "1" {
 		remark += "英语课程"
 	}
 
@@ -130,9 +130,9 @@ func ApplyLogAddToConsumerAction(w http.ResponseWriter, r *http.Request) {
 
 	if remark != "" {
 		contactStatus = CONSUMER_STATUS_WAIT
-		lastContactTime := strings.Replace(createTime," ","",-1)
-		lastContactTime = strings.Replace(lastContactTime,":","",-1)
-		lastContactTime = strings.Replace(lastContactTime,"-","",-1)
+		lastContactTime := strings.Replace(createTime, " ", "", -1)
+		lastContactTime = strings.Replace(lastContactTime, ":", "", -1)
+		lastContactTime = strings.Replace(lastContactTime, "-", "", -1)
 	}
 
 	/**********************数据插入consumer表**********************/

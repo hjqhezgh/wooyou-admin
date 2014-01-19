@@ -16,13 +16,12 @@ package main
 import (
 	"fmt"
 	"github.com/hjqhezgh/lessgo"
-	"strconv"
 	"net/http"
 	"server"
+	"strconv"
 	"web"
 	"wooyousite"
 )
-
 
 func main() {
 
@@ -36,7 +35,7 @@ func main() {
 		r.HandleFunc(url, handler)
 	}
 
-//	go server.ReportSend()
+	//	go server.ReportSend()
 
 	http.Handle("/", r)
 
@@ -48,7 +47,7 @@ func main() {
 	http.Handle("/artimg/", http.FileServer(http.Dir("../")))
 
 	fmt.Println("服务器监听", portString, "端口")
-//	go server.UpdateVideoStatus()
+	//	go server.UpdateVideoStatus()
 
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
@@ -61,9 +60,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//根据角色ID获取员工列表
 	"/employeeListByRoleId.json": server.EmployeeListByRoleIdAction,
-	"/employeeByCenterId.json": server.EmployeeListByCenterIdAction,
-	"/courseInCenter.json": server.CourseInCenterAction,
-	"/employeeInCenter.json": server.EmployeeListInCenterAction,
+	"/employeeByCenterId.json":   server.EmployeeListByCenterIdAction,
+	"/courseInCenter.json":       server.CourseInCenterAction,
+	"/employeeInCenter.json":     server.EmployeeListInCenterAction,
 
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
@@ -74,26 +73,26 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/audioNoteSave.json":                server.AudioNoteSaveAction,
 
 	//客户相关服务
-	"/consumer.json":     web.ConsumerListAction,
-	"/consumerSave.json": web.ConsumerSaveAction,
-	"/consumerLoad.json": server.ConsumerLoadAction,
-	"/consumer/contact_record.json": server.ConsumerContactRecordListAction,
+	"/consumer.json":                       web.ConsumerListAction,
+	"/consumerSave.json":                   web.ConsumerSaveAction,
+	"/consumerLoad.json":                   server.ConsumerLoadAction,
+	"/consumer/contact_record.json":        server.ConsumerContactRecordListAction,
 	"/web/consumer/backToAllConsumer.json": server.BackToAllConsumerAction,
-	"/contacts/page": server.ContactsListAction,
-	"/contacts/save.json": server.ContactsSaveAction,
-	"/contacts/delete.json": server.ContactsDeleteAction,
-	"/web/consumerContactsLog/page.json": server.ConsumerContactLogAction,
-	"/web/consumerContactsLog/save.json": server.ConsumerContactLogSaveAction,
-	"/web/consumerContactsLog/load.json": server.ConsumerContactLogLoadAction,
-	"/web/contacts/contactsLoad.json": server.ContactsLoadAction,
-	"/web/child/data.json": server.ChildListAction,
-	"/web/contract/page.json": server.ContractListAction,
-	"/web/contract/save.json": server.ContractSaveAction,
-	"/web/contract/load.json": server.ContractLoadAction,
-	"/web/contract/contractOfChild.json": server.ContractOfChildAction,
-	"/web/child/signInData.json": server.ChildSignInLogListAction,
-	"/web/child/addCardToSignIn.json": server.AddCardToSignInAction,
-	"/web/child/addContractToSignIn.json": server.AddContractToSignInAction,
+	"/contacts/page":                       server.ContactsListAction,
+	"/contacts/save.json":                  server.ContactsSaveAction,
+	"/contacts/delete.json":                server.ContactsDeleteAction,
+	"/web/consumerContactsLog/page.json":   server.ConsumerContactLogAction,
+	"/web/consumerContactsLog/save.json":   server.ConsumerContactLogSaveAction,
+	"/web/consumerContactsLog/load.json":   server.ConsumerContactLogLoadAction,
+	"/web/contacts/contactsLoad.json":      server.ContactsLoadAction,
+	"/web/child/data.json":                 web.ChildListAction,
+	"/web/contract/page.json":              web.ContractListAction,
+	"/web/contract/save.json":              web.ContractSaveAction,
+	"/web/contract/load.json":              web.ContractLoadAction,
+	"/web/contract/contractOfChild.json":   server.ContractOfChildAction,
+	"/web/child/signInData.json":           server.ChildSignInLogListAction,
+	"/web/child/addCardToSignIn.json":      server.AddCardToSignInAction,
+	"/web/child/addContractToSignIn.json":  server.AddContractToSignInAction,
 
 	//Call Center统计
 	"/callCenterStatistics.json": server.CallCenterStatisticsAction,
@@ -130,12 +129,12 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/gallery/load.json":           wooyousite.GalleryLoadAction,
 	"/web/gallery/save.json":           wooyousite.GallerySaveAction,
 	"/web/gallery/update.json":         wooyousite.GalleryUpdateAction,
-	"/web/gallery/list.json":			wooyousite.GalleryListAction,
+	"/web/gallery/list.json":           wooyousite.GalleryListAction,
 	"/web/news/delete.json":            wooyousite.NewsDeleteAction,
 	"/web/news/load.json":              wooyousite.NewsLoadAction,
 	"/web/news/save.json":              wooyousite.NewsSaveAction,
 	"/web/news/update.json":            wooyousite.NewsUpdateAction,
-	"/newsImageUplaod":            		wooyousite.NewsImageUplaodAction,
+	"/newsImageUplaod":                 wooyousite.NewsImageUplaodAction,
 
 	//app开户数据读取
 	"/addAppAccountLoad.json": server.AddAppAccountLoadAction,
@@ -143,55 +142,57 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/addAppAccountSave.json": server.AddAppAccountSaveAction,
 
 	//课程信息相关服务
-	"/course.json": server.CourseListAction,
-	"/web/course/save.json": server.CourseSaveAction,
-	"/web/course/load.json": server.CourseLoadAction,
-	"/courseByCenterId.json": server.CourseByCenterIdListAction,
-	"/time_section.json": server.TimeSectionListAction,
+	"/course.json":                server.CourseListAction,
+	"/web/course/save.json":       server.CourseSaveAction,
+	"/web/course/load.json":       server.CourseLoadAction,
+	"/courseByCenterId.json":      server.CourseByCenterIdListAction,
+	"/time_section.json":          server.TimeSectionListAction,
 	"/class_schedule_detail.json": server.ClassScheduleDetailListAction,
-	"/lessonByClassId.json": server.LessonByClassIdAction,
+	"/lessonByClassId.json":       server.LessonByClassIdAction,
 	"/timeSectionByCenterId.json": server.TimeSectionByCenterIdAction,
 
 	//课表相关
-	"/web/class_schedule_detail/data.json": server.ClassScheduleDetailListAction,
-	"/web/class_schedule_detail/quick_data.json": server.ClassScheduleDetailListQuickAction,
-	"/web/class_schedule_detail/temp_data.json": server.ClassScheduleDetailListTempAction,
-	"/web/class_schedule_detail/load.json": server.ClassScheduleDetailLoadAction,
-	"/web/class_schedule_detail/add.json": server.ClassScheduleDetailAddAction,
-	"/web/class_schedule_detail/modify.json": server.ClassScheduleDetailModifyAction,
-	"/web/class_schedule_detail/createWeekSchedule.json": server.CreateWeekScheduleAction,
-	"/web/schedule_detail/deleteSingle.json": server.DeleteSingleScheduleAction,
-	"/web/child/childInCenter.json": web.ChildInCenterAction,
-	"/web/child/childInClass.json": web.ChildInClassListAction,
-	"/web/child/childInNormalSchedule.json": web.ChildInNormalScheduleAction,
-	"/web/wyclass/signIn.json": server.ChildSignInAction,
-	"/web/wyclass/pay.json": server.ClassPayAction,
-	"/web/wyclass/signInWithoutClass.json": server.ChildSignInWithoutAction,
-	"/web/wyclass/sendSMS/save.json": server.WyClassSendSMSSaveAction,
-	"/web/wyclass/addChild.json": web.AddChildToClassAction,
-	"/web/wyclass/addChildQuick.json": web.AddChildToClassQuickAction,
-	"/web/wyclass/addChildForNormalOnce.json": server.AddChildForNormalOnceAction,
-	"/web/wyclass/addChildForNormalTempelate.json": server.AddChildForNormalTempelateAction,
-	"/web/wyclass/sendSMS/load.json": server.WyClassSendSMSLoadAction,
-	"/web/wyclass/removeChild.json": server.RemoveChildFromClassAction,
-	"/web/wyclass/removeChildForNormalOnce.json": server.RemoveChildForNormalOnceAction,
-	"/web/wyclass/removeChildForNormal.json": server.RemoveChildForNormalAction,
-	"/web/wyclass/leaveForChild.json": server.LeaveForChildAction,
-	"/web/wyclass/changeClass.json": server.WyClassChangeClassAction,
-	"/web/wyclass/contractCheckInSave.json": server.ContractCheckInSaveAction,
-	"/web/class_schedule_attach/data.json": server.ClassScheduleAttachListAction,
-	"/web/class_schedule_attach/load.json": server.ClassScheduleAttachLoadAction,
-	"/web/class_schedule_attach/save.json": server.ClassScheduleAttachSaveAction,
-	"/web/class_schedule_attach/videoplay.html": server.ClassScheduleAttachVideoPlayAction,
+	"/web/class_schedule_detail/data.json":               server.ClassScheduleDetailListAction,
+	"/web/class_schedule_detail/quick_data.json":         server.ClassScheduleDetailListQuickAction,
+	"/web/class_schedule_detail/temp_data.json":          server.ClassScheduleDetailListTempAction,
+	"/web/class_schedule_detail/load.json":               server.ClassScheduleDetailLoadAction,
+	"/web/class_schedule_detail/add.json":                server.ClassScheduleDetailAddAction,
+	"/web/class_schedule_detail/modify.json":             server.ClassScheduleDetailModifyAction,
+	"/web/class_schedule_detail/createWeekSchedule.json": web.CreateWeekScheduleAction,
+	"/web/class_schedule_detail/leave.json":              web.ClassScheduleDetailLeaveAction,
+	"/web/class_schedule_detail/truant.json":             web.ClassScheduleDetailTruantAction,
+//	"/web/class_schedule_detail/signIn.json":             web.ClassScheduleDetailSignInAction,
+	"/web/schedule_detail/deleteSingle.json":             server.DeleteSingleScheduleAction,
+	"/web/child/childInCenter.json":                      web.ChildInCenterAction,
+	"/web/child/childInClass.json":                       web.ChildInClassListAction,
+	"/web/child/childInNormalSchedule.json":              web.ChildInNormalScheduleAction,
+	"/web/wyclass/signIn.json":                           server.ChildSignInAction,
+	"/web/wyclass/pay.json":                              server.ClassPayAction,
+	"/web/wyclass/signInWithoutClass.json":               server.ChildSignInWithoutAction,
+	"/web/wyclass/sendSMS/save.json":                     server.WyClassSendSMSSaveAction,
+	"/web/wyclass/addChild.json":                         web.AddChildToClassAction,
+	"/web/wyclass/addChildQuick.json":                    web.AddChildToClassQuickAction,
+	"/web/wyclass/addChildForNormalOnce.json":            server.AddChildForNormalOnceAction,
+	"/web/wyclass/addChildForNormalTempelate.json":       server.AddChildForNormalTempelateAction,
+	"/web/wyclass/sendSMS/load.json":                     server.WyClassSendSMSLoadAction,
+	"/web/wyclass/removeChild.json":                      server.RemoveChildFromClassAction,
+	"/web/wyclass/removeChildForNormalOnce.json":         server.RemoveChildForNormalOnceAction,
+	"/web/wyclass/removeChildForNormal.json":             server.RemoveChildForNormalAction,
+	"/web/wyclass/changeClass.json":                      server.WyClassChangeClassAction,
+	"/web/wyclass/contractCheckInSave.json":              web.ContractCheckInSaveAction,
+	"/web/class_schedule_attach/data.json":               server.ClassScheduleAttachListAction,
+	"/web/class_schedule_attach/load.json":               server.ClassScheduleAttachLoadAction,
+	"/web/class_schedule_attach/save.json":               server.ClassScheduleAttachSaveAction,
+	"/web/class_schedule_attach/videoplay.html":          server.ClassScheduleAttachVideoPlayAction,
 
 	//班级相关服务
-	"/wyclass.json": server.WyClassListAction,
+	"/wyclass.json":                  server.WyClassListAction,
 	"/web/wyclass/wyclass_free.json": server.WyClassFreeListAction,
-	"/web/wyclass/save.json": server.WyClassSaveAction,
-	"/web/wyclass/load.json": server.WyClassLoadAction,
+	"/web/wyclass/save.json":         server.WyClassSaveAction,
+	"/web/wyclass/load.json":         server.WyClassLoadAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
 	"/wyclass/saveChildToClass.json": server.SaveChildToClassAction,
-	"/classByCenterId.json": server.ClassByCenterIdAction,
+	"/classByCenterId.json":          server.ClassByCenterIdAction,
 
 	"/roomByCenterId.json": server.RoomByCenterIdListAction,
 
@@ -200,10 +201,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	//试听课程，添加至客户库中
 	"/web/apply_log/addToConsumer.json": server.ApplyLogAddToConsumerAction,
 
-
 	//课件管理
-	"/web/courseware/page.json": web.CoursewareListAction,
-	"/web/courseware/save.json": web.CoursewareSaveAction,
-	"/web/courseware/load.json": web.CoursewareLoadAction,
+	"/web/courseware/page.json":      web.CoursewareListAction,
+	"/web/courseware/save.json":      web.CoursewareSaveAction,
+	"/web/courseware/load.json":      web.CoursewareLoadAction,
 	"/web/courseware/uploadCallBack": web.CoursewareUploadCallBack,
 }

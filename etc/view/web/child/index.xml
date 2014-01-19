@@ -39,7 +39,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="regTime" desc="注册时间">
+        <column field="regTime" desc="注册时间" hidden="true">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -66,6 +66,8 @@
                 ]]>
             </formatter>
         </column>
+        <column field="totalNum" desc="合同总课数"/>
+        <column field="usedNum" desc="已用课数"/>
 
         <action desc="修改" url="/web/child/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
         <action desc="签到记录" url="/web/child/signInData" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>

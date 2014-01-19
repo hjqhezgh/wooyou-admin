@@ -63,7 +63,7 @@ ImageUploader.prototype = {
             var flag = true;
 
             if(mythis.imageType){
-                if(mythis.imageType.lastIndexOf(suffix)<0){
+                if(mythis.imageType.toLowerCase().lastIndexOf(suffix.toLowerCase())<0){
                     flag = false;
                     alert('图片格式应为：'+ mythis.imageType);
                 }

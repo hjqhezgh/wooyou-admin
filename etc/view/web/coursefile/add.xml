@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form" title="添加文件" saveUrl="/web/coursefile/save.json" load="false" loadUrl="" inwindow="true">
+        <element field="coursewareId" type="hidden" defaultValue="$id"/>
+        <element field="fileData" type="file" desc="文件" fileUploadUrl="http://192.168.1.191:9101/courseFileUpload.json"/>
+        <element field="intro" type="textarea" desc="描述"/>
+
+        <afterRender>
+            $('[name=fileData_srcFileName]').change(function(){
+                $('[name=intro]').val($(this).val());
+            });
+
+            $.get('',function(){
+
+            });
+        </afterRender>
+    </customformpanel>
+</viewport>

@@ -7,7 +7,10 @@
     </customformpanel>
 
     <customgridpanel url="/web/coursefile/pageOfcourseware.json" pageSize="15" title="文件列表" id="grid1" height="50" loadUrl="true" mutiSelect="true">
-        <toolaction desc="添加" url="/web/contacts/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <toolaction desc="添加" url="/web/coursefile/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+
+
+
         <toolaction desc="删除" url="/contacts/delete.json" colorClass="h-bg-green" linkType="ajax" confirmMsg="确认删除联系人吗？" actionParams="[{name:'id',value:'id'}]"/>
 
         <column field="商城" desc="描述"/>

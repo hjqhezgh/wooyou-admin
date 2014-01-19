@@ -14,12 +14,12 @@
 package server
 
 import (
+	"fmt"
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"net/http"
 	"strings"
 	"time"
-	"fmt"
 )
 
 func WyClassSendSMSLoadAction(w http.ResponseWriter, r *http.Request) {
@@ -237,7 +237,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 			}
 
 			contentDetail := getSmsContent(content, childName)
-			smsResult := SmsResult{Msg:"asdas",Result:0}
+			smsResult := SmsResult{Msg: "asdas", Result: 0}
 			//smsResult, err := SendMessage(phone, contentDetail)
 			fmt.Println(contentDetail)
 			if err != nil {

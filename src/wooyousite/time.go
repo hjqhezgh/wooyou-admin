@@ -51,7 +51,7 @@ func GetNoDateString() string {
  			start  	:  截取的起始位置
  			length  :  截取长度
  * 返回值：  截取的字符串
- */
+*/
 func Substr(str string, start, length int) string {
 	rs := []rune(str)
 	rl := len(rs)
@@ -82,10 +82,10 @@ func Substr(str string, start, length int) string {
 	return string(rs[start:end])
 }
 
-func TimeFormat(tm string) (string) {
+func TimeFormat(tm string) string {
 	b := []byte(tm)
 	var bb []byte
-	for k, v := range (b) {
+	for k, v := range b {
 		bb = append(bb, v)
 		if k == 3 || k == 5 {
 			bb = append(bb, '-')

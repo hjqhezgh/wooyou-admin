@@ -48,7 +48,7 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 	level := paramsMap["level"]
 	createUser := paramsMap["createUser"]
 
-	//todo 数据验证
+	// todo 数据验证
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -152,7 +152,7 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 		}
 
 	} else {
-		consumerDataMap, err := findConsumerById(id)
+		consumerDataMap, err := getConsumerById(id)
 
 		if err != nil {
 			return false, "", err
@@ -306,7 +306,7 @@ select id,center_id centerId,contact_status contactStatus,home_phone homePhone,p
 	    	       pay_time,payTime,pay_status payStatus,parttime_name parttimeName,level
 	        from consumer_new where id=?
 */
-func findConsumerById(id string) (map[string]string, error) {
+func getConsumerById(id string) (map[string]string, error) {
 
 	sql := `select id,center_id centerId,contact_status contactStatus,home_phone homePhone,parent_id parentId,child,year,month,birthday,
 	    	       last_tmk_id lastTMKId,is_own_by_tmk isOwnByTmk,come_from_id comeFromId,current_tmk_id currentTMKId,sign_in_time signInTime,
@@ -325,7 +325,11 @@ func findConsumerById(id string) (map[string]string, error) {
 		return nil, err
 	}
 
-	dataMap, err := lessgo.GetDataMap(rows)
+	var dataMap map[string]string
+
+	if rows.Next() {
+		dataMap, err = lessgo.GetDataMap(rows)
+	}
 
 	if err != nil {
 		return nil, err
@@ -523,7 +527,7 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 select cons.id,cons.center_id centerId,cons.contact_status contactStatus,cons.home_phone homePhone,cons.parent_id parentId,cons.child,cons.year,cons.month,cons.birthday,cons.last_tmk_id lastTMKId,cons.is_own_by_tmk isOwnByTmk,cons.come_from_id comeFromId,cons.current_tmk_id currentTMKId,cons.sign_in_time signInTime,cons.pay_time payTime,cons.pay_status payStatus,cons.parttime_name parttimeName,cons.level
 	    	from consumer_new cons left join child ch on ch.pid=cons.parent_id where ch.cid=?
 */
-func findConsumerByChildId(id string) (map[string]string, error) {
+func getConsumerByChildId(id string) (map[string]string, error) {
 
 	sql := `
 			select cons.id,cons.center_id centerId,cons.contact_status contactStatus,cons.home_phone homePhone,cons.parent_id parentId,cons.child,cons.year,cons.month,cons.birthday,cons.last_tmk_id lastTMKId,cons.is_own_by_tmk isOwnByTmk,cons.come_from_id comeFromId,cons.current_tmk_id currentTMKId,cons.sign_in_time signInTime,cons.pay_time payTime,cons.pay_status payStatus,cons.parttime_name parttimeName,cons.level
@@ -542,7 +546,11 @@ func findConsumerByChildId(id string) (map[string]string, error) {
 		return nil, err
 	}
 
-	dataMap, err := lessgo.GetDataMap(rows)
+	var dataMap map[string]string
+
+	if rows.Next() {
+		dataMap, err = lessgo.GetDataMap(rows)
+	}
 
 	if err != nil {
 		return nil, err

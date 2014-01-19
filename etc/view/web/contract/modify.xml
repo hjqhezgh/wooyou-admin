@@ -8,5 +8,6 @@
         <element field="type"  type="localSelect" validate="notNull" localData="[{desc:'新单', value:'1'},{desc:'续单', value:'2'}]" defaultValue="1" desc="类型"/>
         <element field="childId" type="hidden" validate="notNull" defaultValue="$childId" desc="学生id"/>
         <element field="id" type="hidden" validate="notNull" desc="主键id"/>
+        <element field="expireDate" type="date"  desc="过期时间" tip="过期时间为第一次上课后的三个月" char8="true"/>
     </customformpanel>
 </viewport>

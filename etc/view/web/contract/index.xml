@@ -6,7 +6,7 @@
 
         <column field="contractNo" desc="合同号"/>
         <column field="courseName" desc="课程"/>
-        <column field="createTime" desc="签单时间">
+        <column field="applyTime" desc="签单时间">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -18,9 +18,59 @@
             </formatter>
         </column>
         <column field="price" desc="金额"/>
-        <column field="courseNum" desc="合同总课数"/>
+        <column field="totalNum" desc="合同总课数"/>
+        <column field="usedNum" desc="上课数">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="") {
+                            return "0";
+                        }else{
+                            return cellvalue;
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="leaveNum" desc="请假数">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="") {
+                            return "0";
+                        }else{
+                            return cellvalue;
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="truantNum" desc="旷课数">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="") {
+                            return "0";
+                        }else{
+                            return cellvalue;
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="noUsedNum" desc="未上课数">
+            <formatter>
+                <![CDATA[
+                        var usedNum = 0;
+                        if(rowObject['usedNum']!='') {
+                            usedNum = rowObject['usedNum'];
+                        }
+
+                        var truantNum = 0;
+                        if(rowObject['truantNum']!='') {
+                            truantNum = rowObject['truantNum'];
+                        }
+
+                        return rowObject['totalNum'] - usedNum - truantNum;
+                ]]>
+            </formatter>
+        </column>
         <column field="employeeName" desc="签单员工"/>
-        <column field="type" desc="类型">
+        <column field="contractType" desc="类型">
             <formatter>
                 <![CDATA[
                         if(cellvalue=="1") {
@@ -31,7 +81,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="status" desc="状态" hidden="true">
+        <column field="contractStatus" desc="状态" hidden="true">
             <formatter>
                 <![CDATA[
                         if(cellvalue=="1") {

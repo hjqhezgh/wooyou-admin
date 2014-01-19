@@ -461,16 +461,16 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 	getScheduleInfoSql += " left join course cour on cour.cid=csd.course_id "
 	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=? and csd.course_id is null"
 
-	params := []interface {}{}
+	params := []interface{}{}
 
-	params = append(params,employee.UserId)
-	params = append(params,st)
-	params = append(params,et)
-	params = append(params,centerId)
+	params = append(params, employee.UserId)
+	params = append(params, st)
+	params = append(params, et)
+	params = append(params, centerId)
 
-	if oldClassId!= ""{
+	if oldClassId != "" {
 		getScheduleInfoSql += " and wc.class_id!= ? "
-		params = append(params,oldClassId)
+		params = append(params, oldClassId)
 	}
 
 	lessgo.Log.Debug(getScheduleInfoSql)
@@ -492,7 +492,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 		className := ""
 		courseName := ""
 
-		err = commonlib.PutRecord(rows, &schedule.Id, &schedule.RoomId, &schedule.TimeId, &courseId, &schedule.Teacher, &schedule.Assistant, &schedule.PersonNum, &schedule.SignNum, &className, &courseName, &schedule.Week, &schedule.ClassId, &schedule.CenterId, &schedule.Code,&schedule.CurrentTMKPersonNum)
+		err = commonlib.PutRecord(rows, &schedule.Id, &schedule.RoomId, &schedule.TimeId, &courseId, &schedule.Teacher, &schedule.Assistant, &schedule.PersonNum, &schedule.SignNum, &className, &courseName, &schedule.Week, &schedule.ClassId, &schedule.CenterId, &schedule.Code, &schedule.CurrentTMKPersonNum)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -570,7 +570,7 @@ func ClassScheduleDetailListTempAction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if roleType=="center" {
+	if roleType == "center" {
 		userId, _ := strconv.Atoi(employee.UserId)
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
@@ -723,12 +723,12 @@ func ClassScheduleDetailListTempAction(w http.ResponseWriter, r *http.Request) {
 	getScheduleInfoSql += " left join course cour on cour.cid=csd.course_id "
 	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=? and  csd.course_id is null"
 
-	params := []interface {}{}
+	params := []interface{}{}
 
-	params = append(params,employee.UserId)
-	params = append(params,st)
-	params = append(params,et)
-	params = append(params,centerId)
+	params = append(params, employee.UserId)
+	params = append(params, st)
+	params = append(params, et)
+	params = append(params, centerId)
 
 	lessgo.Log.Debug(getScheduleInfoSql)
 
@@ -749,7 +749,7 @@ func ClassScheduleDetailListTempAction(w http.ResponseWriter, r *http.Request) {
 		className := ""
 		courseName := ""
 
-		err = commonlib.PutRecord(rows, &schedule.Id, &schedule.RoomId, &schedule.TimeId, &courseId, &schedule.Teacher, &schedule.Assistant, &schedule.PersonNum, &schedule.SignNum, &className, &courseName, &schedule.Week, &schedule.ClassId, &schedule.CenterId, &schedule.Code,&schedule.CurrentTMKPersonNum)
+		err = commonlib.PutRecord(rows, &schedule.Id, &schedule.RoomId, &schedule.TimeId, &courseId, &schedule.Teacher, &schedule.Assistant, &schedule.PersonNum, &schedule.SignNum, &className, &courseName, &schedule.Week, &schedule.ClassId, &schedule.CenterId, &schedule.Code, &schedule.CurrentTMKPersonNum)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -892,7 +892,7 @@ func ClassScheduleDetailAddAction(w http.ResponseWriter, r *http.Request) {
 			selectTmpSql := "select id from schedule_template where center_id=? and room_id=? and time_id=? and week=? "
 			lessgo.Log.Debug(selectTmpSql)
 
-			rows, err := db.Query(selectTmpSql, _employee.CenterId, roomId, timeId,week)
+			rows, err := db.Query(selectTmpSql, _employee.CenterId, roomId, timeId, week)
 
 			scheduleTemplateId := 0
 
@@ -1322,235 +1322,6 @@ func ClassScheduleDetailLoadAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m["datas"] = loadFormObjects
-	commonlib.OutputJson(w, m, " ")
-}
-
-func CreateWeekScheduleAction(w http.ResponseWriter, r *http.Request) {
-
-	m := make(map[string]interface{})
-
-	employee := lessgo.GetCurrentEmployee(r)
-
-	if employee.UserId == "" {
-		lessgo.Log.Warn("用户未登陆")
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "用户未登陆"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	userId, _ := strconv.Atoi(employee.UserId)
-	_employee, err := FindEmployeeById(userId)
-	if err != nil {
-		lessgo.Log.Error(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	err = r.ParseForm()
-
-	if err != nil {
-		lessgo.Log.Error(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	firstDayOfWeek := r.FormValue("firstDayOfWeek")
-
-	db := lessgo.GetMySQL()
-	defer db.Close()
-
-	getScheduleTmpSql := "select id,room_id,teacher_id,assistant_id,time_id,week,course_id from schedule_template where center_id=? "
-	lessgo.Log.Debug(getScheduleTmpSql)
-
-	rows, err := db.Query(getScheduleTmpSql, _employee.CenterId)
-
-	if err != nil {
-		lessgo.Log.Error(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	firstDay, _ := time.ParseInLocation("20060102150405", firstDayOfWeek, time.Local)
-
-	tx, err := db.Begin()
-	if err != nil {
-		lessgo.Log.Error(err.Error())
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "系统发生错误，请联系IT部门"
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-
-	for rows.Next() {
-		var scheduleTmpId, roomId, teacherId, assistantId, timeId, courseId string
-		week := 0
-
-		err = commonlib.PutRecord(rows, &scheduleTmpId, &roomId, &teacherId, &assistantId, &timeId, &week, &courseId)
-
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		theDay := firstDay.Add(time.Duration((week-1) * 24)*time.Hour)
-		date := theDay.Format("20060102")
-
-		getScheduleDetailSql := "select id from class_schedule_detail where center_id=? and room_id=? and time_id=? and day_date=?"
-		lessgo.Log.Debug(getScheduleDetailSql)
-
-		scheduleDetailRows, err := db.Query(getScheduleDetailSql, _employee.CenterId, roomId, timeId, date)
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			m["success"] = false
-			m["code"] = 100
-			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-			commonlib.OutputJson(w, m, " ")
-			return
-		}
-
-		scheduleDetailId := 0
-
-		if scheduleDetailRows.Next() {
-			err = commonlib.PutRecord(scheduleDetailRows, &scheduleDetailId)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-		}
-
-		if scheduleDetailId == 0 {
-
-			insertScheduleSql := "insert into class_schedule_detail(teacher_id,assistant_id,course_id,center_id,time_id,room_id,day_date,week,start_time,end_time,status,capacity) values(?,?,?,?,?,?,?,?,?,?,?,?)"
-			lessgo.Log.Debug(insertScheduleSql)
-
-			stmt, err := tx.Prepare(insertScheduleSql)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-
-			timeSection, err := FindTimeSectionById(timeId)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-
-			startTime := date + strings.Replace(timeSection.StartTime, ":", "", -1) + "00"
-			endTime := date + strings.Replace(timeSection.EndTime, ":", "", -1) + "00"
-
-			res, err := stmt.Exec(teacherId, assistantId, courseId, _employee.CenterId, timeId, roomId, date, week, startTime, endTime, 1, 10)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-
-			newScheduleDetailId, err := res.LastInsertId()
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-
-			getChildSql := "select child_id,contract_id from schedule_template_child where schedule_template_id=? "
-			lessgo.Log.Debug(getChildSql)
-
-			childRows, err := db.Query(getChildSql, scheduleTmpId)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				m["success"] = false
-				m["code"] = 100
-				m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-				commonlib.OutputJson(w, m, " ")
-				return
-			}
-
-			for childRows.Next() {
-				var childId string
-				var contractId int
-				err = commonlib.PutRecord(childRows, &childId, &contractId)
-
-				if err != nil {
-					lessgo.Log.Error(err.Error())
-					m["success"] = false
-					m["code"] = 100
-					m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-					commonlib.OutputJson(w, m, " ")
-					return
-				}
-
-				insertScheduleChildSql := "insert into schedule_detail_child(schedule_detail_id,child_id,create_time,create_user,contract_id) values(?,?,?,?,?)"
-				lessgo.Log.Debug(insertScheduleChildSql)
-
-				stmt, err = tx.Prepare(insertScheduleChildSql)
-
-				if err != nil {
-					lessgo.Log.Error(err.Error())
-					m["success"] = false
-					m["code"] = 100
-					m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-					commonlib.OutputJson(w, m, " ")
-					return
-				}
-
-				_, err = stmt.Exec(newScheduleDetailId, childId, time.Now().Format("20060102150405"), employee.UserId, contractId)
-
-				if err != nil {
-					lessgo.Log.Error(err.Error())
-					m["success"] = false
-					m["code"] = 100
-					m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-					commonlib.OutputJson(w, m, " ")
-					return
-				}
-			}
-
-		}
-	}
-
-	tx.Commit()
-
-	m["success"] = true
 	commonlib.OutputJson(w, m, " ")
 }
 

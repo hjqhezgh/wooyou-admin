@@ -16,7 +16,9 @@ package logic
 import (
 	"database/sql"
 	"fmt"
+	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -52,7 +54,7 @@ func AddChildToClass(classId, scheduleId, ids, employeeId string) (flag bool, ms
 			return false, "", err
 		}
 
-		consumerDataMap, err := findConsumerByChildId(id)
+		consumerDataMap, err := getConsumerByChildId(id)
 
 		if err != nil {
 			return false, "", err
@@ -86,14 +88,14 @@ func AddChildToClass(classId, scheduleId, ids, employeeId string) (flag bool, ms
 
 			note := fmt.Sprintf("邀约至%v%v中", classDataMap["start_time"], classDataMap["name"])
 
-			_,err = insertConsumerContactsLog(tx, employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+			_, err = insertConsumerContactsLog(tx, employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 			if err != nil {
 				return false, "", err
 			}
 
 		} else {
-			return false, "数据关联有问题，请联系IT部门,chilId:"+id, nil
+			return false, "数据关联有问题，请联系IT部门,chilId:" + id, nil
 		}
 	}
 
@@ -102,16 +104,16 @@ func AddChildToClass(classId, scheduleId, ids, employeeId string) (flag bool, ms
 	return true, "", nil
 }
 
-func AddChildToClassQuickAction(classId, scheduleId, consumerId, employeeId string) (flag bool, msg string, err error){
+func AddChildToClassQuick(classId, scheduleId, consumerId, employeeId string) (flag bool, msg string, err error) {
 
-	childId,err := getChildByConsumerId(consumerId)
+	childId, err := getChildByConsumerId(consumerId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	return AddChildToClass(classId, scheduleId,fmt.Sprint(childId),employeeId)
+	return AddChildToClass(classId, scheduleId, fmt.Sprint(childId), employeeId)
 }
 
 func checkChildInSchedule(childId, scheduleId string) (bool, error) {
@@ -175,4 +177,362 @@ func insertScheduleClass(tx *sql.Tx, childId, scheduleId, classId, employeeId st
 	}
 
 	return nil
+}
+
+func updateContractOfScheduleChild(tx *sql.Tx, contractId, childId, scheduleDetailId string) error {
+	sql := "update schedule_detail_child set contract_id=? where child_id=? and schedule_detail_id=? "
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(contractId, childId, scheduleDetailId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func updateContractOfScheduleTmpChild(tx *sql.Tx, contractId, childId, scheduleTmpId string) error {
+	sql := "update schedule_template_child set contract_id=? where child_id=? and schedule_template_id=?"
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(contractId, childId, scheduleTmpId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func getFurtherScheduleIds(timeId, roomId, week, startTime, courseId string) ([]string, error) {
+
+	sql := `
+			select id from class_schedule_detail where time_id=? and room_id=? and week=? and start_time>=? and course_id=?`
+
+	lessgo.Log.Debug(sql)
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	rows, err := db.Query(sql, timeId, roomId, week, startTime, courseId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return nil, err
+	}
+
+	ids := []string{}
+
+	for rows.Next() {
+		id := ""
+		err := commonlib.PutRecord(rows, &id)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return nil, err
+		}
+
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}
+
+func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool, msg string, err error) {
+
+	firstDay, err := time.ParseInLocation("20060102150405", firstDayOfWeek, time.Local)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	scheduleTempDatas, err := getScheduleTmpsByCenterId(centerId)
+
+	if err != nil {
+		return false, "", err
+	}
+
+	for _, scheduleTemp := range scheduleTempDatas {
+
+		scheduleTempId := scheduleTemp["id"]
+		week := scheduleTemp["week"]
+		roomId := scheduleTemp["room_id"]
+		timeId := scheduleTemp["time_id"]
+		teacherId := scheduleTemp["teacher_id"]
+		assistantId := scheduleTemp["assistant_id"]
+		courseId := scheduleTemp["course_id"]
+
+		weekNum, _ := strconv.Atoi(week)
+
+		theDay := firstDay.Add(time.Duration((weekNum-1)*24) * time.Hour)
+		date := theDay.Format("20060102")
+
+		scheduleExistFlag, err := checkScheduleExist(centerId, roomId, timeId, date)
+
+		if err != nil {
+			return false, "", err
+		}
+
+		if !scheduleExistFlag { //相关课表还未生成
+			scheduleId, err := insertSchedule(tx, teacherId, assistantId, courseId, centerId, timeId, roomId, date, week, "10")
+
+			if err != nil {
+				return false, "", err
+			}
+
+			childMapDatas, err := getChildAndContractByScheduleTempId(scheduleTempId)
+
+			for _, childMapData := range childMapDatas {
+
+				contractId := childMapData["contract_id"]
+
+				if contractId == "0" || contractId == "" { //暂时没有合同信息的，直接进行排课操作
+					err = insertScheduleChild(tx, fmt.Sprint(scheduleId), childMapData["child_id"], employeeId, "0")
+
+					if err != nil {
+						return false, "", err
+					}
+				}
+
+				contractDataMap, err := getContractById(contractId)
+				if err != nil {
+					return false, "", err
+				}
+
+				validSignInNum, err := getVaildNumOfContract(contractId)
+				if err != nil {
+					return false, "", err
+				}
+
+				totalSignInNum, _ := strconv.Atoi(contractDataMap["left_lesson_num"])
+
+				if totalSignInNum > validSignInNum {
+					flag, err := checkContractValid(contractDataMap["expire_date"])
+					if err != nil {
+						return false, "", err
+					}
+
+					if flag {
+						err = insertScheduleChild(tx, fmt.Sprint(scheduleId), childMapData["child_id"], employeeId, contractId)
+
+						if err != nil {
+							return false, "", err
+						}
+					}
+				}
+
+			}
+
+		}
+	}
+
+	tx.Commit()
+
+	return true, "", nil
+}
+
+func checkScheduleExist(centerId, roomId, timeId, dayDate string) (flag bool, err error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select id from class_schedule_detail where center_id=? and room_id=? and time_id=? and day_date=?"
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, centerId, roomId, timeId, dayDate)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, err
+	}
+
+	scheduleDetailId := 0
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &scheduleDetailId)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, err
+		}
+	}
+
+	if scheduleDetailId == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func insertSchedule(tx *sql.Tx, teacherId, assistantId, courseId, centerId, timeId, roomId, dayDate, week, capacity string) (id int64, err error) {
+
+	sql := "insert into class_schedule_detail(teacher_id,assistant_id,course_id,center_id,time_id,room_id,day_date,week,start_time,end_time,status,capacity) values(?,?,?,?,?,?,?,?,?,?,?,?)"
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	timeSectionDataMap, err := getTimeSectionById(timeId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	startTime := dayDate + strings.Replace(timeSectionDataMap["start_time"], ":", "", -1) + "00"
+	endTime := dayDate + strings.Replace(timeSectionDataMap["end_time"], ":", "", -1) + "00"
+
+	res, err := stmt.Exec(teacherId, assistantId, courseId, centerId, timeId, roomId, dayDate, week, startTime, endTime, 1, capacity)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	newScheduleDetailId, err := res.LastInsertId()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	return newScheduleDetailId, nil
+}
+
+func insertScheduleChild(tx *sql.Tx, scheduleId, childId, employeeId, contractId string) (err error) {
+	sql := "insert into schedule_detail_child(schedule_detail_id,child_id,create_time,create_user,contract_id) values(?,?,?,?,?)"
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, contractId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func ClassScheduleDetailLeave(childId, scheduleId, employeeId string) (flag bool, msg string, err error) {
+
+	signInExistFlag, err := checkSignInExist(childId, scheduleId)
+
+	if err != nil {
+		return false, "", err
+	}
+
+	if signInExistFlag {
+		return true, "", nil
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	contractId, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
+	if err != nil {
+		return false, "", err
+	}
+
+	//统一合同号没值的适合，为0
+	if contractId == "" {
+		contractId = "0"
+	}
+
+	err = insertSignIn(tx, scheduleId, childId, SIGN_IN_LEAVE, contractId, "", employeeId, IS_FREE_NO)
+
+	if err != nil {
+		return false, "", err
+	}
+
+	tx.Commit()
+
+	return true, "", nil
+}
+
+func ClassScheduleDetailTruant(childId, scheduleId, employeeId string) (flag bool, msg string, err error) {
+
+	signInExistFlag, err := checkSignInExist(childId, scheduleId)
+
+	if err != nil {
+		return false, "", err
+	}
+
+	if signInExistFlag {
+		return true, "", nil
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	contractId, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
+	if err != nil {
+		return false, "", err
+	}
+
+	//统一合同号没值的适合，为0
+	if contractId == "" {
+		contractId = "0"
+	}
+
+	err = insertSignIn(tx, scheduleId, childId, SIGN_IN_TRUANT, contractId, "", employeeId, IS_FREE_NO)
+
+	if err != nil {
+		return false, "", err
+	}
+
+	tx.Commit()
+
+	return true, "", nil
 }

@@ -1,7 +1,7 @@
 /**
  * Title：
- * 
- * Description: 
+ *
+ * Description:
  *
  * Author: Ivan
  *
@@ -11,7 +11,7 @@
  *
  * 修改历史: 版本号 修改日期 修改人 修改说明
  *   1.0 2013-09-28 Ivan 创建文件
-*/
+ */
 package wooyousite
 
 import (
@@ -22,22 +22,22 @@ import (
 /****
 * 数据插入
  */
-func TxInsert(tx *sql.Tx, sql string, args ...interface {}) (sql.Result, error) {
-	return txOperation(tx, sql, args ...)
+func TxInsert(tx *sql.Tx, sql string, args ...interface{}) (sql.Result, error) {
+	return txOperation(tx, sql, args...)
 }
 
 /****
 * 数据删除
  */
-func TxDelete(tx *sql.Tx, sql string, args ...interface {}) (sql.Result, error) {
-	return txOperation(tx, sql, args ...)
+func TxDelete(tx *sql.Tx, sql string, args ...interface{}) (sql.Result, error) {
+	return txOperation(tx, sql, args...)
 }
 
 /****
 * 数据更新
  */
-func TxUpdate(tx *sql.Tx, sql string, args ...interface {}) (sql.Result, error) {
-	return txOperation(tx, sql, args ...)
+func TxUpdate(tx *sql.Tx, sql string, args ...interface{}) (sql.Result, error) {
+	return txOperation(tx, sql, args...)
 }
 
 /****
@@ -58,7 +58,9 @@ func TxSelect(tx *sql.Tx, sql string, args ...interface{}) (*sql.Rows, error) {
 
 	rows, err := stmt.Query(args...)
 
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	return rows, err
 }
@@ -66,22 +68,22 @@ func TxSelect(tx *sql.Tx, sql string, args ...interface{}) (*sql.Rows, error) {
 /****
 * 数据插入
  */
-func DBInsert(sql string, args ...interface {}) (sql.Result, error) {
-	return dbOperation(sql, args ...)
+func DBInsert(sql string, args ...interface{}) (sql.Result, error) {
+	return dbOperation(sql, args...)
 }
 
 /****
 * 数据删除
  */
-func DBDelete(sql string, args ...interface {}) (sql.Result, error) {
-	return dbOperation(sql, args ...)
+func DBDelete(sql string, args ...interface{}) (sql.Result, error) {
+	return dbOperation(sql, args...)
 }
 
 /****
 * 数据更新
  */
-func DBUpdate(sql string, args ...interface {}) (sql.Result, error) {
-	return dbOperation(sql, args ...)
+func DBUpdate(sql string, args ...interface{}) (sql.Result, error) {
+	return dbOperation(sql, args...)
 }
 
 /****
@@ -93,7 +95,7 @@ func DBSelect(sql string, args ...interface{}) (*sql.Rows, error) {
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
-	rows, err := db.Query(sql, args ...)
+	rows, err := db.Query(sql, args...)
 
 	return rows, err
 }
@@ -108,14 +110,19 @@ func dbOperation(sql string, args ...interface{}) (sql.Result, error) {
 
 	stmt, err := db.Prepare(sql)
 
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	result, err := stmt.Exec(args...)
 
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	return result, err
 }
+
 /****
 * 数据增删改处理(事务)
  */
@@ -135,8 +142,9 @@ func txOperation(tx *sql.Tx, sqlStr string, args ...interface{}) (sql.Result, er
 
 	result, err := stmt.Exec(args...)
 
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	return result, err
 }
-
