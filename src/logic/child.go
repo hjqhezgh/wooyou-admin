@@ -19,6 +19,7 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"strconv"
+	"time"
 )
 
 func insertChild(tx *sql.Tx, name, pid, sex, birthday, year, month, centerId string) (id int64, err error) {
@@ -224,7 +225,7 @@ func ChildInClassPage(scheduleId string, pageNo, pageSize int) (*commonlib.Tradi
 	            left join consumer_new cons on cons.parent_id=ch.pid
 	            left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) d on d.consumer_id=cons.id
 				left join employee e on e.user_id=sdc.create_user
-				left join sign_in si on sdc.wyclass_id=si.wyclass_id and si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
+				left join sign_in si on si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
 				where sdc.schedule_detail_id=? order by sdc.id desc limit ?,?`
 	lessgo.Log.Debug(dataSql)
 
@@ -394,4 +395,217 @@ func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pa
 	}
 
 	return pageData, nil
+}
+
+func ChildPay(childId,scheduleId,classId,payType,employeeId string) (flag bool, msg string, err error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	flag,msg,err = childPay(tx,childId,"",scheduleId,classId,payType,employeeId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	if !flag {
+		return false,msg,nil
+	}
+
+	tx.Commit()
+
+	return true,"", nil
+}
+
+func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeId string) (flag bool, msg string, err error) {
+
+	var consumerDataMap map[string]string
+
+	if consumerId == ""{
+		consumerDataMap,err = getConsumerByChildId(childId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+		consumerId = consumerDataMap["id"]
+	}else{
+		consumerDataMap,err = getConsumerById(consumerId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+	}
+
+	if childId == "" {
+		childIdInt,err := getChildByConsumerId(consumerId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+		childId = fmt.Sprint(childIdInt)
+	}
+
+	err = insertPayLog(tx,consumerId,employeeId)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	if payType == "all" {
+		payType = "2"
+	} else if payType == "part" {
+		payType = "1"
+	}
+
+	consumerUpdateMap := make(map[string]interface{})
+	consumerUpdateMap["pay_status"] = payType
+	consumerUpdateMap["pay_time"] = time.Now().Format("20060102150405")
+
+	err = updateConsumer(tx,consumerUpdateMap,consumerId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	if scheduleId == ""{//是在客户主界面点击的缴费
+		if consumerDataMap["contactStatus"] != CONSUMER_STATUS_SIGNIN {
+			consumerUpdateMap = make(map[string]interface{})
+			consumerUpdateMap["contact_status"] = CONSUMER_STATUS_SIGNIN
+			consumerUpdateMap["sign_in_time"] = time.Now().Format("20060102150405")
+
+			err = updateConsumer(tx,consumerUpdateMap,consumerId)
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				return false, "", err
+			}
+
+			_,err = insertConsumerStatusLog(tx,consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				return false, "", err
+			}
+
+			scheduleId,classId,err = getNewestFreeScheduleIdByChildId(childId)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				return false, "", err
+			}
+
+			if scheduleId == "" {//进行无班签到
+				err = insertSignIn(tx,"",fmt.Sprint(childId),SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+
+				if err != nil {
+					lessgo.Log.Error(err.Error())
+					return false, "", err
+				}
+
+				insertConsumerContactsLog(tx,employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+
+				if err != nil {
+					lessgo.Log.Error(err.Error())
+					return false, "", err
+				}
+			}else{
+				err = insertSignIn(tx,scheduleId,childId,SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+				if err != nil {
+					lessgo.Log.Error(err.Error())
+					return false, "", err
+				}
+
+				note := ""
+
+				if classId == ""{//常规课
+					scheduleDataMap,err := getScheduleDetailId(scheduleId)
+
+					if err != nil {
+						return false, "", err
+					}
+					note = fmt.Sprintf("签到常规课[时间]%v[教室]%v[课程]%v中", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
+				}else{
+					classDataMap,err := getWyClassById(classId)
+
+					if err != nil {
+						lessgo.Log.Error(err.Error())
+						return false, "", err
+					}
+
+					note = "签到"+classDataMap["start_time"]+classDataMap["name"]
+				}
+
+				insertConsumerContactsLog(tx,employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+
+				if err != nil {
+					lessgo.Log.Error(err.Error())
+					return false, "", err
+				}
+			}
+
+		}
+	}else{//在排课界面的缴费
+		err = insertSignIn(tx,scheduleId,childId,SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+
+		consumerUpdateMap = make(map[string]interface{})
+		consumerUpdateMap["contact_status"] = CONSUMER_STATUS_SIGNIN
+		consumerUpdateMap["sign_in_time"] = time.Now().Format("20060102150405")
+
+		err = updateConsumer(tx,consumerUpdateMap,consumerId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+
+		_,err = insertConsumerStatusLog(tx,consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+
+		note := ""
+
+		if classId == ""{//常规课
+			scheduleDataMap,err := getScheduleDetailId(scheduleId)
+
+			if err != nil {
+				return false, "", err
+			}
+			note = fmt.Sprintf("签到常规课[时间]%v[教室]%v[课程]%v中", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
+		}else{
+			classDataMap,err := getWyClassById(classId)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				return false, "", err
+			}
+
+			note = "签到"+classDataMap["start_time"]+classDataMap["name"]
+		}
+
+		insertConsumerContactsLog(tx,employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+	}
+
+
+	tx.Commit()
+
+	return true,"",nil
 }

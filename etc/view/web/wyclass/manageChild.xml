@@ -50,8 +50,8 @@
 
         <action desc="剔除" url="/web/class_schedule_detail/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldClassId',value:'@classId'},{name:'cid-eq',value:'@centerId'}]" linkType="iframeWindow"/>
-        <action desc="缴定金" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'part'}]" linkType="ajax" confirmMsg="确认为该用户缴定金？"/>
-        <action desc="缴全额" url="/web/wyclass/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'all'}]" linkType="ajax" confirmMsg="确认为该用户缴全额？"/>
+        <action desc="缴定金" url="/web/class_schedule_detail/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'part'}]" linkType="ajax" confirmMsg="确认为该用户缴定金？"/>
+        <action desc="缴全额" url="/web/class_schedule_detail/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'all'}]" linkType="ajax" confirmMsg="确认为该用户缴全额？"/>
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@cosumerId'}]" linkType="iframeWindow"/>
 
         <toolaction desc="签到" url="/web/class_schedule_detail/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>

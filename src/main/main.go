@@ -111,7 +111,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	//tmk自己的名单库
 	"/consumer/tmk_consumer.json": server.TmkConsumerSelfListAction,
 	//缴费
-	"/web/consumer/consumerPay.json": server.ConsumerPayAction,
+	"/web/consumer/consumerPay.json": web.ConsumerPayAction,
 	//tmk运营报表
 	"/tmkStatistics.json": server.TmkStatisticsAction,
 	//tmk运营报表详情
@@ -166,16 +166,15 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_detail/addChildForNormalTempelate.json": web.AddChildForNormalTempelateAction,
 	"/web/class_schedule_detail/addChildForNormalOnce.json":      web.AddChildForNormalOnceAction,
 	"/web/class_schedule_detail/removeChild.json":                web.RemoveChildFromScheduleAction,
+	"/web/class_schedule_detail/pay.json":                        web.ChildPayAction,
 	"/web/schedule_detail/deleteSingle.json":                     server.DeleteSingleScheduleAction,
 	"/web/child/childInCenter.json":                              web.ChildInCenterAction,
 	"/web/child/childInClass.json":                               web.ChildInClassListAction,
 	"/web/child/childInNormalSchedule.json":                      web.ChildInNormalScheduleAction,
-	"/web/wyclass/pay.json":                                      server.ClassPayAction,
 	"/web/wyclass/signInWithoutClass.json":                       web.ChildSignInWithoutClassAction,
 	"/web/wyclass/sendSMS/save.json":                             server.WyClassSendSMSSaveAction,
 	"/web/wyclass/addChildQuick.json":                            web.AddChildToClassQuickAction,
 	"/web/wyclass/sendSMS/load.json":                             server.WyClassSendSMSLoadAction,
-	"/web/wyclass/removeChildForNormal.json":                     server.RemoveChildForNormalAction,
 	"/web/wyclass/changeClass.json":                              server.WyClassChangeClassAction,
 	"/web/wyclass/contractCheckInSave.json":                      web.ContractCheckInSaveAction,
 	"/web/class_schedule_attach/data.json":                       server.ClassScheduleAttachListAction,

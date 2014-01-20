@@ -15,6 +15,7 @@ package logic
 
 import (
 	"github.com/hjqhezgh/lessgo"
+	"github.com/hjqhezgh/commonlib"
 	"database/sql"
 )
 
@@ -65,5 +66,31 @@ func deleteScheduleChild(tx *sql.Tx,childId,scheduleId string) error {
 	}
 
 	return nil
+}
+
+func getNewestFreeScheduleIdByChildId(childId string) (scheduleId,classId string ,err error){
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select schedule_detail_id,wyclass_id from schedule_detail_child where child_id=? and is_free=1 order by id desc "
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, childId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return "","", err
+	}
+
+	if rows.Next() {
+		err = commonlib.PutRecord(rows, &scheduleId,&classId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return "","", err
+		}
+	}
+
+	return scheduleId,classId,nil
 }
 

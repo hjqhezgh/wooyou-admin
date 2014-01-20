@@ -285,3 +285,58 @@ func ChildListAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.RenderTemplate(w, r, "page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/page.json")
 }
+
+func ChildPayAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	classId := r.FormValue("classId")
+	childId := r.FormValue("childId")
+	payType := r.FormValue("type")
+	scheduleId := r.FormValue("scheduleId")
+
+	flag, msg, err := logic.ChildPay(childId,scheduleId,classId,payType,employee.UserId)
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	if !flag {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "操作失败:" + msg
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+
+	return
+}

@@ -20,6 +20,7 @@ import (
 	"github.com/hjqhezgh/lessgo"
 	"strconv"
 	"time"
+	"strings"
 )
 
 const (
@@ -557,4 +558,36 @@ func getConsumerByChildId(id string) (map[string]string, error) {
 	}
 
 	return dataMap, nil
+}
+
+func ConsumerPay(consumerIds,payType,employeeId string) (flag bool, msg string, err error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	idList := strings.Split(consumerIds,",")
+
+	for _,consumerId := range idList {
+		flag,msg,err = childPay(tx,"",consumerId,"","",payType,employeeId)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+
+		if !flag {
+			return false,msg,nil
+		}
+	}
+
+	tx.Commit()
+
+	return true,"", nil
 }
