@@ -15,10 +15,10 @@ define(function (require, exports, module) {
             var paramsMap = getParamsMap();
             var centerId = paramsMap["cid-eq"];
             var childId = paramsMap["childId"];
-            var oldClassId = paramsMap["oldClassId"];
+            var oldScheduleId = paramsMap["oldScheduleId"];
             $('[name=centerId]').val(centerId);
             $('[name=childId]').val(childId);
-            $('[name=oldClassId]').val(oldClassId);
+            $('[name=oldScheduleId]').val(oldScheduleId);
 
             process.render();
 
@@ -113,7 +113,7 @@ define(function (require, exports, module) {
                     allDataTable.find('div:last').append('<p>当前人数：'+schedule.currentTMKPersonNum+"/"+schedule.personNum+'</p>');
                     allDataTable.find('div:last').append('<p>签到人数：'+schedule.signNum+'</p>');
                     allDataTable.find('div:last').append('<p><a href="/web/wyclass/manageChild?classId='+schedule.classId+'&centerId-eq='+schedule.centerId+'&scheduleId='+schedule.id+'" data-action="openIframeWindow">学生管理</a></p>');
-                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-class-value="'+schedule.classId+'"data-action="change">调入此班</a></p>');
+                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-action="change">调入此班</a></p>');
                     allDataTable.find('div:last').append('<p></p>');
                 }
             }else{
@@ -170,12 +170,10 @@ define(function (require, exports, module) {
                 e.preventDefault();
 
                 var sid = $(this).attr('data-value');
-                var classId = $(this).attr('data-class-value');
 
-                $.post('/web/wyclass/changeClass.json',{
-                    scheduleId:sid,
-                    newClassId:classId,
-                    oldClassId:$('[name=oldClassId]').val(),
+                $.post('/web/class_schedule_detail/changeClass.json',{
+                    newScheduleId:sid,
+                    oldScheduleId:$('[name=oldScheduleId]').val(),
                     childId:$('[name=childId]').val()
                 },function(data){
                     if(data.success){

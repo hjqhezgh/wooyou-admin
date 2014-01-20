@@ -29,6 +29,7 @@
             </formatter>
         </column>
         <column field="classId" desc="班级ID" hidden="true"/>
+        <column field="scheduleDetailId" desc="课表ID" hidden="true"/>
         <column field="inviteUser" desc="tmkid" hidden="true"/>
         <column field="centerId" desc="centerId" hidden="true"/>
         <column field="smsStatus" desc="短信发送状态" width="50">
@@ -49,7 +50,7 @@
         <column field="consumerId" desc="consumerId" hidden="true"/>
 
         <action desc="剔除" url="/web/class_schedule_detail/removeChild.json" linkType="ajax" confirmMsg="确认将该学员从班级中剔除吗？" actionParams="[{name:'childId',value:'id'}]"/>
-        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldClassId',value:'@classId'},{name:'cid-eq',value:'@centerId'}]" linkType="iframeWindow"/>
+        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldScheduleId',value:'$scheduleId'},{name:'cid-eq',value:'@centerId'}]" linkType="iframeWindow"/>
         <action desc="缴定金" url="/web/class_schedule_detail/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'part'}]" linkType="ajax" confirmMsg="确认为该用户缴定金？"/>
         <action desc="缴全额" url="/web/class_schedule_detail/pay.json" actionParams="[{name:'childId',value:'id'},{name:'classId',value:'@classId'},{name:'type',value:'all'}]" linkType="ajax" confirmMsg="确认为该用户缴全额？"/>
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@cosumerId'}]" linkType="iframeWindow"/>

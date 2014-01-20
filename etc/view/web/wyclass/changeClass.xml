@@ -23,7 +23,7 @@
                     <input name="firstDayOfWeek" type="hidden"/>
                     <input name="centerId" type="hidden"/>
                     <input name="childId" type="hidden"/>
-                    <input name="oldClassId" type="hidden"/>
+                    <input name="oldScheduleId" type="hidden"/>
                     </div>
 
                     <div class="inline">
