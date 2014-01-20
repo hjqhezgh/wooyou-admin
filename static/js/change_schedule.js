@@ -102,7 +102,7 @@ define(function (require, exports, module) {
                     allDataTable.find('div:last').append('<p>助教：'+schedule.assistant+'</p>');
                     allDataTable.find('div:last').append('<p>人数：'+schedule.signNum+"/"+schedule.personNum+'</p>');
                     allDataTable.find('div:last').append('<p><a href="/web/wyclass/manageChildForNormal?centerId-eq='+schedule.centerId+'&scheduleId='+schedule.id+'" data-action="openIframeWindow">分配学生</a></p>');
-                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-action="deleteTmpSchedule">删</a>&nbsp;<a href="/web/class_schedule_detail/modify_normal?scheduleId='+schedule.id+'" data-value="'+schedule.id+'" data-action="openIframeWindow">改</a></p>');
+                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-action="change">调入此班</a></p>');
                 }else if(schedule.isNormal == 2){
                     allDataTable.find('tr:last').append('<td><div class="schedule-detail foronce"></div></td>');
                     if(schedule.code){

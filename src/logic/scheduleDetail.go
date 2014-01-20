@@ -672,11 +672,6 @@ func ChildSignInWithoutClass(consumerIds,employeeId string) (flag bool, msg stri
 
 		childId,err := getChildByConsumerId(consumerId)
 
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			return false, "", err
-		}
-
 		signInFlag,err := checkSignInExist(fmt.Sprint(childId),"")
 
 		if err != nil {
@@ -1130,4 +1125,75 @@ func ChangeClassSchedule(childId, newScheduleId, oldScheduleId, employeeId strin
 	tx.Commit()
 
 	return true, "", nil
+}
+
+func ClassScheduleDetailPage(centerId,kw,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	params := []interface{}{}
+
+	dataSql := `
+				select csd.id,cour.name courseName,class.code,csd.start_time,class.name className,ce.name centerName,class.class_id,ce.cid centerId
+				from class_schedule_detail csd
+				left join wyclass class on csd.class_id=class.class_id
+				left join course cour on cour.cid=csd.course_id
+				left join center ce on ce.cid=csd.center_id
+				where 1=1 `
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employeeId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return nil,err
+		}
+
+		params = append(params, _employee.CenterId)
+
+		dataSql += " and csd.center_id=? "
+	}
+
+	if centerId != "" && dataType == "all" {
+		params = append(params, centerId)
+		dataSql += " and csd.center_id=? "
+	}
+
+	if kw != "" {
+		dataSql += ` and csd.id in
+		(select sdc.schedule_detail_id from child ch
+		left join schedule_detail_child sdc on sdc.child_id=ch.cid
+		left join parent p on p.pid=ch.pid
+		where ch.name=? or p.telephone=?) `
+		params = append(params, kw)
+		params = append(params, kw)
+	}
+
+	countSql := "select count(1) from (" + dataSql + ") num"
+	lessgo.Log.Debug(countSql)
+	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	currPageNo := pageNo
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	dataSql += " order by csd.id desc limit ?,? "
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	lessgo.Log.Debug(dataSql)
+	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pageData, nil
 }

@@ -625,6 +625,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	partTimeName := r.FormValue("partTimeName-eq")
 	level := r.FormValue("level-eq")
 
+	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+	if centerId1 == "1"{
+		centerId1 = "7"
+	}
+
 	params := []interface{}{}
 	paramsForCount := []interface{}{}
 
@@ -648,6 +653,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
 			commonlib.OutputJson(w, m, " ")
 			return
+		}
+
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if _employee.CenterId == "1"{
+			_employee.CenterId = "7"
 		}
 
 		params = append(params, _employee.CenterId)
@@ -700,6 +710,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 			m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
 			commonlib.OutputJson(w, m, " ")
 			return
+		}
+
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if _employee.CenterId == "1"{
+			_employee.CenterId = "7"
 		}
 
 		paramsForCount = append(paramsForCount, _employee.CenterId)

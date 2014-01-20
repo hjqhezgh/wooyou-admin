@@ -28,6 +28,7 @@
             </callback>
         </toolaction>
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
+        <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
 
         <column field="centerName" desc="门店" width="80"/>
         <column field="lastTMK" desc="最后TMK" width="60"/>

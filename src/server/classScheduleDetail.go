@@ -459,7 +459,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 	getScheduleInfoSql += " left join (select count(1) num,schedule_detail_id from sign_in group by schedule_detail_id) signNum on signNum.schedule_detail_id = csd.id "
 	getScheduleInfoSql += " left join wyclass wc on wc.class_id=csd.class_id "
 	getScheduleInfoSql += " left join course cour on cour.cid=csd.course_id "
-	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=? and csd.course_id is null"
+	getScheduleInfoSql += " where csd.start_time>=? and csd.start_time<=? and csd.center_id=?"
 
 	params := []interface{}{}
 

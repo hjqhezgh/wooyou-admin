@@ -81,7 +81,7 @@ func ChildSignInLogListAction(w http.ResponseWriter, r *http.Request) {
 	 				left join contract contr on contr.id=si.contract_id
 	 				left join course cour on cour.cid=contr.course_id
 	 				left join course cour1 on cour1.cid=csd.course_id
-	 		where si.child_id=? and si.schedule_detail_id is not null and si.wyclass_id is null `
+	 		where si.child_id=? and si.is_free=2 `
 
 	params = append(params, childId)
 

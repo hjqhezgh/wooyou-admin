@@ -26,6 +26,16 @@ define(function (require, exports, module) {
                 dateFormat : 'yy-mm-dd'
             });
 
+            $.get('/web/center/alldata',function(data){
+                if(data.success){
+                    for(var i=0;i<data.datas.length;i++){
+                        $('#center').append('<option value="'+data.datas[i].cid+'">'+data.datas[i].name+'</option>');
+                    }
+
+                    $('#center').val($('[name=centerId]').val());
+                }
+            },'json');
+
             process.bind();
         },
         render : function(type){
@@ -99,7 +109,7 @@ define(function (require, exports, module) {
                     allDataTable.find('div:last').append('<p>助教：'+schedule.assistant+'</p>');
                     allDataTable.find('div:last').append('<p>人数：'+schedule.signNum+"/"+schedule.personNum+'</p>');
                     allDataTable.find('div:last').append('<p><a href="/web/wyclass/manageChildForNormal?centerId-eq='+schedule.centerId+'&scheduleId='+schedule.id+'" data-action="openIframeWindow">分配学生</a></p>');
-                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-action="deleteTmpSchedule">删</a>&nbsp;<a href="/web/class_schedule_detail/modify_normal?scheduleId='+schedule.id+'" data-value="'+schedule.id+'" data-action="openIframeWindow">改</a></p>');
+                    allDataTable.find('div:last').append('<p><a href="#" data-value="'+schedule.id+'" data-class-value="'+schedule.classId+'"data-action="quickAdd">加入</a></p>');
                 }else if(schedule.isNormal == 2){
                     allDataTable.find('tr:last').append('<td><div class="schedule-detail foronce"></div></td>');
                     if(schedule.code){
@@ -140,10 +150,17 @@ define(function (require, exports, module) {
 
             $('a[data-action=search]').click(function(e){
                 e.preventDefault();
-                if($('input[name=start_time]').val()){
+                if($('input[name=start_time]').val()!=""){
                     $('[name=firstDayOfWeek]').val($('input[name=start_time]').val().replace(new RegExp("-","g"), "")+"000000");
-                    process.render();
                 }
+
+                if($('#center').val()==""){
+                    alert('请选择中心');
+                    return;
+                }
+                $('[name=centerId]').val($('#center').val());
+
+                process.render();
             });
 
             $('a[data-action=reset]').click(function(e){

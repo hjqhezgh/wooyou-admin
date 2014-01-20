@@ -62,6 +62,12 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 	}
 
 	if id == "" {
+
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if centerId == "1"{
+			centerId = "7"
+		}
+
 		homePhoneFlag, err := checkConsumerPhoneExist(homePhone)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -463,20 +469,40 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 		if err != nil {
 			return nil, err
 		}
+
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if _employee.CenterId == "1"{
+			_employee.CenterId = "7"
+		}
+
 		countParams = append(countParams, _employee.CenterId)
 		dataParams = append(dataParams, _employee.CenterId)
+
 		whereSql += " and b.center_id=? "
 	}
 
 	if paramsMap["centerId1"] != "" && dataType == "all" {
-		countParams = append(countParams, paramsMap["centerId1"])
-		dataParams = append(dataParams, paramsMap["centerId1"])
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if paramsMap["centerId1"] == "1" {
+			countParams = append(countParams, "7")
+			dataParams = append(dataParams, "7")
+		}else{
+			countParams = append(countParams, paramsMap["centerId1"])
+			dataParams = append(dataParams, paramsMap["centerId1"])
+		}
+
 		whereSql += " and b.center_id=? "
 	}
 
 	if paramsMap["centerId2"] != "" && dataType == "all" {
-		countParams = append(countParams, paramsMap["centerId2"])
-		dataParams = append(dataParams, paramsMap["centerId2"])
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if paramsMap["centerId2"] == "1" {
+			countParams = append(countParams, "7")
+			dataParams = append(dataParams, "7")
+		}else{
+			countParams = append(countParams, paramsMap["centerId2"])
+			dataParams = append(dataParams, paramsMap["centerId2"])
+		}
 		whereSql += " and b.center_id=? "
 	}
 

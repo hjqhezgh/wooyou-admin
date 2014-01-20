@@ -11,12 +11,12 @@
         <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
 
         <column field="centerName" desc="所属门店"/>
-        <column field="employeeName" desc="TMK"/>
+        <column field="tmkName" desc="TMK"/>
         <column field="contactName" desc="联系人"/>
-        <column field="contactPhone" desc="联系电话"/>
+        <column field="phone" desc="联系电话"/>
         <column field="homePhone" desc="家庭电话"/>
-        <column field="child" desc="孩子姓名"/>
-        <column field="status" desc="状态">
+        <column field="childName" desc="孩子姓名"/>
+        <column field="contactStatus" desc="状态">
         <formatter>
             <![CDATA[
                 if(cellvalue==1){
@@ -33,7 +33,7 @@
             ]]>
         </formatter>
         </column>
-        <column field="isAPP" desc="是否APP用户" hidden="true">
+        <column field="parentId" desc="是否APP用户" hidden="true">
             <formatter>
                 <![CDATA[
                     if(cellvalue){
@@ -58,7 +58,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="paytime" desc="缴费时间">
+        <column field="payTime" desc="缴费时间">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -69,7 +69,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="comefrom" desc="来源">
+        <column field="comeFromName" desc="来源">
             <formatter>
                 <![CDATA[
                     var value = cellvalue;
@@ -81,6 +81,6 @@
                 ]]>
             </formatter>
         </column>
-        <column field="parttimeName" desc="兼职人员姓名" hidden="true"/>
+        <column field="partTimeName" desc="兼职人员姓名" hidden="true"/>
     </customgridpanel>
 </viewport>

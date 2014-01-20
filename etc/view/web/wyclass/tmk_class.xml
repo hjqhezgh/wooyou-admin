@@ -17,13 +17,19 @@
             <div class="input-box text-center">
 
                 <form class="form-inline">
-
-                    <div class="inline form-field" field-desc="日期" field-name="start_time" field-searchtype="eq" field-inputtype="date" field-localdata="" field-url="" field-valuefield="" field-descfield="" field-char14="" field-char8="" field-parentselect="">
+                    <div class="inline form-field">
+                    课表所属中心：
+                    <select id="center" data-field="" data-desc="课表所属中心" data-searchtype="eq">
+                    <option value="">全部</option>
+                    </select>
+                    </div>
+                    <div class="inline form-field">
                     日期：<input name="start_time" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="eq" />
+                    </div>
+
                     <input name="firstDayOfWeek" type="hidden"/>
                     <input name="centerId" type="hidden"/>
                     <input name="consumerId" type="hidden"/>
-                    </div>
 
                     <div class="inline">
                         <a href="javascript:void(0)" data-action="search" class="btn btn-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">搜索</span></a>

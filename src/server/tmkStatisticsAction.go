@@ -113,27 +113,27 @@ func TmkStatisticsAction(w http.ResponseWriter, r *http.Request) {
 
 	params := []interface{}{}
 
-	sql := "select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '定金',ff.num as '全额',1,2,3"
-	sql += " from employee em left join "
-	sql += " (select count(1) num,e.user_id from audio a left join employee e on a.cid=e.center_id and a.localphone=e.phone_in_center "
-	sql += " where e.user_id is not null and start_time >=? and start_time<=?  group by e.user_id ) aa on em.user_id= aa.user_id "
-	sql += " left join "
-	sql += " (select count(1) num,tmk_id from tmk_consumer where tmk_create_time >=? and tmk_create_time<=? group by tmk_id )bb on em.user_id=bb.tmk_id "
-	sql += " left join "
-	sql += " (select count(1) num,create_user from schedule_detail_child where create_time>=? and create_time <=? and wyclass_id is not null group by create_user) cc on em.user_id=cc.create_user "
-	sql += " left join "
-	sql += " (select count(1) num,tmk_id from( select tc.tmk_id,si.sid from tmk_consumer tc "
-	sql += " left join consumer_new cons on tc.consumer_id=cons.id left join parent p  on p.pid=cons.parent_id  left join child ch on ch.pid=p.pid left join sign_in si on si.child_id=ch.cid "
-	sql += " where si.type=1 and  (wyclass_id is not null or (wyclass_id is null and schedule_detail_id is null)) and sign_time>=? and sign_time<=? ) a group by tmk_id )dd on em.user_id=dd.tmk_id "
-	sql += " left join "
-	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id "
-	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=1 ) b group by tmk_id) ee on em.user_id=ee.tmk_id "
-	sql += " left join "
-	sql += " (select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id "
-	sql += " where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=2 ) b group by tmk_id) ff on em.user_id=ff.tmk_id "
-	sql += " left join employee_role er on em.user_id=er.user_id"
-	sql += " left join role r on r.role_id=er.role_id"
-	sql += " where (r.code='tmk' or r.code='tmk_center') and em.is_leave=0 "
+	sql := `select em.user_id,em.really_name,aa.num as '电话数',bb.num as '名单数',cc.num as '邀约数',dd.num as '签到数',ee.num as '定金',ff.num as '全额',1,2,3
+		    from employee em left join
+			(select count(1) num,e.user_id from audio a left join employee e on a.cid=e.center_id and a.localphone=e.phone_in_center
+	        where e.user_id is not null and start_time >=? and start_time<=?  group by e.user_id ) aa on em.user_id= aa.user_id
+			left join
+			(select count(1) num,tmk_id from tmk_consumer where tmk_create_time >=? and tmk_create_time<=? group by tmk_id )bb on em.user_id=bb.tmk_id
+			left join
+			(select count(1) num,create_user from schedule_detail_child where create_time>=? and create_time <=? and is_free=1 group by create_user) cc on em.user_id=cc.create_user
+			left join
+			(select count(1) num,tmk_id from( select tc.tmk_id,si.sid from tmk_consumer tc
+			left join consumer_new cons on tc.consumer_id=cons.id left join parent p  on p.pid=cons.parent_id  left join child ch on ch.pid=p.pid left join sign_in si on si.child_id=ch.cid
+			where si.type=1 and si.is_free=1 and sign_time>=? and sign_time<=? )a group by tmk_id )dd on em.user_id=dd.tmk_id
+			left join
+			(select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id
+			where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=1 ) b group by tmk_id) ee on em.user_id=ee.tmk_id
+			left join
+			(select count(1) num,tmk_id from(select tc.tmk_id,tc.consumer_id from tmk_consumer tc left join pay_log pl on tc.consumer_id=pl.consumer_id left join consumer_new cons on cons.id=tc.consumer_id
+			where pl.pay_time is not null and pl.pay_time>=? and pl.pay_time<=? and cons.pay_status=2 ) b group by tmk_id) ff on em.user_id=ff.tmk_id
+			left join employee_role er on em.user_id=er.user_id
+			left join role r on r.role_id=er.role_id
+			where (r.code='tmk' or r.code='tmk_center') and em.is_leave=0 `
 
 	defaultStartTime := "2000-01-01 00:0:000"
 	defaultEndTime := "2999-12-31 00:00:00"

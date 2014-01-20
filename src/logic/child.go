@@ -302,7 +302,7 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	}
 
 	dataSql := `
-				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark,sdc.is_free isFree
+				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark,sdc.is_free isFree,contr.left_lesson_num totalNum,usedNum.num usedNum
 	 		    from (select * from schedule_detail_child where schedule_detail_id=? order by id desc limit ?,?) sdc
 	 			left join child ch on ch.cid=sdc.child_id
 	 			left join parent p on p.pid=ch.pid
@@ -311,7 +311,9 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	 			left join sign_in si on si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
 	 			left join class_schedule_detail csd on csd.id=sdc.schedule_detail_id
 	 			left join contract contr on contr.id=sdc.contract_id
-	 			left join course cour on cour.cid=contr.course_id`
+	 			left join course cour on cour.cid=contr.course_id
+	 			left join (select count(1) num,contract_id from sign_in where type=1 or type=3 group by contract_id ) usedNum on usedNum.contract_id=contr.id
+	 			`
 	lessgo.Log.Debug(dataSql)
 
 	dataParams := []interface{}{scheduleId, (currPageNo - 1) * pageSize, pageSize}
@@ -329,6 +331,11 @@ func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pa
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
+
+	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+	if centerId == "1"{
+		centerId = "7"
+	}
 
 	params := []interface{}{}
 
@@ -349,7 +356,14 @@ func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pa
 			lessgo.Log.Error(err.Error())
 			return nil,err
 		}
+
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if _employee.CenterId == "1"{
+			_employee.CenterId = "7"
+		}
+
 		params = append(params, _employee.CenterId)
+
 		dataSql += " and ch.center_id=? "
 	}
 

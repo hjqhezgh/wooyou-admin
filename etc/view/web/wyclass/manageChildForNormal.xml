@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="200">
+    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="250">
 
-        <column field="childName" desc="学生"/>
+        <column field="childName" desc="学生" width="70"/>
         <column field="phone" desc="联系电话"/>
-        <column field="signType" desc="签到状态">
+        <column field="signType" desc="签到状态" width="70">
             <formatter>
                 <![CDATA[
                         if(cellvalue==1) {
@@ -20,7 +20,7 @@
                 ]]>
             </formatter>
         </column>
-        <column field="signTime" desc="签到时间">
+        <column field="signTime" desc="签到时间" width="120">
             <formatter>
                 <![CDATA[
                         if(cellvalue) {
@@ -45,10 +45,32 @@
         <column field="contractId" desc="合同id" hidden="true"/>
         <column field="contractNo" desc="合同号" hidden="true"/>
         <column field="applyTime" desc="签单时间" hidden="true"/>
-        <column field="level" desc="星级"/>
+        <column field="totalNum" desc="合同总课数" hidden="true"/>
+        <column field="usedNum" desc="已使用课数" width="70"/>
+        <column field="leftNum" desc="剩余课数" width="70">
+            <formatter>
+                <![CDATA[
+                        var totalNum = 0;
+                        if(rowObject["totalNum"]){
+                            totalNum = rowObject["totalNum"];
+                        }
+                        var usedNum = 0;
+                        if(rowObject["usedNum"]){
+                            usedNum = rowObject["usedNum"];
+                        }
+
+                        if(totalNum==0){
+                            return "";
+                        }
+
+                        return totalNum-usedNum;
+                ]]>
+            </formatter>
+        </column>
+        <column field="level" desc="星级" width="70"/>
         <column field="remark" desc="备注"/>
         <column field="consumerId" desc="consumerId" hidden="true"/>
-        <column field="isFree" desc="是否试听">
+        <column field="isFree" desc="是否试听" width="50">
             <formatter>
                 <![CDATA[
                         if(cellvalue=="1") {

@@ -131,6 +131,11 @@ func ChildInCenterAction(w http.ResponseWriter, r *http.Request) {
 	centerId := r.FormValue("centerId-eq")
 	kw := r.FormValue("kw-like")
 
+	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+	if centerId == "1"{
+		centerId = "7"
+	}
+
 	pageData, err := logic.ChildInCenterPage(centerId, kw, pageNo, pageSize)
 
 	if err != nil {

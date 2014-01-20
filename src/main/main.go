@@ -168,6 +168,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_detail/removeChild.json":                web.RemoveChildFromScheduleAction,
 	"/web/class_schedule_detail/pay.json":                        web.ChildPayAction,
 	"/web/class_schedule_detail/changeClass.json":                web.ChangeClassScheduleAction,
+	"/web/class_schedule_detail/page.json": 					  web.ClassScheduleDetailPageAction,
 	"/web/schedule_detail/deleteSingle.json":                     server.DeleteSingleScheduleAction,
 	"/web/child/childInCenter.json":                              web.ChildInCenterAction,
 	"/web/child/childInClass.json":                               web.ChildInClassListAction,
@@ -184,7 +185,6 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 
 	//班级相关服务
 	"/wyclass.json":                  server.WyClassListAction,
-	"/web/wyclass/wyclass_free.json": server.WyClassFreeListAction,
 	"/web/wyclass/save.json":         server.WyClassSaveAction,
 	"/web/wyclass/load.json":         server.WyClassLoadAction,
 	"/wyclass/loadChildInClass.json": server.LoadChildInClassAction,
