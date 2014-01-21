@@ -48,7 +48,7 @@ func AddChildToClass(classId, scheduleId, ids, employeeId string) (flag bool, ms
 			continue
 		}
 
-		err = insertScheduleChild(tx, id, scheduleId, classId,"0", employeeId,IS_FREE_YES)
+		err = insertScheduleChild(tx, id, scheduleId, classId, employeeId, "0", IS_FREE_YES)
 
 		if err != nil {
 			return false, "", err
@@ -82,15 +82,15 @@ func AddChildToClass(classId, scheduleId, ids, employeeId string) (flag bool, ms
 
 			note := ""
 
-			if classId == ""{//常规课程
-				scheduleDataMap,err := getScheduleDetailId(scheduleId)
+			if classId == "" { //常规课程
+				scheduleDataMap, err := getScheduleDetailId(scheduleId)
 
 				if err != nil {
 					return false, "", err
 				}
 
 				note = fmt.Sprintf("邀约至[时间]%v[教室]%v[课程]%v中", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
-			}else{
+			} else {
 				classDataMap, err := getWyClassById(classId)
 
 				if err != nil {
@@ -160,7 +160,7 @@ func checkChildInSchedule(childId, scheduleId string) (bool, error) {
 	return false, nil
 }
 
-func insertScheduleChild(tx *sql.Tx, childId, scheduleId, classId, employeeId,contractId,isFree string) error {
+func insertScheduleChild(tx *sql.Tx, childId, scheduleId, classId, employeeId, contractId, isFree string) error {
 
 	sql := ""
 	if classId != "" {
@@ -178,9 +178,9 @@ func insertScheduleChild(tx *sql.Tx, childId, scheduleId, classId, employeeId,co
 	}
 
 	if classId != "" {
-		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, classId,isFree)
+		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, classId, isFree)
 	} else {
-		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1,isFree)
+		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, isFree)
 	}
 
 	if err != nil {
@@ -327,7 +327,7 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 				contractId := childMapData["contract_id"]
 
 				if contractId == "0" || contractId == "" { //暂时没有合同信息的，直接进行排课操作
-					err = insertScheduleChild(tx, fmt.Sprint(scheduleId),"", childMapData["child_id"], employeeId, "0",IS_FREE_NO)
+					err = insertScheduleChild(tx, fmt.Sprint(scheduleId), "", childMapData["child_id"], employeeId, "0", IS_FREE_NO)
 
 					if err != nil {
 						return false, "", err
@@ -353,7 +353,7 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 					}
 
 					if flag {
-						err = insertScheduleChild(tx, fmt.Sprint(scheduleId),"", childMapData["child_id"], employeeId, contractId,IS_FREE_NO)
+						err = insertScheduleChild(tx, fmt.Sprint(scheduleId), "", childMapData["child_id"], employeeId, contractId, IS_FREE_NO)
 
 						if err != nil {
 							return false, "", err
@@ -464,7 +464,7 @@ func ClassScheduleDetailLeave(childId, scheduleId, employeeId string) (flag bool
 		return false, "", err
 	}
 
-	contractId,_, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
+	contractId, _, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
 	if err != nil {
 		return false, "", err
 	}
@@ -507,7 +507,7 @@ func ClassScheduleDetailTruant(childId, scheduleId, employeeId string) (flag boo
 		return false, "", err
 	}
 
-	contractId,_, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
+	contractId, _, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
 	if err != nil {
 		return false, "", err
 	}
@@ -528,7 +528,7 @@ func ClassScheduleDetailTruant(childId, scheduleId, employeeId string) (flag boo
 	return true, "", nil
 }
 
-func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) (flag bool, msg string, err error) {
+func ClassScheduleDetailSignIn(childIds, scheduleId, classId, employeeId string) (flag bool, msg string, err error) {
 
 	idList := strings.Split(childIds, ",")
 
@@ -554,7 +554,7 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 			continue
 		}
 
-		contractId,isFree, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
+		contractId, isFree, err := getContractIdByChildIdAndScheduleId(childId, scheduleId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
@@ -565,7 +565,7 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 			contractId = "0"
 		}
 
-		childDataMap,err := getChildById(childId)
+		childDataMap, err := getChildById(childId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
@@ -578,8 +578,8 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 			return false, "", err
 		}
 
-		if isFree == IS_FREE_YES {//免费课有额外逻辑
-			consumerDataMap,err := getConsumerByChildId(childId)
+		if isFree == IS_FREE_YES { //免费课有额外逻辑
+			consumerDataMap, err := getConsumerByChildId(childId)
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
@@ -587,7 +587,7 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 
 			consumerId := consumerDataMap["id"]
 
-			if consumerId == ""{
+			if consumerId == "" {
 				return false, "数据关联出错，请联系it部门，childId：" + childId, nil
 			}
 
@@ -595,14 +595,14 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 			consumerUpdateMap["contact_status"] = CONSUMER_STATUS_SIGNIN
 			consumerUpdateMap["sign_in_time"] = time.Now().Format("20060102150405")
 
-			err = updateConsumer(tx,consumerUpdateMap,consumerId)
+			err = updateConsumer(tx, consumerUpdateMap, consumerId)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			_,err = insertConsumerStatusLog(tx,consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
+			_, err = insertConsumerStatusLog(tx, consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -611,25 +611,25 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 
 			note := ""
 
-			if classId == ""{//常规课
-				scheduleDataMap,err := getScheduleDetailId(scheduleId)
+			if classId == "" { //常规课
+				scheduleDataMap, err := getScheduleDetailId(scheduleId)
 
 				if err != nil {
 					return false, "", err
 				}
 				note = fmt.Sprintf("签到常规课[时间]%v[教室]%v[课程]%v中", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
-			}else{
-				classDataMap,err := getWyClassById(classId)
+			} else {
+				classDataMap, err := getWyClassById(classId)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
 					return false, "", err
 				}
 
-				note = "签到"+classDataMap["start_time"]+classDataMap["name"]
+				note = "签到" + classDataMap["start_time"] + classDataMap["name"]
 			}
 
-			insertConsumerContactsLog(tx,employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+			insertConsumerContactsLog(tx, employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -643,7 +643,7 @@ func ClassScheduleDetailSignIn(childIds, scheduleId,classId, employeeId string) 
 	return true, "", nil
 }
 
-func ChildSignInWithoutClass(consumerIds,employeeId string) (flag bool, msg string, err error){
+func ChildSignInWithoutClass(consumerIds, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -659,7 +659,7 @@ func ChildSignInWithoutClass(consumerIds,employeeId string) (flag bool, msg stri
 
 	for _, consumerId := range idList {
 
-		consumerDataMap,err := getConsumerById(consumerId)
+		consumerDataMap, err := getConsumerById(consumerId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -670,20 +670,20 @@ func ChildSignInWithoutClass(consumerIds,employeeId string) (flag bool, msg stri
 			continue
 		}
 
-		childId,err := getChildByConsumerId(consumerId)
+		childId, err := getChildByConsumerId(consumerId)
 
-		signInFlag,err := checkSignInExist(fmt.Sprint(childId),"")
+		signInFlag, err := checkSignInExist(fmt.Sprint(childId), "")
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		if signInFlag{
+		if signInFlag {
 			continue
 		}
 
-		err = insertSignIn(tx,"",fmt.Sprint(childId),SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+		err = insertSignIn(tx, "", fmt.Sprint(childId), SIGN_IN_SUCCESS, "0", "", employeeId, IS_FREE_YES)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -694,21 +694,21 @@ func ChildSignInWithoutClass(consumerIds,employeeId string) (flag bool, msg stri
 		consumerUpdateMap["contact_status"] = CONSUMER_STATUS_SIGNIN
 		consumerUpdateMap["sign_in_time"] = time.Now().Format("20060102150405")
 
-		err = updateConsumer(tx,consumerUpdateMap,consumerId)
+		err = updateConsumer(tx, consumerUpdateMap, consumerId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		_,err = insertConsumerStatusLog(tx,consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
+		_, err = insertConsumerStatusLog(tx, consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		insertConsumerContactsLog(tx,employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+		insertConsumerContactsLog(tx, employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -778,7 +778,7 @@ func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag b
 	idList := strings.Split(childIds, ",")
 
 	for _, childId := range idList {
-		scheduleTempDataMap,err := getScheduleTmpByScheduelDetailId(scheduleId)
+		scheduleTempDataMap, err := getScheduleTmpByScheduelDetailId(scheduleId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -795,22 +795,22 @@ func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag b
 		startTime := scheduleTempDataMap["start_time"]
 		courseId := scheduleTempDataMap["course_id"]
 
-		furtherScheduleIds ,err := getFurtherScheduleIds(timeId,roomId,week,startTime,courseId)
+		furtherScheduleIds, err := getFurtherScheduleIds(timeId, roomId, week, startTime, courseId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		for _,furtherScheduleId := range furtherScheduleIds{
-			childScheduleFlag,err := checkChildInSchedule(childId,furtherScheduleId)
+		for _, furtherScheduleId := range furtherScheduleIds {
+			childScheduleFlag, err := checkChildInSchedule(childId, furtherScheduleId)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			contractId,_, err := getContractIdByChildIdAndScheduleId(childId, furtherScheduleId)
+			contractId, _, err := getContractIdByChildIdAndScheduleId(childId, furtherScheduleId)
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
@@ -821,8 +821,8 @@ func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag b
 				contractId = "0"
 			}
 
-			if !childScheduleFlag{
-				err = insertScheduleChild(tx,childId,furtherScheduleId,"",employeeId,contractId,IS_FREE_NO)
+			if !childScheduleFlag {
+				err = insertScheduleChild(tx, childId, furtherScheduleId, "", employeeId, contractId, IS_FREE_NO)
 				if err != nil {
 					lessgo.Log.Error(err.Error())
 					return false, "", err
@@ -830,15 +830,15 @@ func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag b
 			}
 		}
 
-		scheduleTempChildExistFlag,err := checkScheduleTempChildExist(childId,scheduleTempDataMap["id"])
+		scheduleTempChildExistFlag, err := checkScheduleTempChildExist(childId, scheduleTempDataMap["id"])
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		if !scheduleTempChildExistFlag{
-			err = insertScheduleTempChild(tx,childId,scheduleTempDataMap["id"])
+		if !scheduleTempChildExistFlag {
+			err = insertScheduleTempChild(tx, childId, scheduleTempDataMap["id"])
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
@@ -866,15 +866,15 @@ func AddChildForNormalOnce(childIds, scheduleId, employeeId string) (flag bool, 
 	idList := strings.Split(childIds, ",")
 
 	for _, childId := range idList {
-		childScheduleFlag,err := checkChildInSchedule(childId,scheduleId)
+		childScheduleFlag, err := checkChildInSchedule(childId, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		if !childScheduleFlag{
-			err = insertScheduleChild(tx,childId,scheduleId,"",employeeId,"0",IS_FREE_NO)
+		if !childScheduleFlag {
+			err = insertScheduleChild(tx, childId, scheduleId, "", employeeId, "0", IS_FREE_NO)
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
@@ -887,7 +887,7 @@ func AddChildForNormalOnce(childIds, scheduleId, employeeId string) (flag bool, 
 	return true, "", nil
 }
 
-func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId string) (flag bool, msg string, err error) {
+func RemoveChildFromSchedule(childId, scheduleId, classId, dataType, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -899,14 +899,14 @@ func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId stri
 		return false, "", err
 	}
 
-	scheduleChildDataMap,err := getScheduleChildByChildIdAndScheduleId(childId,scheduleId)
+	scheduleChildDataMap, err := getScheduleChildByChildIdAndScheduleId(childId, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	signInExistFlag,err := checkSignInExist(childId,scheduleId)
+	signInExistFlag, err := checkSignInExist(childId, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -914,24 +914,24 @@ func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId stri
 	}
 
 	if signInExistFlag {
-		return false,"已签到/请假/旷课的无法剔除",nil
+		return false, "已签到/请假/旷课的无法剔除", nil
 	}
 
 	if scheduleChildDataMap["is_free"] == IS_FREE_YES {
-		if dataType != "all" {//主管级别的是可以直接从班级中剔除任何人的，其他人只能剔除自己邀约的
+		if dataType != "all" { //主管级别的是可以直接从班级中剔除任何人的，其他人只能剔除自己邀约的
 			if employeeId != scheduleChildDataMap["create_user"] {
-				return false,"您不能剔除其他人邀请的学员",nil
+				return false, "您不能剔除其他人邀请的学员", nil
 			}
 		}
 
-		err = deleteScheduleChild(tx,childId,scheduleId)
+		err = deleteScheduleChild(tx, childId, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		consumerDataMap,err := getConsumerByChildId(childId)
+		consumerDataMap, err := getConsumerByChildId(childId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -940,28 +940,28 @@ func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId stri
 
 		consumerId := consumerDataMap["id"]
 		if consumerId == "" {
-			return false,"数据关联出错，childId:"+childId,nil
+			return false, "数据关联出错，childId:" + childId, nil
 		}
 
 		if consumerDataMap["contactStatus"] != CONSUMER_STATUS_SIGNIN {
 			consumerUpdateMap := make(map[string]interface{})
 			consumerUpdateMap["contact_status"] = CONSUMER_STATUS_WAIT
 
-			err = updateConsumer(tx,consumerUpdateMap,consumerId)
+			err = updateConsumer(tx, consumerUpdateMap, consumerId)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			_,err = insertConsumerStatusLog(tx,consumerId, employeeId, CONSUMER_STATUS_NO_SIGNIN, CONSUMER_STATUS_WAIT)
+			_, err = insertConsumerStatusLog(tx, consumerId, employeeId, CONSUMER_STATUS_NO_SIGNIN, CONSUMER_STATUS_WAIT)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			insertConsumerContactsLog(tx,employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+			insertConsumerContactsLog(tx, employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -970,25 +970,25 @@ func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId stri
 
 			note := ""
 
-			if classId == ""{//常规课
-				scheduleDataMap,err := getScheduleDetailId(scheduleId)
+			if classId == "" { //常规课
+				scheduleDataMap, err := getScheduleDetailId(scheduleId)
 
 				if err != nil {
 					return false, "", err
 				}
 				note = fmt.Sprintf("从常规课[时间]%v[教室]%v[课程]%v中剔除", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
-			}else{
-				classDataMap,err := getWyClassById(classId)
+			} else {
+				classDataMap, err := getWyClassById(classId)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
 					return false, "", err
 				}
 
-				note = "从"+classDataMap["start_time"]+classDataMap["name"]+"中剔除"
+				note = "从" + classDataMap["start_time"] + classDataMap["name"] + "中剔除"
 			}
 
-			insertConsumerContactsLog(tx,employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+			insertConsumerContactsLog(tx, employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
@@ -996,8 +996,8 @@ func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId stri
 			}
 		}
 
-	}else{
-		err = deleteScheduleChild(tx,childId,scheduleId)
+	} else {
+		err = deleteScheduleChild(tx, childId, scheduleId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -1010,7 +1010,7 @@ func RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employeeId stri
 	return true, "", nil
 }
 
-func ChangeClassSchedule(childId, newScheduleId, oldScheduleId, employeeId string) (flag bool, msg string, err error){
+func ChangeClassSchedule(childId, newScheduleId, oldScheduleId, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -1022,57 +1022,56 @@ func ChangeClassSchedule(childId, newScheduleId, oldScheduleId, employeeId strin
 		return false, "", err
 	}
 
-	signInExistFlag,err := checkSignInExist(childId,oldScheduleId)
+	signInExistFlag, err := checkSignInExist(childId, oldScheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	if signInExistFlag{
-		return false,"已签到/请假/旷课无法调班",nil
+	if signInExistFlag {
+		return false, "已签到/请假/旷课无法调班", nil
 	}
 
-	childInScheduleFlag,err := checkChildInSchedule(childId,newScheduleId)
+	childInScheduleFlag, err := checkChildInSchedule(childId, newScheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	if childInScheduleFlag{
-		return false,"学生已在新班级中，无需重复排课",nil
+	if childInScheduleFlag {
+		return false, "学生已在新班级中，无需重复排课", nil
 	}
 
-	scheduleChildDataMap,err := getScheduleChildByChildIdAndScheduleId(childId,oldScheduleId)
+	scheduleChildDataMap, err := getScheduleChildByChildIdAndScheduleId(childId, oldScheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	err = deleteScheduleChild(tx,childId,oldScheduleId)
+	err = deleteScheduleChild(tx, childId, oldScheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	err = insertScheduleChild(tx, childId, newScheduleId, scheduleChildDataMap["wyclass_id"], scheduleChildDataMap["create_user"],scheduleChildDataMap["contract_id"],scheduleChildDataMap["is_free"])
+	err = insertScheduleChild(tx, childId, newScheduleId, scheduleChildDataMap["wyclass_id"], scheduleChildDataMap["create_user"], scheduleChildDataMap["contract_id"], scheduleChildDataMap["is_free"])
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	newScheduleDataMpa,err := getScheduleDetailId(newScheduleId)
+	newScheduleDataMpa, err := getScheduleDetailId(newScheduleId)
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-
-	oldScheduleDataMpa,err := getScheduleDetailId(oldScheduleId)
+	oldScheduleDataMpa, err := getScheduleDetailId(oldScheduleId)
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
@@ -1080,42 +1079,42 @@ func ChangeClassSchedule(childId, newScheduleId, oldScheduleId, employeeId strin
 
 	note := "从"
 
-	if oldScheduleDataMpa["classId"] == ""{//常规课
+	if oldScheduleDataMpa["classId"] == "" { //常规课
 		note += fmt.Sprintf("常规课[时间]%v[教室]%v[课程]%v中", oldScheduleDataMpa["startTime"], oldScheduleDataMpa["roomName"], oldScheduleDataMpa["courseName"])
-	}else{
-		classDataMap,err := getWyClassById(oldScheduleDataMpa["classId"])
+	} else {
+		classDataMap, err := getWyClassById(oldScheduleDataMpa["classId"])
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		note += classDataMap["start_time"]+classDataMap["name"]
+		note += classDataMap["start_time"] + classDataMap["name"]
 	}
 
 	note += "调至"
 
-	if newScheduleDataMpa["classId"] == ""{//常规课
+	if newScheduleDataMpa["classId"] == "" { //常规课
 		note += fmt.Sprintf("常规课[时间]%v[教室]%v[课程]%v中", newScheduleDataMpa["startTime"], newScheduleDataMpa["roomName"], newScheduleDataMpa["courseName"])
-	}else{
-		classDataMap,err := getWyClassById(newScheduleDataMpa["classId"])
+	} else {
+		classDataMap, err := getWyClassById(newScheduleDataMpa["classId"])
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		note += classDataMap["start_time"]+classDataMap["name"]
+		note += classDataMap["start_time"] + classDataMap["name"]
 	}
 
-	consumerDataMap,err := getConsumerByChildId(childId)
+	consumerDataMap, err := getConsumerByChildId(childId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	_,err = insertConsumerContactsLog(tx,employeeId,note, consumerDataMap["id"], CONTACTS_LOG_TYPE_SYSTEM)
+	_, err = insertConsumerContactsLog(tx, employeeId, note, consumerDataMap["id"], CONTACTS_LOG_TYPE_SYSTEM)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -1127,7 +1126,7 @@ func ChangeClassSchedule(childId, newScheduleId, oldScheduleId, employeeId strin
 	return true, "", nil
 }
 
-func ClassScheduleDetailPage(centerId,kw,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+func ClassScheduleDetailPage(centerId, kw, dataType, employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -1147,7 +1146,7 @@ func ClassScheduleDetailPage(centerId,kw,dataType,employeeId string, pageNo, pag
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
-			return nil,err
+			return nil, err
 		}
 
 		params = append(params, _employee.CenterId)
@@ -1196,4 +1195,53 @@ func ClassScheduleDetailPage(centerId,kw,dataType,employeeId string, pageNo, pag
 	}
 
 	return pageData, nil
+}
+
+func RemoveChildFromScheduleForNormalAction(childId, scheduleId, employeeId string) (flag bool, msg string, err error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	signInExistFlag, err := checkSignInExist(childId, scheduleId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	if signInExistFlag {
+		return false, "已签到/请假/旷课的无法剔除", nil
+	}
+
+	err = deleteScheduleChild(tx, childId, scheduleId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	scheduleTmpDataMap, err := getScheduleTmpByScheduelDetailId(scheduleId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	err = deleteScheduleTempChild(tx, childId, scheduleTmpDataMap["id"])
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	tx.Commit()
+
+	return true, "", nil
 }

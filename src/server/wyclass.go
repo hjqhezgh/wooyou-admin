@@ -850,5 +850,3 @@ func ClassByCenterIdAction(w http.ResponseWriter, r *http.Request) {
 
 	commonlib.OutputJson(w, m, " ")
 }
-
-

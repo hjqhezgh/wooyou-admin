@@ -264,6 +264,18 @@ func ClassScheduleDetailLeaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行请假操作"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
 	err := r.ParseForm()
 
 	if err != nil {
@@ -315,6 +327,18 @@ func ClassScheduleDetailTruantAction(w http.ResponseWriter, r *http.Request) {
 		m["msg"] = "用户未登陆"
 		commonlib.OutputJson(w, m, " ")
 		return
+	}
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行旷课操作"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
 	}
 
 	err := r.ParseForm()
@@ -396,7 +420,7 @@ func ClassScheduleDetailSignInAction(w http.ResponseWriter, r *http.Request) {
 	scheduleId := r.FormValue("scheduleId")
 	ids := r.FormValue("ids")
 
-	flag, msg, err := logic.ClassScheduleDetailSignIn(ids, scheduleId,classId, employee.UserId)
+	flag, msg, err := logic.ClassScheduleDetailSignIn(ids, scheduleId, classId, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
@@ -460,7 +484,7 @@ func ChildSignInWithoutClassAction(w http.ResponseWriter, r *http.Request) {
 
 	consumerIds := r.FormValue("ids")
 
-	flag, msg, err := logic.ChildSignInWithoutClass(consumerIds,employee.UserId)
+	flag, msg, err := logic.ChildSignInWithoutClass(consumerIds, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
@@ -500,6 +524,18 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行跟班操作"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
 	err := r.ParseForm()
 
 	if err != nil {
@@ -513,7 +549,7 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 	scheduleId := r.FormValue("scheduleId")
 	childs := r.FormValue("ids")
 
-	flag, msg, err := logic.AddChildForNormalTempelate(childs,scheduleId,employee.UserId)
+	flag, msg, err := logic.AddChildForNormalTempelate(childs, scheduleId, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
@@ -563,10 +599,22 @@ func AddChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行临时插班操作"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
 	scheduleId := r.FormValue("scheduleId")
 	childs := r.FormValue("ids")
 
-	flag, msg, err := logic.AddChildForNormalOnce(childs,scheduleId,employee.UserId)
+	flag, msg, err := logic.AddChildForNormalOnce(childs, scheduleId, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
@@ -634,7 +682,7 @@ func RemoveChildFromScheduleAction(w http.ResponseWriter, r *http.Request) {
 	scheduleId := r.FormValue("scheduleId")
 	childId := r.FormValue("childId")
 
-	flag, msg, err := logic.RemoveChildFromSchedule(childId,scheduleId,classId,dataType,employee.UserId)
+	flag, msg, err := logic.RemoveChildFromSchedule(childId, scheduleId, classId, dataType, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
@@ -775,7 +823,7 @@ func ClassScheduleDetailPageAction(w http.ResponseWriter, r *http.Request) {
 	centerId := r.FormValue("cid-eq")
 	kw := r.FormValue("kw-eq")
 
-	pageData, err := logic.ClassScheduleDetailPage(centerId,kw,dataType,employee.UserId, pageNo, pageSize)
+	pageData, err := logic.ClassScheduleDetailPage(centerId, kw, dataType, employee.UserId, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false
@@ -789,4 +837,69 @@ func ClassScheduleDetailPageAction(w http.ResponseWriter, r *http.Request) {
 	m["DataLength"] = len(pageData.Datas) - 1
 
 	commonlib.RenderTemplate(w, r, "page.json", m, template.FuncMap{"getPropValue": lessgo.GetPropValue, "compareInt": lessgo.CompareInt, "dealJsonString": lessgo.DealJsonString}, "../lessgo/template/page.json")
+}
+
+func RemoveChildFromScheduleForNormalAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	employee := lessgo.GetCurrentEmployee(r)
+
+	if employee.UserId == "" {
+		lessgo.Log.Warn("用户未登陆")
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "用户未登陆"
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	roleCodes := strings.Split(employee.RoleCode, ",")
+
+	for _, roleCode := range roleCodes {
+		if roleCode == "tmk" {
+			m["success"] = false
+			m["code"] = 100
+			m["msg"] = "对不起，您没有权限进行结课操作"
+			commonlib.OutputJson(w, m, " ")
+			return
+		}
+	}
+
+	err := r.ParseForm()
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	scheduleId := r.FormValue("scheduleId")
+	childId := r.FormValue("childId")
+
+	flag, msg, err := logic.RemoveChildFromScheduleForNormalAction(childId, scheduleId, employee.UserId)
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	if !flag {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "操作失败:" + msg
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	m["success"] = true
+	m["code"] = 200
+	m["msg"] = "操作成功"
+	commonlib.OutputJson(w, m, " ")
+
+	return
 }

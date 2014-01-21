@@ -302,7 +302,7 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	}
 
 	dataSql := `
-				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark,sdc.is_free isFree,contr.left_lesson_num totalNum,usedNum.num usedNum
+				select sdc.child_id id,ch.name childName,p.telephone phone,si.type signType,si.sign_time signTime,cour.name courseName,contr.id as contractId,contr.contract_no contractNo,contr.apply_time applyTime,cons.id consumerId,cons.level level,d.remark,sdc.is_free isFree,contr.left_lesson_num totalNum,usedNum.num usedNum,csd.center_id centerId
 	 		    from (select * from schedule_detail_child where schedule_detail_id=? order by id desc limit ?,?) sdc
 	 			left join child ch on ch.cid=sdc.child_id
 	 			left join parent p on p.pid=ch.pid
@@ -327,19 +327,19 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	return pageData, nil
 }
 
-func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+func ChildPage(centerId, contractStatus, kw, dataType, employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
 
 	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-	if centerId == "1"{
+	if centerId == "1" {
 		centerId = "7"
 	}
 
 	params := []interface{}{}
 
-	dataSql :=  `
+	dataSql := `
 				select ch.cid id,ce.name centerName,ch.name childName,p.telephone phone,p.password,ch.card_id cardId,ch.birthday,ch.sex,p.reg_date regTime,contract_num.num haveContract,totalNum.num totalNum,usedNum.num usedNum
 				from child ch
 				left join parent p on p.pid=ch.pid
@@ -354,11 +354,11 @@ func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pa
 		_employee, err := FindEmployeeById(userId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
-			return nil,err
+			return nil, err
 		}
 
 		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-		if _employee.CenterId == "1"{
+		if _employee.CenterId == "1" {
 			_employee.CenterId = "7"
 		}
 
@@ -411,7 +411,7 @@ func ChildPage(centerId,contractStatus,kw,dataType,employeeId string, pageNo, pa
 	return pageData, nil
 }
 
-func ChildPay(childId,scheduleId,classId,payType,employeeId string) (flag bool, msg string, err error) {
+func ChildPay(childId, scheduleId, classId, payType, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -423,7 +423,7 @@ func ChildPay(childId,scheduleId,classId,payType,employeeId string) (flag bool, 
 		return false, "", err
 	}
 
-	flag,msg,err = childPay(tx,childId,"",scheduleId,classId,payType,employeeId)
+	flag, msg, err = childPay(tx, childId, "", scheduleId, classId, payType, employeeId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -431,27 +431,27 @@ func ChildPay(childId,scheduleId,classId,payType,employeeId string) (flag bool, 
 	}
 
 	if !flag {
-		return false,msg,nil
+		return false, msg, nil
 	}
 
 	tx.Commit()
 
-	return true,"", nil
+	return true, "", nil
 }
 
-func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeId string) (flag bool, msg string, err error) {
+func childPay(tx *sql.Tx, childId, consumerId, scheduleId, classId, payType, employeeId string) (flag bool, msg string, err error) {
 
 	var consumerDataMap map[string]string
 
-	if consumerId == ""{
-		consumerDataMap,err = getConsumerByChildId(childId)
+	if consumerId == "" {
+		consumerDataMap, err = getConsumerByChildId(childId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 		consumerId = consumerDataMap["id"]
-	}else{
-		consumerDataMap,err = getConsumerById(consumerId)
+	} else {
+		consumerDataMap, err = getConsumerById(consumerId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
@@ -459,7 +459,7 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 	}
 
 	if childId == "" {
-		childIdInt,err := getChildByConsumerId(consumerId)
+		childIdInt, err := getChildByConsumerId(consumerId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
@@ -467,7 +467,7 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 		childId = fmt.Sprint(childIdInt)
 	}
 
-	err = insertPayLog(tx,consumerId,employeeId)
+	err = insertPayLog(tx, consumerId, employeeId)
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
@@ -483,55 +483,55 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 	consumerUpdateMap["pay_status"] = payType
 	consumerUpdateMap["pay_time"] = time.Now().Format("20060102150405")
 
-	err = updateConsumer(tx,consumerUpdateMap,consumerId)
+	err = updateConsumer(tx, consumerUpdateMap, consumerId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
-	if scheduleId == ""{//是在客户主界面点击的缴费
+	if scheduleId == "" { //是在客户主界面点击的缴费
 		if consumerDataMap["contactStatus"] != CONSUMER_STATUS_SIGNIN {
 			consumerUpdateMap = make(map[string]interface{})
 			consumerUpdateMap["contact_status"] = CONSUMER_STATUS_SIGNIN
 			consumerUpdateMap["sign_in_time"] = time.Now().Format("20060102150405")
 
-			err = updateConsumer(tx,consumerUpdateMap,consumerId)
+			err = updateConsumer(tx, consumerUpdateMap, consumerId)
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			_,err = insertConsumerStatusLog(tx,consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				return false, "", err
-			}
-
-			scheduleId,classId,err = getNewestFreeScheduleIdByChildId(childId)
+			_, err = insertConsumerStatusLog(tx, consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			if scheduleId == "" {//进行无班签到
-				err = insertSignIn(tx,"",fmt.Sprint(childId),SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+			scheduleId, classId, err = getNewestFreeScheduleIdByChildId(childId)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				return false, "", err
+			}
+
+			if scheduleId == "" { //进行无班签到
+				err = insertSignIn(tx, "", fmt.Sprint(childId), SIGN_IN_SUCCESS, "0", "", employeeId, IS_FREE_YES)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
 					return false, "", err
 				}
 
-				insertConsumerContactsLog(tx,employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+				insertConsumerContactsLog(tx, employeeId, "无班签到", consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
 					return false, "", err
 				}
-			}else{
-				err = insertSignIn(tx,scheduleId,childId,SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+			} else {
+				err = insertSignIn(tx, scheduleId, childId, SIGN_IN_SUCCESS, "0", "", employeeId, IS_FREE_YES)
 				if err != nil {
 					lessgo.Log.Error(err.Error())
 					return false, "", err
@@ -539,25 +539,25 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 
 				note := ""
 
-				if classId == ""{//常规课
-					scheduleDataMap,err := getScheduleDetailId(scheduleId)
+				if classId == "" { //常规课
+					scheduleDataMap, err := getScheduleDetailId(scheduleId)
 
 					if err != nil {
 						return false, "", err
 					}
 					note = fmt.Sprintf("签到常规课[时间]%v[教室]%v[课程]%v中", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
-				}else{
-					classDataMap,err := getWyClassById(classId)
+				} else {
+					classDataMap, err := getWyClassById(classId)
 
 					if err != nil {
 						lessgo.Log.Error(err.Error())
 						return false, "", err
 					}
 
-					note = "签到"+classDataMap["start_time"]+classDataMap["name"]
+					note = "签到" + classDataMap["start_time"] + classDataMap["name"]
 				}
 
-				insertConsumerContactsLog(tx,employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+				insertConsumerContactsLog(tx, employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 				if err != nil {
 					lessgo.Log.Error(err.Error())
@@ -566,8 +566,8 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 			}
 
 		}
-	}else{//在排课界面的缴费
-		err = insertSignIn(tx,scheduleId,childId,SIGN_IN_SUCCESS,"0","",employeeId,IS_FREE_YES)
+	} else { //在排课界面的缴费
+		err = insertSignIn(tx, scheduleId, childId, SIGN_IN_SUCCESS, "0", "", employeeId, IS_FREE_YES)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
@@ -577,13 +577,13 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 		consumerUpdateMap["contact_status"] = CONSUMER_STATUS_SIGNIN
 		consumerUpdateMap["sign_in_time"] = time.Now().Format("20060102150405")
 
-		err = updateConsumer(tx,consumerUpdateMap,consumerId)
+		err = updateConsumer(tx, consumerUpdateMap, consumerId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		_,err = insertConsumerStatusLog(tx,consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
+		_, err = insertConsumerStatusLog(tx, consumerId, employeeId, consumerDataMap["contactStatus"], CONSUMER_STATUS_SIGNIN)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -592,25 +592,25 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 
 		note := ""
 
-		if classId == ""{//常规课
-			scheduleDataMap,err := getScheduleDetailId(scheduleId)
+		if classId == "" { //常规课
+			scheduleDataMap, err := getScheduleDetailId(scheduleId)
 
 			if err != nil {
 				return false, "", err
 			}
 			note = fmt.Sprintf("签到常规课[时间]%v[教室]%v[课程]%v中", scheduleDataMap["startTime"], scheduleDataMap["roomName"], scheduleDataMap["courseName"])
-		}else{
-			classDataMap,err := getWyClassById(classId)
+		} else {
+			classDataMap, err := getWyClassById(classId)
 
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
 
-			note = "签到"+classDataMap["start_time"]+classDataMap["name"]
+			note = "签到" + classDataMap["start_time"] + classDataMap["name"]
 		}
 
-		insertConsumerContactsLog(tx,employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
+		insertConsumerContactsLog(tx, employeeId, note, consumerId, CONTACTS_LOG_TYPE_SYSTEM)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -618,8 +618,7 @@ func childPay(tx *sql.Tx,childId,consumerId,scheduleId,classId,payType,employeeI
 		}
 	}
 
-
 	tx.Commit()
 
-	return true,"",nil
+	return true, "", nil
 }

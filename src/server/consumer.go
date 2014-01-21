@@ -626,7 +626,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	level := r.FormValue("level-eq")
 
 	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-	if centerId1 == "1"{
+	if centerId1 == "1" {
 		centerId1 = "7"
 	}
 
@@ -656,7 +656,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-		if _employee.CenterId == "1"{
+		if _employee.CenterId == "1" {
 			_employee.CenterId = "7"
 		}
 
@@ -713,7 +713,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-		if _employee.CenterId == "1"{
+		if _employee.CenterId == "1" {
 			_employee.CenterId = "7"
 		}
 

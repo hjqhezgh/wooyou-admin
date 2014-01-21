@@ -14,12 +14,12 @@
 package logic
 
 import (
-	"github.com/hjqhezgh/lessgo"
-	"github.com/hjqhezgh/commonlib"
 	"database/sql"
+	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
 )
 
-func getScheduleChildByChildIdAndScheduleId(childId,scheduleId string) (map[string]string, error) {
+func getScheduleChildByChildIdAndScheduleId(childId, scheduleId string) (map[string]string, error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -27,7 +27,7 @@ func getScheduleChildByChildIdAndScheduleId(childId,scheduleId string) (map[stri
 	sql := "select id,schedule_detail_id,child_id,create_user,wyclass_id,contract_id,is_free from schedule_detail_child where child_id=? and schedule_detail_id=? "
 	lessgo.Log.Debug(sql)
 
-	rows, err := db.Query(sql, childId,scheduleId)
+	rows, err := db.Query(sql, childId, scheduleId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -47,7 +47,7 @@ func getScheduleChildByChildIdAndScheduleId(childId,scheduleId string) (map[stri
 	return dataMap, nil
 }
 
-func deleteScheduleChild(tx *sql.Tx,childId,scheduleId string) error {
+func deleteScheduleChild(tx *sql.Tx, childId, scheduleId string) error {
 	sql := "delete from schedule_detail_child where child_id=? and schedule_detail_id=?"
 	lessgo.Log.Debug(sql)
 
@@ -68,7 +68,7 @@ func deleteScheduleChild(tx *sql.Tx,childId,scheduleId string) error {
 	return nil
 }
 
-func getNewestFreeScheduleIdByChildId(childId string) (scheduleId,classId string ,err error){
+func getNewestFreeScheduleIdByChildId(childId string) (scheduleId, classId string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -80,17 +80,16 @@ func getNewestFreeScheduleIdByChildId(childId string) (scheduleId,classId string
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
-		return "","", err
+		return "", "", err
 	}
 
 	if rows.Next() {
-		err = commonlib.PutRecord(rows, &scheduleId,&classId)
+		err = commonlib.PutRecord(rows, &scheduleId, &classId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
-			return "","", err
+			return "", "", err
 		}
 	}
 
-	return scheduleId,classId,nil
+	return scheduleId, classId, nil
 }
-

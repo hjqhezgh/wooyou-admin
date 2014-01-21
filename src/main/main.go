@@ -166,6 +166,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_detail/addChildForNormalTempelate.json": web.AddChildForNormalTempelateAction,
 	"/web/class_schedule_detail/addChildForNormalOnce.json":      web.AddChildForNormalOnceAction,
 	"/web/class_schedule_detail/removeChild.json":                web.RemoveChildFromScheduleAction,
+	"/web/class_schedule_detail/removeChildForNormal.json":       web.RemoveChildFromScheduleForNormalAction,
 	"/web/class_schedule_detail/pay.json":                        web.ChildPayAction,
 	"/web/class_schedule_detail/changeClass.json":                web.ChangeClassScheduleAction,
 	"/web/class_schedule_detail/page.json": 					  web.ClassScheduleDetailPageAction,

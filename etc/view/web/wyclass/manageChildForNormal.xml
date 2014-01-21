@@ -85,9 +85,10 @@
         <toolaction desc="签到" url="/web/class_schedule_detail/signIn.json"  colorClass="h-bg-green"  linkType="mutiSelect"/>
 
         <action desc="临时剔除" url="/web/class_schedule_detail/removeChild.json" linkType="ajax" confirmMsg="确认将该学生从本次课表中移除吗？" actionParams="[{name:'childId',value:'id'}]"/>
-        <action desc="结课" url="/web/wyclass/removeChildForNormal.json" linkType="ajax" confirmMsg="确认结束该学生当前的课程吗？" actionParams="[{name:'ids',value:'id'}]"/>
+        <action desc="结课" url="/web/class_schedule_detail/removeChildForNormal.json" linkType="ajax" confirmMsg="确认结束该学生当前的课程吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="请假" url="/web/class_schedule_detail/leave.json" linkType="ajax" confirmMsg="确认请假该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="旷课" url="/web/class_schedule_detail/truant.json" linkType="ajax" confirmMsg="确认旷课该学生吗？" actionParams="[{name:'childId',value:'id'}]"/>
+        <action desc="调班" url="/web/wyclass/changeClass" actionParams="[{name:'childId',value:'id'},{name:'oldScheduleId',value:'$scheduleId'},{name:'cid-eq',value:'@centerId'}]" linkType="iframeWindow"/>
         <action desc="合同登记" url="/web/wyclass/contractCheckIn" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="点评" url="/web/class_schedule_attach" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>

@@ -132,7 +132,7 @@ func ChildInCenterAction(w http.ResponseWriter, r *http.Request) {
 	kw := r.FormValue("kw-like")
 
 	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-	if centerId == "1"{
+	if centerId == "1" {
 		centerId = "7"
 	}
 
@@ -275,7 +275,7 @@ func ChildListAction(w http.ResponseWriter, r *http.Request) {
 	contractStatus := r.FormValue("contractStatus-eq")
 	kw := r.FormValue("kw-like")
 
-	pageData, err := logic.ChildPage(centerId,contractStatus,kw,dataType,employee.UserId, pageNo, pageSize)
+	pageData, err := logic.ChildPage(centerId, contractStatus, kw, dataType, employee.UserId, pageNo, pageSize)
 
 	if err != nil {
 		m["success"] = false
@@ -320,7 +320,7 @@ func ChildPayAction(w http.ResponseWriter, r *http.Request) {
 	payType := r.FormValue("type")
 	scheduleId := r.FormValue("scheduleId")
 
-	flag, msg, err := logic.ChildPay(childId,scheduleId,classId,payType,employee.UserId)
+	flag, msg, err := logic.ChildPay(childId, scheduleId, classId, payType, employee.UserId)
 
 	if err != nil {
 		m["success"] = false

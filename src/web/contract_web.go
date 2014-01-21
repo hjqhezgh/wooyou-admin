@@ -155,7 +155,7 @@ func ContractSaveAction(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func ContractLoadAction(w http.ResponseWriter, r *http.Request){
+func ContractLoadAction(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]interface{})
 
@@ -183,7 +183,7 @@ func ContractLoadAction(w http.ResponseWriter, r *http.Request){
 
 	id := r.FormValue("id")
 
-	contractMap,err := logic.GetContractById(id)
+	contractMap, err := logic.GetContractById(id)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())

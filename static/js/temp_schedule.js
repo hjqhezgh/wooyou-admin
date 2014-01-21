@@ -180,7 +180,8 @@ define(function (require, exports, module) {
                 },'json');
             });
 
-            allDataTable.on('click','a[data-action=openIframeWindow]',function(e){
+            $(document).on('click','#schedule a[data-action=openIframeWindow]',function(e){
+
                 e.preventDefault();
 
                 var url = $(this).attr('href');

@@ -19,8 +19,8 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 const (
@@ -64,7 +64,7 @@ func SaveConsumer(paramsMap map[string]string) (flag bool, msg string, err error
 	if id == "" {
 
 		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-		if centerId == "1"{
+		if centerId == "1" {
 			centerId = "7"
 		}
 
@@ -471,7 +471,7 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 		}
 
 		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
-		if _employee.CenterId == "1"{
+		if _employee.CenterId == "1" {
 			_employee.CenterId = "7"
 		}
 
@@ -486,7 +486,7 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 		if paramsMap["centerId1"] == "1" {
 			countParams = append(countParams, "7")
 			dataParams = append(dataParams, "7")
-		}else{
+		} else {
 			countParams = append(countParams, paramsMap["centerId1"])
 			dataParams = append(dataParams, paramsMap["centerId1"])
 		}
@@ -499,7 +499,7 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 		if paramsMap["centerId2"] == "1" {
 			countParams = append(countParams, "7")
 			dataParams = append(dataParams, "7")
-		}else{
+		} else {
 			countParams = append(countParams, paramsMap["centerId2"])
 			dataParams = append(dataParams, paramsMap["centerId2"])
 		}
@@ -586,7 +586,7 @@ func getConsumerByChildId(id string) (map[string]string, error) {
 	return dataMap, nil
 }
 
-func ConsumerPay(consumerIds,payType,employeeId string) (flag bool, msg string, err error) {
+func ConsumerPay(consumerIds, payType, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -598,10 +598,10 @@ func ConsumerPay(consumerIds,payType,employeeId string) (flag bool, msg string, 
 		return false, "", err
 	}
 
-	idList := strings.Split(consumerIds,",")
+	idList := strings.Split(consumerIds, ",")
 
-	for _,consumerId := range idList {
-		flag,msg,err = childPay(tx,"",consumerId,"","",payType,employeeId)
+	for _, consumerId := range idList {
+		flag, msg, err = childPay(tx, "", consumerId, "", "", payType, employeeId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -609,11 +609,11 @@ func ConsumerPay(consumerIds,payType,employeeId string) (flag bool, msg string, 
 		}
 
 		if !flag {
-			return false,msg,nil
+			return false, msg, nil
 		}
 	}
 
 	tx.Commit()
 
-	return true,"", nil
+	return true, "", nil
 }

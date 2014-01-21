@@ -39,9 +39,9 @@ func checkSignInExist(childId, scheduleId string) (bool, error) {
 
 	dataSql := ""
 
-	if scheduleId=="" {
+	if scheduleId == "" {
 		dataSql = "select count(1) from sign_in where child_id=? and schedule_detail_id is null "
-	}else{
+	} else {
 		dataSql = "select count(1) from sign_in where child_id=? and schedule_detail_id=? "
 	}
 
@@ -50,9 +50,9 @@ func checkSignInExist(childId, scheduleId string) (bool, error) {
 	var rows *sql.Rows
 	var err error
 
-	if scheduleId=="" {
+	if scheduleId == "" {
 		rows, err = db.Query(dataSql, childId)
-	}else{
+	} else {
 		rows, err = db.Query(dataSql, childId, scheduleId)
 	}
 
@@ -85,9 +85,9 @@ func insertSignIn(tx *sql.Tx, scheduleId, childId, signType, contractId, cardId,
 
 	sql := ""
 
-	if scheduleId == ""{
+	if scheduleId == "" {
 		sql = "insert into sign_in(child_id,sign_time,type,contract_id,card_id,employee_id,is_free) values(?,?,?,?,?,?,?)"
-	}else{
+	} else {
 		sql = "insert into sign_in(child_id,sign_time,schedule_detail_id,type,contract_id,card_id,employee_id,is_free) values(?,?,?,?,?,?,?,?)"
 	}
 
@@ -100,9 +100,9 @@ func insertSignIn(tx *sql.Tx, scheduleId, childId, signType, contractId, cardId,
 		return err
 	}
 
-	if scheduleId == ""{
+	if scheduleId == "" {
 		_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), signType, contractId, cardId, employeeId, isFree)
-	}else{
+	} else {
 		_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), scheduleId, signType, contractId, cardId, employeeId, isFree)
 	}
 

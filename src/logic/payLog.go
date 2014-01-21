@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-func insertPayLog(tx *sql.Tx,consumerId,employeeId string) error {
+func insertPayLog(tx *sql.Tx, consumerId, employeeId string) error {
 
 	sql := "insert into pay_log(consumer_id,pay_time,employee_id) values(?,?,?)"
 	lessgo.Log.Debug(sql)
@@ -38,4 +38,3 @@ func insertPayLog(tx *sql.Tx,consumerId,employeeId string) error {
 
 	return nil
 }
-

@@ -14,9 +14,9 @@
 package logic
 
 import (
-	"github.com/hjqhezgh/lessgo"
-	"github.com/hjqhezgh/commonlib"
 	"database/sql"
+	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
 )
 
 /*
@@ -119,7 +119,7 @@ func getChildAndContractByScheduleTempId(tempId string) ([]map[string]string, er
 	return datas, nil
 }
 
-func checkScheduleTempChildExist(childId,scheduleTempId string)(flag bool,err error){
+func checkScheduleTempChildExist(childId, scheduleTempId string) (flag bool, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -128,7 +128,7 @@ func checkScheduleTempChildExist(childId,scheduleTempId string)(flag bool,err er
 
 	lessgo.Log.Debug(sql)
 
-	rows, err := db.Query(sql, childId,scheduleTempId)
+	rows, err := db.Query(sql, childId, scheduleTempId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())
@@ -148,13 +148,13 @@ func checkScheduleTempChildExist(childId,scheduleTempId string)(flag bool,err er
 	}
 
 	if num > 0 {
-		return true,nil
+		return true, nil
 	}
 
-	return false,nil
+	return false, nil
 }
 
-func insertScheduleTempChild(tx *sql.Tx,childId,scheduleTempId string) error {
+func insertScheduleTempChild(tx *sql.Tx, childId, scheduleTempId string) error {
 	sql := "insert into schedule_template_child(schedule_template_id,child_id) values(?,?) "
 	lessgo.Log.Debug(sql)
 
@@ -165,7 +165,28 @@ func insertScheduleTempChild(tx *sql.Tx,childId,scheduleTempId string) error {
 		return err
 	}
 
-	_, err = stmt.Exec(scheduleTempId,childId)
+	_, err = stmt.Exec(scheduleTempId, childId)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func deleteScheduleTempChild(tx *sql.Tx, childId, scheduleTempId string) error {
+	sql := "delete from schedule_template_child where schedule_template_id=? and child_id=? "
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(scheduleTempId, childId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())

@@ -206,7 +206,7 @@ func ConsumerPayAction(w http.ResponseWriter, r *http.Request) {
 	consumerIds := r.FormValue("ids")
 	payType := r.FormValue("status")
 
-	flag, msg, err := logic.ConsumerPay(consumerIds,payType,employee.UserId)
+	flag, msg, err := logic.ConsumerPay(consumerIds, payType, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
