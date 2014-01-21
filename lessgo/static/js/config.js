@@ -85,7 +85,7 @@ define(function (require, exports, module) {
             },
             'jq-grid' : {
                 src: productUrl + '/lib/jqGrid/jquery.jqGrid.min.js',
-                deps: ['jquery','jq-ui','jq-grid-i18n',productUrl + '/lib/jqGrid/css/ui.jqgrid.css']
+                deps: ['jquery','jq-ui','jq-grid-i18n','url-utils',productUrl + '/lib/jqGrid/css/ui.jqgrid.css']
             },
             'jq-grid-i18n' : {
                 src: productUrl + '/lib/jqGrid/grid.locale-cn.js',
