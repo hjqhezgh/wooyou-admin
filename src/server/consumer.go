@@ -624,6 +624,7 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	kw := r.FormValue("kw-like")
 	partTimeName := r.FormValue("partTimeName-eq")
 	level := r.FormValue("level-eq")
+	comeFromId := r.FormValue("comeFromId-eq")
 
 	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
 	if centerId1 == "1" {
@@ -684,6 +685,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 		sql += " and b.level=? "
 	}
 
+	if comeFromId != "" {
+		params = append(params, comeFromId)
+		sql += " and b.come_from_id=? "
+	}
+
 	sql += `group by a.consumer_id order by b.id desc  limit ?,?) c
 	left join consumer_new cons on cons.id=c.consumer_id
 	left join contacts cont on cont.id=c.contacts_id
@@ -739,6 +745,11 @@ func TmkAllConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	if level != "" {
 		paramsForCount = append(paramsForCount, level)
 		countSql += " and b.level=? "
+	}
+
+	if comeFromId != "" {
+		paramsForCount = append(paramsForCount, comeFromId)
+		countSql += " and b.come_from_id=? "
 	}
 
 	countSql += " group by a.consumer_id) aa "
@@ -1085,6 +1096,7 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	timeType := r.FormValue("timeType-eq")
 	partTimeName := r.FormValue("partTimeName-eq")
 	level := r.FormValue("level-eq")
+	comeFromId := r.FormValue("comeFromId-eq")
 
 	params := []interface{}{}
 
@@ -1153,6 +1165,11 @@ func TmkConsumerSelfListAction(w http.ResponseWriter, r *http.Request) {
 	if level != "" {
 		params = append(params, level)
 		sql += " and cons.level=? "
+	}
+
+	if comeFromId != "" {
+		params = append(params, comeFromId)
+		sql += " and cons.come_from_id=? "
 	}
 
 	countSql := ""

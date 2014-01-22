@@ -19,6 +19,7 @@
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
         <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
         <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
+        <search field="comeFromId" searchType="eq" inputType="remoteSelect" desc="来源" url="/web/come_from/alldata" valueField="id" descField="name" />
 
         <toolaction desc="添加" url="/web/consumer/add" linkType="iframeWindow" colorClass="h-bg-green"/>
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>

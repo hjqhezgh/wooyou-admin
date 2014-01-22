@@ -162,6 +162,7 @@ func ConsumerListAction(w http.ResponseWriter, r *http.Request) {
 	paramsMap["payStatus"] = r.FormValue("payStatus-eq")
 	paramsMap["timeType"] = r.FormValue("timeType-eq")
 	paramsMap["parttimeName"] = r.FormValue("partTimeName-eq")
+	paramsMap["comeFromId"] = r.FormValue("comeFromId-eq")
 
 	pageData, err := logic.ConsumerPage(paramsMap, dataType, employee.UserId, pageNo, pageSize)
 

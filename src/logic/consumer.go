@@ -512,6 +512,12 @@ func ConsumerPage(paramsMap map[string]string, dataType, employeeId string, page
 		whereSql += " and b.parttime_name=? "
 	}
 
+	if paramsMap["comeFromId"] != "" {
+		countParams = append(countParams, paramsMap["comeFromId"])
+		dataParams = append(dataParams, paramsMap["comeFromId"])
+		whereSql += " and b.come_from_id=? "
+	}
+
 	orderSql := ""
 
 	if paramsMap["sort"] == "" || paramsMap["sort"] == "create_time" {

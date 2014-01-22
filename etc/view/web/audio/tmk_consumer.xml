@@ -15,6 +15,7 @@
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
         <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
         <search field="level" searchType="eq" inputType="localSelect" desc="星级" localData="[{desc:'★',value:'★'},{desc:'★★',value:'★★'},{desc:'★★★',value:'★★★'}]"/>
+        <search field="comeFromId" searchType="eq" inputType="remoteSelect" desc="来源" url="/web/come_from/alldata" valueField="id" descField="name" />
 
         <toolaction desc="开始邀约" url="/consumer/tmkInvite.json" linkType="mutiSelect" colorClass="h-bg-green">
             <callback>
@@ -111,6 +112,7 @@
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
         <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
         <search field="level" searchType="eq" inputType="localSelect" desc="星级" localData="[{desc:'★',value:'★'},{desc:'★★',value:'★★'},{desc:'★★★',value:'★★★'}]"/>
+        <search field="comeFromId" searchType="eq" inputType="remoteSelect" desc="来源" url="/web/come_from/alldata" valueField="id" descField="name" />
 
         <toolaction desc="废弃" url="/consumerStatusChange" linkType="mutiSelect" confirmMsg="确认废弃该客户吗？" colorClass="h-bg-green" params="{status:'3'}"/>
         <toolaction desc="回总库" url="/web/consumer/backToAllConsumer.json" linkType="mutiSelect" confirmMsg="确认把该客户重置回总库吗？" colorClass="h-bg-green" params="{}">
