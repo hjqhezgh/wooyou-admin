@@ -40,9 +40,7 @@ var FORM_ACTION_TYPE FormActionType = FormActionType{
 
 // 图片规格
 const (
-	IMAGE_SIZE_1 = "290x175"
-	IMAGE_SIZE_2 = "290x370"
-	IMAGE_SIZE_3 = "590x185"
-	IMAGE_SIZE_4 = "600x370"
-	IMAGE_SIZE_5 = "800x600"
+	IMAGE_SIZE_1 = "240x150"
+	IMAGE_SIZE_2 = "223x220"
+	IMAGE_SIZE_3 = "800x600"
 )

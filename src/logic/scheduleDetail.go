@@ -289,6 +289,7 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 	scheduleTempDatas, err := getScheduleTmpsByCenterId(centerId)
 
 	if err != nil {
+		lessgo.Log.Error(err.Error())
 		return false, "", err
 	}
 
@@ -310,6 +311,7 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 		scheduleExistFlag, err := checkScheduleExist(centerId, roomId, timeId, date)
 
 		if err != nil {
+			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
@@ -317,30 +319,39 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 			scheduleId, err := insertSchedule(tx, teacherId, assistantId, courseId, centerId, timeId, roomId, date, week, "10")
 
 			if err != nil {
+				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
+
+			fmt.Println(scheduleTempId)
 
 			childMapDatas, err := getChildAndContractByScheduleTempId(scheduleTempId)
 
 			for _, childMapData := range childMapDatas {
 
+				fmt.Println(scheduleId)
+				fmt.Println(fmt.Sprint(scheduleId))
+
 				contractId := childMapData["contract_id"]
 
 				if contractId == "0" || contractId == "" { //暂时没有合同信息的，直接进行排课操作
-					err = insertScheduleChild(tx, fmt.Sprint(scheduleId), "", childMapData["child_id"], employeeId, "0", IS_FREE_NO)
+					err = insertScheduleChild(tx, childMapData["child_id"],fmt.Sprint(scheduleId), "", employeeId, "0", IS_FREE_NO)
 
 					if err != nil {
+						lessgo.Log.Error(err.Error())
 						return false, "", err
 					}
 				}
 
 				contractDataMap, err := getContractById(contractId)
 				if err != nil {
+					lessgo.Log.Error(err.Error())
 					return false, "", err
 				}
 
 				validSignInNum, err := getVaildNumOfContract(contractId)
 				if err != nil {
+					lessgo.Log.Error(err.Error())
 					return false, "", err
 				}
 
@@ -349,13 +360,15 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 				if totalSignInNum > validSignInNum {
 					flag, err := checkContractValid(contractDataMap["expire_date"])
 					if err != nil {
+						lessgo.Log.Error(err.Error())
 						return false, "", err
 					}
 
 					if flag {
-						err = insertScheduleChild(tx, fmt.Sprint(scheduleId), "", childMapData["child_id"], employeeId, contractId, IS_FREE_NO)
+						err = insertScheduleChild(tx, childMapData["child_id"], fmt.Sprint(scheduleId), "", employeeId, contractId, IS_FREE_NO)
 
 						if err != nil {
+							lessgo.Log.Error(err.Error())
 							return false, "", err
 						}
 					}

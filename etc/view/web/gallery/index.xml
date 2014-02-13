@@ -21,32 +21,18 @@
         <column field="image1" desc="图片1">
             <formatter>
                 <![CDATA[
-                    return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_290x175.' + rowObject[3] + '" width="80px"/></div>';
+                    return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_240x150.' + rowObject[3] + '" width="80px"/></div>';
                 ]]>
             </formatter>
         </column>
         <column field="image2" desc="图片2">
             <formatter>
                 <![CDATA[
-                    return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_290x370.' + rowObject[3] + '" width="80px"/></div>';
+                    return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_223x220.' + rowObject[3] + '" width="80px"/></div>';
                 ]]>
             </formatter>
         </column>
         <column field="image3" desc="图片3">
-            <formatter>
-                <![CDATA[
-                    return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_590x185.' + rowObject[3] + '" width="80px"/></div>';
-                ]]>
-            </formatter>
-        </column>
-        <column field="image4" desc="图片4">
-            <formatter>
-                <![CDATA[
-                    return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_600x370.' + rowObject[3] + '" width="80px"/></div>';
-                ]]>
-            </formatter>
-        </column>
-        <column field="image5" desc="图片5">
             <formatter>
                 <![CDATA[
                     return '<div style="text-align:center;"><img src="/artimg/' + rowObject[2] + '_800x600.' + rowObject[3] + '" width="80px"/></div>';

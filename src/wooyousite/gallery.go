@@ -62,10 +62,6 @@ func GalleryLoadAction(w http.ResponseWriter, r *http.Request) {
 	datas = append(datas, jsonImage2)
 	jsonImage3 := lessgo.LoadFormObject{"image3", imagePath + gallery.ImageName + "_" + IMAGE_SIZE_3 + "." + gallery.ImageSuffix}
 	datas = append(datas, jsonImage3)
-	jsonImage4 := lessgo.LoadFormObject{"image4", imagePath + gallery.ImageName + "_" + IMAGE_SIZE_4 + "." + gallery.ImageSuffix}
-	datas = append(datas, jsonImage4)
-	jsonImage5 := lessgo.LoadFormObject{"image5", imagePath + gallery.ImageName + "_" + IMAGE_SIZE_5 + "." + gallery.ImageSuffix}
-	datas = append(datas, jsonImage5)
 
 	if err != nil {
 		m["sucess"] = false
@@ -304,8 +300,6 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 	image1 := GetImageFileName(r.FormValue("image1"))
 	image2 := GetImageFileName(r.FormValue("image2"))
 	image3 := GetImageFileName(r.FormValue("image3"))
-	image4 := GetImageFileName(r.FormValue("image4"))
-	image5 := GetImageFileName(r.FormValue("image5"))
 	imageName := r.FormValue("image_name")
 	if imageName == "" {
 		gallery.ImageName = GetTimeString()
@@ -317,17 +311,17 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 	msg := ""
 	switch actionType {
 	case FORM_ACTION_TYPE.CREATE.Key:
-		if image1 == "" || image2 == "" || image3 == "" || image4 == "" || image5 == "" {
+		if image1 == "" || image2 == "" || image3 == "" {
 			m["success"] = false
-			m["msg"] = "必须上传五张图片"
-			lessgo.Log.Error("必须上传五张图片")
+			m["msg"] = "必须上传三张图片"
+			lessgo.Log.Error("必须上传三张图片")
 			commonlib.OutputJson(w, m, " ")
 			return
 		} else {
-			if !(GetImageFileSuffix(image1) == GetImageFileSuffix(image2) && GetImageFileSuffix(image1) == GetImageFileSuffix(image3) && GetImageFileSuffix(image1) == GetImageFileSuffix(image4) && GetImageFileSuffix(image1) == GetImageFileSuffix(image5)) {
+			if !(GetImageFileSuffix(image1) == GetImageFileSuffix(image2) && GetImageFileSuffix(image1) == GetImageFileSuffix(image3)) {
 				m["success"] = false
-				m["msg"] = "请确保五张图片的文件格式一致"
-				lessgo.Log.Error("请确保五张图片的文件格式一致")
+				m["msg"] = "请确保三张图片的文件格式一致"
+				lessgo.Log.Error("请确保三张图片的文件格式一致")
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
@@ -335,20 +329,20 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 		}
 		msg, err = GallerySave(gallery)
 	case FORM_ACTION_TYPE.UPDATE.Key:
-		if image1 == "" || image2 == "" || image3 == "" || image4 == "" || image5 == "" {
-			if (image1 != "" && GetImageFileSuffix(image1) != imageSuffix) || (image2 != "" && GetImageFileSuffix(image2) != imageSuffix) || (image3 != "" && GetImageFileSuffix(image3) != imageSuffix) || (image4 != "" && GetImageFileSuffix(image4) != imageSuffix) || (image5 != "" && GetImageFileSuffix(image5) != imageSuffix) {
+		if image1 == "" || image2 == "" || image3 == "" {
+			if (image1 != "" && GetImageFileSuffix(image1) != imageSuffix) || (image2 != "" && GetImageFileSuffix(image2) != imageSuffix) || (image3 != "" && GetImageFileSuffix(image3) != imageSuffix) {
 				m["success"] = false
-				m["msg"] = "请确保五张图片的文件格式一致"
-				lessgo.Log.Error("请确保五张图片的文件格式一致")
+				m["msg"] = "请确保三张图片的文件格式一致"
+				lessgo.Log.Error("请确保三张图片的文件格式一致")
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
 			gallery.ImageSuffix = imageSuffix
 		} else {
-			if !(GetImageFileSuffix(image1) == GetImageFileSuffix(image2) && GetImageFileSuffix(image1) == GetImageFileSuffix(image3) && GetImageFileSuffix(image1) == GetImageFileSuffix(image4) && GetImageFileSuffix(image1) == GetImageFileSuffix(image5)) {
+			if !(GetImageFileSuffix(image1) == GetImageFileSuffix(image2) && GetImageFileSuffix(image1) == GetImageFileSuffix(image3)) {
 				m["success"] = false
-				m["msg"] = "请确保五张图片的文件格式一致"
-				lessgo.Log.Error("请确保五张图片的文件格式一致")
+				m["msg"] = "请确保三张图片的文件格式一致"
+				lessgo.Log.Error("请确保三张图片的文件格式一致")
 				commonlib.OutputJson(w, m, " ")
 				return
 			}
@@ -377,24 +371,6 @@ func GalleryFormAction(w http.ResponseWriter, r *http.Request, actionType string
 	}
 	// 图片3
 	if UploadImage(image3, gallery.ImageName+"_"+IMAGE_SIZE_3+"."+gallery.ImageSuffix, artImgDir) != nil {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		lessgo.Log.Error(err.Error())
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-	// 图片4
-	if UploadImage(image4, gallery.ImageName+"_"+IMAGE_SIZE_4+"."+gallery.ImageSuffix, artImgDir) != nil {
-		m["success"] = false
-		m["code"] = 100
-		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
-		lessgo.Log.Error(err.Error())
-		commonlib.OutputJson(w, m, " ")
-		return
-	}
-	// 图片5
-	if UploadImage(image5, gallery.ImageName+"_"+IMAGE_SIZE_5+"."+gallery.ImageSuffix, artImgDir) != nil {
 		m["success"] = false
 		m["code"] = 100
 		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()

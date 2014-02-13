@@ -237,8 +237,8 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 			}
 
 			contentDetail := getSmsContent(content, childName)
-			smsResult := SmsResult{Msg: "asdas", Result: 0}
-			//smsResult, err := SendMessage(phone, contentDetail)
+//			smsResult := SmsResult{Msg: "asdas", Result: 0}
+			smsResult, err := SendMessage(phone, contentDetail)
 			fmt.Println(contentDetail)
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
@@ -249,7 +249,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if smsResult.Msg == "" { //请求短信接口没有成功
+			if smsResult.Result != 0 { //请求短信接口没有成功
 				m["success"] = false
 				m["code"] = 100
 				m["msg"] = "短信发送错误，请联系IT部门"
