@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
 
-    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="已报名学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="250">
+    <customgridpanel url="/web/child/childInNormalSchedule.json" pageSize="15" title="班级学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="250">
 
         <column field="childName" desc="学生" width="70"/>
         <column field="phone" desc="联系电话"/>
@@ -105,27 +105,9 @@
 
         <action desc="备注" url="/web/consumerContactsLog/add" actionParams="[{name:'consumerId',value:'@consumerId'}]" linkType="iframeWindow"/>
 
-        <toolaction desc="跟班" url="/web/class_schedule_detail/addChildForNormalTempelate.json"  colorClass="h-bg-green" linkType="mutiSelect">
-            <callback>
-                <![CDATA[
-                     if(!data.success){
-                        alert(data.msg)
-                     }
-                     grid1.grid.trigger("reloadGrid");
-                ]]>
-            </callback>
-        </toolaction>
+        <action desc="跟班" url="/web/class_schedule_detail/addChildForNormalTempelate"  actionParams="[{name:'childId',value:'id'}]" colorClass="h-bg-green" linkType="iframeWindow" />
 
-        <toolaction desc="临时插班" url="/web/class_schedule_detail/addChildForNormalOnce.json"  colorClass="h-bg-green" linkType="mutiSelect">
-            <callback>
-                <![CDATA[
-                     if(!data.success){
-                        alert(data.msg)
-                     }
-                     grid1.grid.trigger("reloadGrid");
-                ]]>
-            </callback>
-        </toolaction>
+        <action desc="临时插班" url="/web/class_schedule_detail/addChildForNormalOnce"  colorClass="h-bg-green" actionParams="[{name:'childId',value:'id'}]" linkType="iframeWindow" />
 
         <toolaction desc="免费试听" url="/web/class_schedule_detail/addChild.json"  colorClass="h-bg-org" linkType="mutiSelect">
             <callback>

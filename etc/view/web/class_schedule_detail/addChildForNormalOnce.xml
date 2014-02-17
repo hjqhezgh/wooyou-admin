@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <customformpanel id="form1" saveUrl="/web/class_schedule_detail/addChildForNormalOnce.json" load="false" title="合同登记" inwindow="true">
+        <element field="childId"  type="hidden" defaultValue="$childId" desc="学生id"/>
+        <element field="scheduleId"  type="hidden" defaultValue="$scheduleId" desc="课表id"/>
+        <element field="contractId"  type="remoteSelect" url="/web/contract/contractOfChild.json" params="[{name:'childId',value:'$childId'}]" valueField="value" descField="desc" desc="合同" validate="notNull"/>
+
+        <afterSave>
+            <![CDATA[
+                alert('插班成功');
+                $.getParentComponentObject(parentWindowName,'grid1').getGrid().trigger("reloadGrid");
+                top.layer.close(top.layer.getFrameIndex(window.name));
+            ]]>
+        </afterSave>
+    </customformpanel>
+</viewport>

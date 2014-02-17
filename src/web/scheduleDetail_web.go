@@ -547,9 +547,10 @@ func AddChildForNormalTempelateAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scheduleId := r.FormValue("scheduleId")
-	childs := r.FormValue("ids")
+	childId := r.FormValue("childId")
+	contractId := r.FormValue("contractId")
 
-	flag, msg, err := logic.AddChildForNormalTempelate(childs, scheduleId, employee.UserId)
+	flag, msg, err := logic.AddChildForNormalTempelate(childId, scheduleId,contractId, employee.UserId)
 
 	if err != nil {
 		m["success"] = false
@@ -612,9 +613,10 @@ func AddChildForNormalOnceAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scheduleId := r.FormValue("scheduleId")
-	childs := r.FormValue("ids")
+	childId := r.FormValue("childId")
+	contractId := r.FormValue("contractId")
 
-	flag, msg, err := logic.AddChildForNormalOnce(childs, scheduleId, employee.UserId)
+	flag, msg, err := logic.AddChildForNormalOnce(childId, scheduleId,contractId, employee.UserId)
 
 	if err != nil {
 		m["success"] = false

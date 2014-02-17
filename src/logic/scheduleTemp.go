@@ -154,8 +154,8 @@ func checkScheduleTempChildExist(childId, scheduleTempId string) (flag bool, err
 	return false, nil
 }
 
-func insertScheduleTempChild(tx *sql.Tx, childId, scheduleTempId string) error {
-	sql := "insert into schedule_template_child(schedule_template_id,child_id) values(?,?) "
+func insertScheduleTempChild(tx *sql.Tx, childId, scheduleTempId,contractId string) error {
+	sql := "insert into schedule_template_child(schedule_template_id,child_id,contract_id) values(?,?,?) "
 	lessgo.Log.Debug(sql)
 
 	stmt, err := tx.Prepare(sql)
@@ -165,7 +165,7 @@ func insertScheduleTempChild(tx *sql.Tx, childId, scheduleTempId string) error {
 		return err
 	}
 
-	_, err = stmt.Exec(scheduleTempId, childId)
+	_, err = stmt.Exec(scheduleTempId, childId,contractId)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())

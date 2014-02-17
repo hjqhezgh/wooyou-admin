@@ -94,6 +94,10 @@
     <url path="/web/class_schedule_detail/temp_class_index" view="web/class_schedule_detail/temp_class_index.xml" />
     <!--常规班级小孩子分配界面-->
     <url path="/web/wyclass/manageChildForNormal" view="web/wyclass/manageChildForNormal.xml" />
+    <!--跟班合同分配界面-->
+    <url path="/web/class_schedule_detail/addChildForNormalTempelate" view="web/class_schedule_detail/addChildForNormalTempelate.xml" />
+    <!--跟班合同分配界面-->
+    <url path="/web/class_schedule_detail/addChildForNormalOnce" view="web/class_schedule_detail/addChildForNormalOnce.xml" />
     <!--附件点评-->
     <url path="/web/class_schedule_attach" view="web/class_schedule_attach/index.xml" />
     <!--附件点评-->
@@ -112,4 +116,5 @@
 
     <!--课件附件-->
     <url path="/web/coursefile/add" view="web/coursefile/add.xml" />
+
 </urls>

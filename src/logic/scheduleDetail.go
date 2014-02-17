@@ -166,7 +166,7 @@ func insertScheduleChild(tx *sql.Tx, childId, scheduleId, classId, employeeId, c
 	if classId != "" {
 		sql += "insert into schedule_detail_child(schedule_detail_id,child_id,create_time,create_user,sms_status,wyclass_id,is_free) values(?,?,?,?,?,?,?) "
 	} else {
-		sql += "insert into schedule_detail_child(schedule_detail_id,child_id,create_time,create_user,sms_status,is_free) values(?,?,?,?,?,?) "
+		sql += "insert into schedule_detail_child(schedule_detail_id,child_id,create_time,create_user,sms_status,is_free,contract_id) values(?,?,?,?,?,?,?) "
 	}
 
 	lessgo.Log.Debug(sql)
@@ -180,7 +180,7 @@ func insertScheduleChild(tx *sql.Tx, childId, scheduleId, classId, employeeId, c
 	if classId != "" {
 		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, classId, isFree)
 	} else {
-		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, isFree)
+		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, isFree,contractId)
 	}
 
 	if err != nil {
@@ -776,7 +776,7 @@ func getScheduleDetailId(id string) (map[string]string, error) {
 	return dataMap, nil
 }
 
-func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag bool, msg string, err error) {
+func AddChildForNormalTempelate(childId, scheduleId,contractId, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -788,74 +788,59 @@ func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag b
 		return false, "", err
 	}
 
-	idList := strings.Split(childIds, ",")
+	scheduleTempDataMap, err := getScheduleTmpByScheduelDetailId(scheduleId)
 
-	for _, childId := range idList {
-		scheduleTempDataMap, err := getScheduleTmpByScheduelDetailId(scheduleId)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
 
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			return false, "", err
-		}
+	if scheduleTempDataMap["id"] == "" {
+		return false, "该课表不是模板课表，无法跟班", nil
+	}
 
-		if scheduleTempDataMap["id"] == "" {
-			return false, "该课表不是模板课表，无法跟班", nil
-		}
+	timeId := scheduleTempDataMap["time_id"]
+	roomId := scheduleTempDataMap["room_id"]
+	week := scheduleTempDataMap["week"]
+	startTime := scheduleTempDataMap["start_time"]
+	courseId := scheduleTempDataMap["course_id"]
 
-		timeId := scheduleTempDataMap["time_id"]
-		roomId := scheduleTempDataMap["room_id"]
-		week := scheduleTempDataMap["week"]
-		startTime := scheduleTempDataMap["start_time"]
-		courseId := scheduleTempDataMap["course_id"]
+	furtherScheduleIds, err := getFurtherScheduleIds(timeId, roomId, week, startTime, courseId)
 
-		furtherScheduleIds, err := getFurtherScheduleIds(timeId, roomId, week, startTime, courseId)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
 
-		if err != nil {
-			lessgo.Log.Error(err.Error())
-			return false, "", err
-		}
-
-		for _, furtherScheduleId := range furtherScheduleIds {
-			childScheduleFlag, err := checkChildInSchedule(childId, furtherScheduleId)
-
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				return false, "", err
-			}
-
-			contractId, _, err := getContractIdByChildIdAndScheduleId(childId, furtherScheduleId)
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				return false, "", err
-			}
-
-			//统一合同号没值的适合，为0
-			if contractId == "" {
-				contractId = "0"
-			}
-
-			if !childScheduleFlag {
-				err = insertScheduleChild(tx, childId, furtherScheduleId, "", employeeId, contractId, IS_FREE_NO)
-				if err != nil {
-					lessgo.Log.Error(err.Error())
-					return false, "", err
-				}
-			}
-		}
-
-		scheduleTempChildExistFlag, err := checkScheduleTempChildExist(childId, scheduleTempDataMap["id"])
+	for _, furtherScheduleId := range furtherScheduleIds {
+		childScheduleFlag, err := checkChildInSchedule(childId, furtherScheduleId)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		if !scheduleTempChildExistFlag {
-			err = insertScheduleTempChild(tx, childId, scheduleTempDataMap["id"])
+		if !childScheduleFlag {
+			err = insertScheduleChild(tx, childId, furtherScheduleId, "", employeeId, contractId, IS_FREE_NO)
 			if err != nil {
 				lessgo.Log.Error(err.Error())
 				return false, "", err
 			}
+		}
+	}
+
+	scheduleTempChildExistFlag, err := checkScheduleTempChildExist(childId, scheduleTempDataMap["id"])
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	if !scheduleTempChildExistFlag {
+		err = insertScheduleTempChild(tx, childId, scheduleTempDataMap["id"],contractId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
 		}
 	}
 
@@ -864,7 +849,7 @@ func AddChildForNormalTempelate(childIds, scheduleId, employeeId string) (flag b
 	return true, "", nil
 }
 
-func AddChildForNormalOnce(childIds, scheduleId, employeeId string) (flag bool, msg string, err error) {
+func AddChildForNormalOnce(childId, scheduleId,contractId, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -876,22 +861,18 @@ func AddChildForNormalOnce(childIds, scheduleId, employeeId string) (flag bool, 
 		return false, "", err
 	}
 
-	idList := strings.Split(childIds, ",")
+	childScheduleFlag, err := checkChildInSchedule(childId, scheduleId)
 
-	for _, childId := range idList {
-		childScheduleFlag, err := checkChildInSchedule(childId, scheduleId)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
 
+	if !childScheduleFlag {
+		err = insertScheduleChild(tx, childId, scheduleId, "", employeeId, contractId, IS_FREE_NO)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
-		}
-
-		if !childScheduleFlag {
-			err = insertScheduleChild(tx, childId, scheduleId, "", employeeId, "0", IS_FREE_NO)
-			if err != nil {
-				lessgo.Log.Error(err.Error())
-				return false, "", err
-			}
 		}
 	}
 
