@@ -19,9 +19,9 @@ import (
 	"net/http"
 	"server"
 	"strconv"
+	_ "tool"
 	"web"
 	"wooyousite"
-	_"tool"
 )
 
 func main() {
@@ -50,7 +50,7 @@ func main() {
 	fmt.Println("服务器监听", portString, "端口")
 	//	go server.UpdateVideoStatus()
 
-//	tool.SendMsg()
+	//	tool.SendMsg()
 
 	lessgo.Log.Error(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 
@@ -145,11 +145,12 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/addAppAccountSave.json": server.AddAppAccountSaveAction,
 
 	//课程信息相关服务
-	"/course.json":                server.CourseListAction,
-	"/web/course/save.json":       server.CourseSaveAction,
+	"/web/course/page.json":       web.CourseListAction,
+	"/web/course/save.json":       web.CourseSaveAction,
 	"/web/course/load.json":       server.CourseLoadAction,
 	"/courseByCenterId.json":      server.CourseByCenterIdListAction,
-	"/time_section.json":          server.TimeSectionListAction,
+	"/web/time_section/page.json": web.TimeSectionListAction,
+	"/web/time_section/save.json": web.TimeSectionSaveAction,
 	"/class_schedule_detail.json": server.ClassScheduleDetailListAction,
 	"/lessonByClassId.json":       server.LessonByClassIdAction,
 	"/timeSectionByCenterId.json": server.TimeSectionByCenterIdAction,
@@ -172,7 +173,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/class_schedule_detail/removeChildForNormal.json":       web.RemoveChildFromScheduleForNormalAction,
 	"/web/class_schedule_detail/pay.json":                        web.ChildPayAction,
 	"/web/class_schedule_detail/changeClass.json":                web.ChangeClassScheduleAction,
-	"/web/class_schedule_detail/page.json": 					  web.ClassScheduleDetailPageAction,
+	"/web/class_schedule_detail/page.json":                       web.ClassScheduleDetailPageAction,
 	"/web/schedule_detail/deleteSingle.json":                     server.DeleteSingleScheduleAction,
 	"/web/child/childInCenter.json":                              web.ChildInCenterAction,
 	"/web/child/childInClass.json":                               web.ChildInClassListAction,

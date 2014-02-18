@@ -108,6 +108,8 @@
     <url path="/web/child/signInData" view="web/child/signInData.xml" />
     <!--学生模块，签到记录批量合同补登-->
     <url path="/web/child/addContractToSignIn" view="web/child/addContractToSignIn.xml" />
+    <!--课表配置 -->
+    <url path="/web/class_schedule_detail/config" view="web/class_schedule_detail/config.xml" />
 
     <!--课件-->
     <url path="/web/courseware" view="web/courseware/index.xml" />

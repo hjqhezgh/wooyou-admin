@@ -180,7 +180,7 @@ func insertScheduleChild(tx *sql.Tx, childId, scheduleId, classId, employeeId, c
 	if classId != "" {
 		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, classId, isFree)
 	} else {
-		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, isFree,contractId)
+		_, err = stmt.Exec(scheduleId, childId, time.Now().Format("20060102150405"), employeeId, 1, isFree, contractId)
 	}
 
 	if err != nil {
@@ -335,7 +335,7 @@ func CreateWeekSchedule(centerId, firstDayOfWeek, employeeId string) (flag bool,
 				contractId := childMapData["contract_id"]
 
 				if contractId == "0" || contractId == "" { //暂时没有合同信息的，直接进行排课操作
-					err = insertScheduleChild(tx, childMapData["child_id"],fmt.Sprint(scheduleId), "", employeeId, "0", IS_FREE_NO)
+					err = insertScheduleChild(tx, childMapData["child_id"], fmt.Sprint(scheduleId), "", employeeId, "0", IS_FREE_NO)
 
 					if err != nil {
 						lessgo.Log.Error(err.Error())
@@ -776,7 +776,7 @@ func getScheduleDetailId(id string) (map[string]string, error) {
 	return dataMap, nil
 }
 
-func AddChildForNormalTempelate(childId, scheduleId,contractId, employeeId string) (flag bool, msg string, err error) {
+func AddChildForNormalTempelate(childId, scheduleId, contractId, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()
@@ -837,7 +837,7 @@ func AddChildForNormalTempelate(childId, scheduleId,contractId, employeeId strin
 	}
 
 	if !scheduleTempChildExistFlag {
-		err = insertScheduleTempChild(tx, childId, scheduleTempDataMap["id"],contractId)
+		err = insertScheduleTempChild(tx, childId, scheduleTempDataMap["id"], contractId)
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
@@ -849,7 +849,7 @@ func AddChildForNormalTempelate(childId, scheduleId,contractId, employeeId strin
 	return true, "", nil
 }
 
-func AddChildForNormalOnce(childId, scheduleId,contractId, employeeId string) (flag bool, msg string, err error) {
+func AddChildForNormalOnce(childId, scheduleId, contractId, employeeId string) (flag bool, msg string, err error) {
 
 	db := lessgo.GetMySQL()
 	defer db.Close()

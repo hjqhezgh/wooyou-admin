@@ -15,6 +15,8 @@ package logic
 
 import (
 	"github.com/hjqhezgh/lessgo"
+	"github.com/hjqhezgh/commonlib"
+	"database/sql"
 )
 
 func getTimeSectionById(id string) (map[string]string, error) {
@@ -44,4 +46,91 @@ func getTimeSectionById(id string) (map[string]string, error) {
 	}
 
 	return dataMap, nil
+}
+
+func TimeSectionPage(centerId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	countSql := " select count(1) from time_section where center_id=? "
+	lessgo.Log.Debug(countSql)
+	countParams := []interface{}{centerId}
+
+	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, countParams)
+
+	if err != nil {
+		return nil, err
+	}
+
+	currPageNo := pageNo
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	dataSql := `select id,start_time,end_time from time_section where center_id=? order by start_time,end_time limit ?,?`
+	lessgo.Log.Debug(dataSql)
+
+	dataParams := []interface{}{}
+	dataParams = append(dataParams, centerId)
+	dataParams = append(dataParams, (currPageNo-1)*pageSize)
+	dataParams = append(dataParams, pageSize)
+
+	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, dataParams)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pageData, nil
+}
+
+func InsertTimeSection(centerId, startTime, endTime string) (flag bool, msg string, err error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	tx, err := db.Begin()
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	_, err = insertTimeSection(tx, centerId, startTime, endTime)
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, "", err
+	}
+
+	tx.Commit()
+
+	return true, "", nil
+}
+
+func insertTimeSection(tx *sql.Tx, centerId, startTime, endTime string) (id int64, err error) {
+
+	sql := "insert into time_section(center_id,start_time,end_time,lesson_no) values(?,?,?,?)"
+	lessgo.Log.Debug(sql)
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	res, err := stmt.Exec(centerId,startTime,endTime,"1")
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	newTimeSectionId, err := res.LastInsertId()
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return 0, err
+	}
+
+	return newTimeSectionId, nil
 }

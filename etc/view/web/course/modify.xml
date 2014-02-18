@@ -3,14 +3,6 @@
     <customformpanel id="form" title="修改课程" saveUrl="/web/course/save.json" load="true" loadUrl="/web/course/load.json" inwindow="true">
         <element field="id" type="hidden" />
         <element field="name"  type="text" desc="课程名" validate="notNull"/>
-        <element field="center_id"  type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="中心" validate="notNull"/>
-        <element field="price"  type="text" desc="价格" validate="notNull"/>
-        <element field="is_probation"  type="localSelect" localData="[{desc:'是', value:'1'},{desc:'否', value:'0'}]" desc="是否体验课" validate="notNull"/>
         <element field="type" type="localSelect" localData="[{desc:'音乐类', value:'1'},{desc:'体育类', value:'2'},{desc:'英语类', value:'3'},{desc:'艺术类', value:'4'}]" desc="课程类别" validate="notNull"/>
-        <element field="begin_age"  type="text" desc="开始年龄(月)" validate="notNull"/>
-        <element field="end_age"  type="text" desc="结束年龄(月)" validate="notNull"/>
-        <element field="intro"  type="textarea" desc="课程介绍" />
-        <element field="lesson_num"  type="text" desc="课节数目" validate="notNull"/>
-        <element field="courseImg" type="image" imageType="png" desc="课程图片" tip="大小：480*230"/>
     </customformpanel>
 </viewport>
