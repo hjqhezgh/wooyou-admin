@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
-    <formpanel entity="room" id="form" title="添加教室" inwindow="true">
+    <customformpanel id="form" title="添加教室" saveUrl="/web/room/save.json" load="false" loadUrl="" inwindow="true">
         <element field="name" type="text" validate="notNull" desc="名字"/>
-        <element field="cid" type="remoteSelect" url="/web/center/alldata" valueField="cid" descField="name" desc="所属中心"/>
         <element field="channel" type="text" validate="" desc="所属通道"/>
-    </formpanel>
+    </customformpanel>
 </viewport>

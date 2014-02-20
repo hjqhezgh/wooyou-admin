@@ -218,15 +218,17 @@ func ChildInClassPage(scheduleId string, pageNo, pageSize int) (*commonlib.Tradi
 	}
 
 	dataSql := `
-				select sdc.child_id id,ch.name childName,p.telephone phone,e.really_name tmkName,sdc.create_time inviteTime,si.sign_time signTime,sdc.wyclass_id classId,sdc.create_user inviteUser,ch.center_id centerId,sdc.sms_status smsStatus,d.remark remark,cons.level level,cons.id cosumerId
+				select sdc.child_id id,ch.name childName,p.telephone phone,e.really_name tmkName,sdc.create_time inviteTime,si.sign_time signTime,sdc.wyclass_id classId,sdc.create_user inviteUser,ch.center_id centerId,sdc.sms_status smsStatus,d.remark remark,cons.level level,cons.id cosumerId,wc.code code ,ch.sex sex,ch.birthday birthday
 				from schedule_detail_child sdc
+				left join class_schedule_detail csd on csd.id=sdc.schedule_detail_id
+				left join wyclass wc on wc.class_id=csd.class_id
 	            left join child ch on ch.cid=sdc.child_id
 	            left join parent p on p.pid=ch.pid
 	            left join consumer_new cons on cons.parent_id=ch.pid
 	            left join (select consumer_id,GROUP_CONCAT(concat(DATE_FORMAT(create_time,'%Y-%m-%d %H:%i'),' ',note) ORDER BY id DESC SEPARATOR '<br/>') remark from consumer_contact_log group by consumer_id) d on d.consumer_id=cons.id
 				left join employee e on e.user_id=sdc.create_user
 				left join sign_in si on si.child_id=sdc.child_id and sdc.schedule_detail_id=si.schedule_detail_id
-				where sdc.schedule_detail_id=? order by sdc.id desc limit ?,?`
+				where sdc.schedule_detail_id=? order by si.sid desc,sdc.id desc limit ?,?`
 	lessgo.Log.Debug(dataSql)
 
 	dataParams := []interface{}{}
@@ -313,6 +315,7 @@ func ChildInNormalSchedulePage(scheduleId string, pageNo, pageSize int) (*common
 	 			left join contract contr on contr.id=sdc.contract_id
 	 			left join course cour on cour.cid=contr.course_id
 	 			left join (select count(1) num,contract_id from sign_in where type=1 or type=3 group by contract_id ) usedNum on usedNum.contract_id=contr.id
+	 			order by si.sid desc,ch.cid desc
 	 			`
 	lessgo.Log.Debug(dataSql)
 
@@ -621,4 +624,82 @@ func childPay(tx *sql.Tx, childId, consumerId, scheduleId, classId, payType, emp
 	tx.Commit()
 
 	return true, "", nil
+}
+
+func PotentialChildPage(centerId, kw, dataType, employeeId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+	if centerId == "1" {
+		centerId = "7"
+	}
+
+	params := []interface{}{}
+
+	dataSql := `
+				select ch.cid id,ce.name centerName,ch.name childName,p.telephone phone,ch.birthday,ch.sex
+				from child ch
+				left join parent p on p.pid=ch.pid
+				left join center ce on ce.cid=ch.center_id
+				left join (select child_id,count(1) num from contract where price >0 group by child_id) contract_num on contract_num.child_id=ch.cid where 1=1 and (contract_num.num=0 or contract_num.num is null)
+	`
+
+	if dataType == "center" {
+		userId, _ := strconv.Atoi(employeeId)
+		_employee, err := FindEmployeeById(userId)
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return nil, err
+		}
+
+		//番茄田逻辑补丁，番茄田添加的用户都属于福州台江中心
+		if _employee.CenterId == "1" {
+			_employee.CenterId = "7"
+		}
+
+		params = append(params, _employee.CenterId)
+
+		dataSql += " and ch.center_id=? "
+	}
+
+	if centerId != "" && dataType == "all" {
+		params = append(params, centerId)
+		dataSql += " and ch.center_id=? "
+	}
+
+	if kw != "" {
+		dataSql += " and (ch.name like ? "
+		dataSql += " or p.telephone like ?) "
+		params = append(params, "%"+kw+"%")
+		params = append(params, "%"+kw+"%")
+	}
+
+	countSql := "select count(1) from (" + dataSql + ") num"
+	lessgo.Log.Debug(countSql)
+	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	currPageNo := pageNo
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	dataSql += " order by ch.cid desc limit ?,? "
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	lessgo.Log.Debug(dataSql)
+	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pageData, nil
 }

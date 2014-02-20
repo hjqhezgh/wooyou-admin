@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="客户信息" url="javascript:void(0);"/>
+        <crumb text="潜在学员" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/web/child/potential.json" pageSize="15" title="潜在学员" id="grid1" width="1200" height="400" loadUrl="false">
+
+        <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="kw" searchType="like" inputType="text" desc="名字/电话"/>
+
+        <column field="centerName" desc="门店"/>
+        <column field="childName" desc="姓名"/>
+        <column field="phone" desc="联系电话"/>
+        <column field="birthday" desc="生日">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar8Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="sex" desc="性别" width="50">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "男";
+                        }else{
+                            return "女";
+                        }
+                ]]>
+            </formatter>
+        </column>
+
+        <action desc="修改" url="/web/child/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="签单" url="/web/contract/add" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

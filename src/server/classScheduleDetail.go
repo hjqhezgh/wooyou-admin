@@ -171,7 +171,7 @@ func ClassScheduleDetailListAction(w http.ResponseWriter, r *http.Request) {
 		rooms = append(rooms, room)
 	}
 
-	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by lesson_no"
+	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by start_time,end_time"
 	lessgo.Log.Debug(getRoomInfoSql)
 
 	rows, err = db.Query(getTimeSql, _employee.CenterId)
@@ -393,7 +393,7 @@ func ClassScheduleDetailListQuickAction(w http.ResponseWriter, r *http.Request) 
 		rooms = append(rooms, room)
 	}
 
-	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by lesson_no"
+	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by start_time,end_time"
 	lessgo.Log.Debug(getRoomInfoSql)
 
 	rows, err = db.Query(getTimeSql, centerId)
@@ -655,7 +655,7 @@ func ClassScheduleDetailListTempAction(w http.ResponseWriter, r *http.Request) {
 		rooms = append(rooms, room)
 	}
 
-	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by lesson_no"
+	getTimeSql := "select id,start_time,end_time from time_section where center_id=? order by start_time,end_time"
 	lessgo.Log.Debug(getRoomInfoSql)
 
 	rows, err = db.Query(getTimeSql, centerId)

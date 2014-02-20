@@ -19,6 +19,7 @@ import (
 	"logic"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 )
 
@@ -121,14 +122,14 @@ func ContractSaveAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.FormValue("id")
-	contractNo := r.FormValue("contractNo")
-	price := r.FormValue("price")
-	courseId := r.FormValue("courseId")
-	courseNum := r.FormValue("courseNum")
-	contractType := r.FormValue("type")
-	childId := r.FormValue("childId")
-	expireDate := r.FormValue("expireDate")
+	id := strings.Trim(r.FormValue("id")," ")
+	contractNo := strings.Trim(r.FormValue("contractNo")," ")
+	price := strings.Trim(r.FormValue("price")," ")
+	courseId := strings.Trim(r.FormValue("courseId")," ")
+	courseNum := strings.Trim(r.FormValue("courseNum")," ")
+	contractType := strings.Trim(r.FormValue("type")," ")
+	childId := strings.Trim(r.FormValue("childId")," ")
+	expireDate := strings.Trim(r.FormValue("expireDate")," ")
 
 	flag, msg, err := logic.SaveContract(id, contractNo, price, courseId, courseNum, contractType, childId, expireDate, employee.UserId, _employee.CenterId)
 

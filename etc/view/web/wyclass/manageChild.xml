@@ -4,6 +4,30 @@
     <customgridpanel url="/web/child/childInClass.json" pageSize="15" title="班级学生" id="grid1" width="1200" height="150" loadUrl="true" mutiSelect="true" pageId="grid1" actionWidth="150">
 
         <column field="childName" desc="学员姓名"/>
+        <column field="level" desc="星级"/>
+        <column field="sex" desc="性别">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue == '1') {
+                            return '男';
+                        }else{
+                            return "女";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="birthday" desc="年龄">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            var nowYear = new Date().getFullYear();
+                            var childYear = cellvalue.substr(0,4);
+                            return nowYear-childYear;
+                        }
+                        return '';
+                ]]>
+            </formatter>
+        </column>
         <column field="phone" desc="联系电话"/>
         <column field="tmkName" desc="邀约人" width="50"/>
         <column field="inviteTime" desc="邀约时间">
@@ -45,7 +69,6 @@
                 ]]>
             </formatter>
         </column>
-        <column field="level" desc="星级"/>
         <column field="remark" desc="备注"/>
         <column field="consumerId" desc="consumerId" hidden="true"/>
 

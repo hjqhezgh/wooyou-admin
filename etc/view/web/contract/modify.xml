@@ -9,5 +9,35 @@
         <element field="childId" type="hidden" validate="notNull" defaultValue="$childId" desc="学生id"/>
         <element field="id" type="hidden" validate="notNull" desc="主键id"/>
         <element field="expireDate" type="date"  desc="过期时间" tip="过期时间为第一次上课后的100天" char8="true"/>
+
+        <beforeSave>
+            <![CDATA[
+                var contractNo = container.find('form').find('[name=contractNo]').val();
+
+                infos = contractNo.split('-');
+
+                if(infos.length != 3) {
+                    alert('合同号格式错误，请参照1：E0011-14-0023，或联系管理员');
+                    return false;
+                }
+
+                if(infos[0].charAt(0) != 'A' && infos[0].charAt(0) != 'E'){
+                     alert('合同号格式错误，请参照2：E0011-14-0023，或联系管理员');
+                     return false;
+                }
+
+                if(infos[0].length!=5){
+                    alert('合同号格式错误，请参照3：E0011-14-0023，或联系管理员');
+                     return false;
+                }
+
+                if(infos[2].length!=4){
+                    alert('合同号格式错误，请参照3：E0011-14-0023，或联系管理员');
+                     return false;
+                }
+
+                return true;
+            ]]>
+        </beforeSave>
     </customformpanel>
 </viewport>

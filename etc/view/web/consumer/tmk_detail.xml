@@ -8,7 +8,7 @@
         <search field="lastContractEndTime" searchType="le" inputType="datetime" char14="true" desc="结束时间"/>
         <search field="kw" searchType="like" inputType="text" desc="关键字"/>
         <search field="partTimeName" searchType="eq" inputType="text" desc="兼职人员姓名"/>
-        <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'}]"/>
+        <search field="sort" searchType="eq" inputType="localSelect" desc="排序方式，默认按录入时间" localData="[{desc:'录入时间',value:'create_time'},{desc:'最后通话时间',value:'last_time'},{desc:'签到时间',value:'sign_time'}]"/>
 
         <column field="centerName" desc="所属门店"/>
         <column field="tmkName" desc="TMK"/>

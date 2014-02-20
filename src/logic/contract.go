@@ -264,14 +264,25 @@ func SaveContract(id, contractNo, price, courseId, courseNum, contractType, chil
 	}
 
 	if id == "" {
-		parentId, err := getChildByParentId(childId)
+		contractNoExistFlag ,err := checkContractNoExist(contractNo)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
 			return false, "", err
 		}
 
-		_, err = insertContract(tx, childId, contractNo, fmt.Sprint(parentId), price, employeeId, centerId, courseId, courseNum, contractType, expireDate)
+		if contractNoExistFlag {
+			return false, "合同号已存在", nil
+		}
+
+		childDataMap ,err := getChildById(childId)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+
+		_, err = insertContract(tx, childId, contractNo, fmt.Sprint(childDataMap["pid"]), price, employeeId, centerId, courseId, courseNum, contractType, expireDate)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -280,15 +291,35 @@ func SaveContract(id, contractNo, price, courseId, courseNum, contractType, chil
 
 	} else {
 
-		contractDataMap := make(map[string]interface{})
-		contractDataMap["contract_no"] = contractNo
-		contractDataMap["price"] = price
-		contractDataMap["course_id"] = courseId
-		contractDataMap["left_lesson_num"] = courseNum
-		contractDataMap["type"] = contractType
-		contractDataMap["expire_date"] = expireDate
+		contractUpdateDataMap := make(map[string]interface{})
+		contractUpdateDataMap["contract_no"] = contractNo
+		contractUpdateDataMap["price"] = price
+		contractUpdateDataMap["course_id"] = courseId
+		contractUpdateDataMap["left_lesson_num"] = courseNum
+		contractUpdateDataMap["type"] = contractType
+		contractUpdateDataMap["expire_date"] = expireDate
 
-		err = updateContract(tx, contractDataMap, id)
+		contractDataMap,err := getContractById(id)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
+
+		if contractNo != contractDataMap["contract_no"] {
+			contractNoExistFlag ,err := checkContractNoExist(contractNo)
+
+			if err != nil {
+				lessgo.Log.Error(err.Error())
+				return false, "", err
+			}
+
+			if contractNoExistFlag {
+				return false, "合同号已存在", nil
+			}
+		}
+
+		err = updateContract(tx, contractUpdateDataMap, id)
 
 		if err != nil {
 			lessgo.Log.Error(err.Error())
@@ -366,4 +397,43 @@ select id,child_id,apply_time,contract_no,parent_id,price,employee_id,center_id,
 */
 func GetContractById(id string) (map[string]string, error) {
 	return getContractById(id)
+}
+
+func checkContractNoExist(contractNo string) (bool, error) {
+
+	if contractNo == "" {
+		return false, nil
+	}
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	sql := "select count(1) from contract where contract_no=? "
+
+	lessgo.Log.Debug(sql)
+
+	rows, err := db.Query(sql, contractNo)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return false, err
+	}
+
+	num := 0
+
+	if rows.Next() {
+
+		err = commonlib.PutRecord(rows, &num)
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, err
+		}
+	}
+
+	if num > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

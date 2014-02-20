@@ -154,6 +154,8 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/class_schedule_detail.json": server.ClassScheduleDetailListAction,
 	"/lessonByClassId.json":       server.LessonByClassIdAction,
 	"/timeSectionByCenterId.json": server.TimeSectionByCenterIdAction,
+	"/web/room/page.json": web.RoomListAction,
+	"/web/room/save.json": web.RoomSaveAction,
 
 	//课表相关
 	"/web/class_schedule_detail/data.json":                       server.ClassScheduleDetailListAction,
@@ -178,6 +180,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/child/childInCenter.json":                              web.ChildInCenterAction,
 	"/web/child/childInClass.json":                               web.ChildInClassListAction,
 	"/web/child/childInNormalSchedule.json":                      web.ChildInNormalScheduleAction,
+	"/web/child/potential.json":                      			  web.PotentialChildListAction,
 	"/web/wyclass/signInWithoutClass.json":                       web.ChildSignInWithoutClassAction,
 	"/web/wyclass/sendSMS/save.json":                             server.WyClassSendSMSSaveAction,
 	"/web/wyclass/addChildQuick.json":                            web.AddChildToClassQuickAction,

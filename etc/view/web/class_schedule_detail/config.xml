@@ -29,10 +29,17 @@
         <!--<action desc="配置课节" url="/web/lesson" actionParams="[{name:'course_id-eq',value:'id'}]" linkType="iframeWindow"/>-->
     </customgridpanel>
 
-    <customgridpanel url="/web/time_section/page.json" pageSize="15" title="时间段管理" id="grid1" width="1200" height="300" loadUrl="false">
+    <customgridpanel url="/web/time_section/page.json" pageSize="15" title="时间段管理" id="grid2" width="1200" height="300" loadUrl="false">
         <column field="start_time" desc="起始时间"/>
         <column field="end_time" desc="结束时间" />
         <toolaction desc="添加" url="/web/time_section/add" colorClass="h-bg-green" linkType="iframeWindow"/>
         <action desc="修改" url="/web/time_section/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
+    </customgridpanel>
+
+    <customgridpanel url="/web/room/page.json" pageSize="15" title="教室管理" id="grid3" width="1200" height="200" loadUrl="false">
+        <column field="name" desc="名字"/>
+        <column field="channel" desc="视频所属通道"/>
+        <toolaction desc="添加" url="/web/room/add" colorClass="h-bg-green" linkType="iframeWindow"/>
+        <action desc="修改" url="/web/room/modify" actionParams="[{name:'id',value:'id'}]" linkType="iframeWindow"/>
     </customgridpanel>
 </viewport>
