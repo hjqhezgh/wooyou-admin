@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+
+    <customgridpanel url="/web/child/childInParent.json" pageSize="15" title="孩子管理" id="grid1" width="1200" height="400" loadUrl="true">
+
+        <column field="childName" desc="姓名"/>
+        <column field="password" desc="APP密码"/>
+        <column field="cardId" desc="卡号"/>
+        <column field="birthday" desc="生日">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar8Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="sex" desc="性别" width="50">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue=="1") {
+                            return "男";
+                        }else{
+                            return "女";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="regTime" desc="注册时间" hidden="true">
+            <formatter>
+                <![CDATA[
+                        if(cellvalue) {
+                            return cellvalue.formatChar14Time();
+                        }else{
+                            return "";
+                        }
+                ]]>
+            </formatter>
+        </column>
+        <column field="totalNum" desc="合同总课数"/>
+        <column field="usedNum" desc="已用课数"/>
+
+        <action desc="修改" url="/web/child/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="合同管理" url="/web/contract" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
+        <action desc="签到记录" url="/web/child/signInData" linkType="iframeWindow" actionParams="[{name:'childId',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

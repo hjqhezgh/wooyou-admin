@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <!--面包屑-->
+    <crumbs>
+        <crumb text="客户信息" url="javascript:void(0);"/>
+        <crumb text="会员管理" currentPage="true"/>
+    </crumbs>
+
+    <customgridpanel url="/web/member/data.json" pageSize="15" title="会员管理" id="grid1" width="1200" height="400" loadUrl="false">
+
+        <search field="centerId" searchType="eq" inputType="remoteSelect" desc="所属中心" url="/web/center/alldata" valueField="cid" descField="name" />
+        <search field="kw" searchType="like" inputType="text" desc="名字/电话"/>
+
+        <column field="centerName" desc="门店"/>
+        <column field="childs" desc="孩子"/>
+        <column field="telephone" desc="APP电话"/>
+        <column field="fatherName" desc="父亲姓名"/>
+        <column field="fatherPhone" desc="父亲电话"/>
+        <column field="motherName" desc="母亲姓名"/>
+        <column field="motherPhone" desc="母亲电话"/>
+
+        <action desc="修改" url="/web/member/modify" linkType="iframeWindow" actionParams="[{name:'id',value:'id'}]"/>
+        <action desc="孩子管理" url="/web/child/childInParent" linkType="iframeWindow" actionParams="[{name:'parentId',value:'id'}]"/>
+    </customgridpanel>
+</viewport>

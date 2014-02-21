@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <formpanel entity="parent" id="form" load="true" title="会员信息修改" inwindow="true">
+        <element field="father_name" type="text" validate="" desc="父亲名字"/>
+        <element field="father_phone" type="text" validate="" desc="父亲电话"/>
+        <element field="mother_name" type="text" validate="" desc="母亲名字"/>
+        <element field="mother_phone" type="text" validate="" desc="母亲电话"/>
+        <element field="address" type="textarea" validate="" desc="地址"/>
+        <element field="email" type="text" validate="email" desc="联系邮箱"/>
+        <element field="qq" type="text" validate="" desc="QQ"/>
+    </formpanel>
+</viewport>

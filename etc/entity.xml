@@ -381,4 +381,25 @@
         <field name="type"/>
         <field name="status"/>
     </entity>
+
+    <!--会员家长-->
+    <entity id="parent">
+        <pk>pid</pk>
+        <field name="name"/>
+        <field name="password"/>
+        <field name="telephone"/>
+        <field name="email"/>
+        <field name="job"/>
+        <field name="sina_weibo"/>
+        <field name="address"/>
+        <field name="qq"/>
+        <field name="qq_weibo"/>
+        <field name="reg_date"/>
+        <field name="come_form"/>
+        <field name="father_name"/>
+        <field name="father_phone"/>
+        <field name="mother_name"/>
+        <field name="mother_phone"/>
+        <field name="is_member"/>
+    </entity>
 </entitys>

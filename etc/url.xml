@@ -118,5 +118,12 @@
 
     <!--课件附件-->
     <url path="/web/coursefile/add" view="web/coursefile/add.xml" />
-
+    <!--潜在会员-->
+    <url path="/web/child/potential" view="web/child/potential.xml" />
+    <!--会员管理-->
+    <url path="/web/member" view="web/parent/member.xml" />
+    <!--会员修改-->
+    <url path="/web/member/modify" view="web/parent/member_modify.xml" />
+    <!--会员下的小孩子-->
+    <url path="/web/child/childInParent" view="web/child/childInParent.xml" />
 </urls>

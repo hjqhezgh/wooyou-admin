@@ -703,3 +703,48 @@ func PotentialChildPage(centerId, kw, dataType, employeeId string, pageNo, pageS
 
 	return pageData, nil
 }
+
+func ChildInParentPage(parentId string, pageNo, pageSize int) (*commonlib.TraditionPage, error) {
+
+	db := lessgo.GetMySQL()
+	defer db.Close()
+
+	params := []interface{}{}
+
+	dataSql := `
+				select ch.cid id,ch.name childName,ch.card_id cardId,ch.birthday,ch.sex,totalNum.num totalNum,usedNum.num usedNum
+				from child ch
+				left join (select sum(left_lesson_num) num,child_id from contract group by child_id) totalNum on totalNum.child_id=ch.cid
+				left join (select count(1) num,child_id from sign_in where (type=1 or type=3) and contract_id!=0 and contract_id is not null group by child_id) usedNum on usedNum.child_id=ch.cid
+				where 1=1 and ch.pid=?
+	`
+
+	params = append(params, parentId)
+
+	countSql := "select count(1) from (" + dataSql + ") num"
+	lessgo.Log.Debug(countSql)
+	totalPage, totalNum, err := lessgo.GetTotalPage(pageSize, db, countSql, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	currPageNo := pageNo
+	if currPageNo > totalPage {
+		currPageNo = totalPage
+	}
+
+	dataSql += " order by ch.cid desc limit ?,? "
+
+	params = append(params, (currPageNo-1)*pageSize)
+	params = append(params, pageSize)
+
+	lessgo.Log.Debug(dataSql)
+	pageData, err := lessgo.GetFillObjectPage(db, dataSql, currPageNo, pageSize, totalNum, params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pageData, nil
+}
