@@ -289,6 +289,15 @@ func SaveContract(id, contractNo, price, courseId, courseNum, contractType, chil
 			return false, "", err
 		}
 
+		parentDataMap := make(map[string]interface{})
+		parentDataMap["is_member"] = 1
+
+		err =updateParent(tx,parentDataMap,childDataMap["pid"])
+
+		if err != nil {
+			lessgo.Log.Error(err.Error())
+			return false, "", err
+		}
 	} else {
 
 		contractUpdateDataMap := make(map[string]interface{})

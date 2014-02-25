@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <viewport window="true">
     <customformpanel id="form" title="添加合同" saveUrl="/web/contract/save.json" load="false" inwindow="true">
-        <element field="contractNo" type="text" validate="notNull" desc="合同号"/>
+        <element field="contractNo" type="text" validate="" desc="合同号"/>
         <element field="price" type="text" validate="notNull" desc="金额"/>
         <element field="courseId"  type="remoteSelect" url="/courseInCenter.json" valueField="value" descField="desc" desc="课程" validate="notNull"/>
         <element field="courseNum" type="text" validate="notNull" desc="上课次数"/>
@@ -12,26 +12,30 @@
             <![CDATA[
                 var contractNo = container.find('form').find('[name=contractNo]').val();
 
-                infos = contractNo.split('-');
+                if(contractNo){
+                    infos = contractNo.split('-');
 
-                if(infos.length != 3) {
-                    alert('合同号格式错误，请参照1：E0011-14-0023，或联系管理员');
-                    return false;
-                }
+                    if(infos.length != 3) {
+                        alert('合同号格式错误，请参照1：E0011-14-0023，或联系管理员');
+                        return false;
+                    }
 
-                if(infos[0].charAt(0) != 'A' && infos[0].charAt(0) != 'E'){
-                     alert('合同号格式错误，请参照2：E0011-14-0023，或联系管理员');
-                     return false;
-                }
+                    if(infos[0].charAt(0) != 'A' && infos[0].charAt(0) != 'E'){
+                         alert('合同号格式错误，请参照2：E0011-14-0023，或联系管理员');
+                         return false;
+                    }
 
-                if(infos[0].length!=5){
-                    alert('合同号格式错误，请参照3：E0011-14-0023，或联系管理员');
-                     return false;
-                }
+                    if(infos[0].length!=5){
+                        alert('合同号格式错误，请参照3：E0011-14-0023，或联系管理员');
+                         return false;
+                    }
 
-                if(infos[2].length!=4){
-                    alert('合同号格式错误，请参照3：E0011-14-0023，或联系管理员');
-                     return false;
+                    if(infos[2].length!=4){
+                        alert('合同号格式错误，请参照3：E0011-14-0023，或联系管理员');
+                         return false;
+                    }
+
+                    return true;
                 }
 
                 return true;

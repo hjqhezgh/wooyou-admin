@@ -19,6 +19,7 @@ import (
 	"github.com/hjqhezgh/lessgo"
 	"time"
 	"strconv"
+	"fmt"
 )
 
 //根据电话获取parent表的id
@@ -159,4 +160,39 @@ func MemberPage(dataType,centerId,kw,employeeId string, pageNo, pageSize int) (*
 	}
 
 	return pageData, nil
+}
+
+func updateParent(tx *sql.Tx, parentDataMap map[string]interface{}, id string) error {
+	sql := "update parent set %v where pid=?"
+	params := []interface{}{}
+
+	setSql := ""
+
+	for key, value := range parentDataMap {
+		setSql += key + "=?,"
+		params = append(params, value)
+	}
+
+	params = append(params, id)
+
+	setSql = commonlib.Substr(setSql, 0, len(setSql)-1)
+
+	sql = fmt.Sprintf(sql, setSql)
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(params...)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
 }
