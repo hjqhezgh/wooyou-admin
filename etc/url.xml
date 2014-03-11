@@ -126,4 +126,7 @@
     <url path="/web/member/modify" view="web/parent/member_modify.xml" />
     <!--会员下的小孩子-->
     <url path="/web/child/childInParent" view="web/child/childInParent.xml" />
+
+    <!--财务小模块-->
+    <url path="/web/finance" view="web/finance/index.xml"/>
 </urls>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <blankpanel>dsa
+        <content>
+            <![CDATA[
+            <div style="margin: 4% 15%">
+                <div id="divSubmissionAction" class="block" style="display:none; margin-bottom: 3%;">
+                    <div style="display: inline;margin-right:5%;"><a id="btnReimbursed">我要报销</a></div><div style="display: inline;"><a id="btnPayment">我要付款</a></div>
+                </div>
+
+                <div id="divSearch" style="display: inline; margin-right: 5%;">
+                    <div style="display: inline;"><input name="search_text" type="text" placeholder="输入时间"></div>
+                    <div style="display: inline;"><a href="javascript:void(0)" class="btn btn-primary"><span class="ui-button-text">搜索</span></a></div>
+                </div>
+                <div style="display: none;" id="divCenter"></div>
+                <div id="divHandleApply" style="display: inline; margin-left: 5%;"></div>
+
+                <div id="divApplyDetails" style="margin-top: 3%;"></div>
+                <script type="text/javascript">
+                    seajs.use('/js/finance.js');
+                </script>
+            </div>
+            ]]>
+        </content>
+    </blankpanel>
+</viewport>

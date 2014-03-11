@@ -22,6 +22,7 @@ import (
 	_ "tool"
 	"web"
 	"wooyousite"
+	"finance"
 )
 
 func main() {
@@ -213,4 +214,10 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/courseware/save.json":      web.CoursewareSaveAction,
 	"/web/courseware/load.json":      web.CoursewareLoadAction,
 	"/web/courseware/uploadCallBack": web.CoursewareUploadCallBack,
+
+	"/getUserInfo.json"					:			finance.UserInfoAction,
+	"/getHandleApplyInfo.json"			:			finance.HandleApplyAction,
+	"/getReceiptDetails.json"			:			finance.ReceiptDetailsAction,
+	"/classifiedPendingReceiptList"		:			finance.ClassifiedPendingReceiptListAction,
+	"/classifiedCompletedReceiptList"	:			finance.ClassifiedCompletedReceiptListAction,
 }

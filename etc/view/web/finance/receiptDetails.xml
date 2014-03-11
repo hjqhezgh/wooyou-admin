@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport>
+    <blankpanel>dsa
+        <content>
+            <![CDATA[
+            <div style="margin: 4% 15%">
+                <div id="divReceiptDetails" class="block">
+                </div>
+                <script type="text/javascript">
+                    seajs.use('/js/receiptDetails.js');
+                </script>
+            </div>
+            ]]>
+        </content>
+    </blankpanel>
+</viewport>
