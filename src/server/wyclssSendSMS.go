@@ -14,7 +14,7 @@
 package server
 
 import (
-	"fmt"
+//	"fmt"
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"net/http"
@@ -239,7 +239,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 			contentDetail := getSmsContent(content, childName)
 //			smsResult := SmsResult{Msg: "asdas", Result: 0}
 			smsResult, err := SendMessage(phone, contentDetail)
-			fmt.Println(contentDetail)
+
 			if err != nil {
 				lessgo.Log.Warn(err.Error())
 				m["success"] = false
