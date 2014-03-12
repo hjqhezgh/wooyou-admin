@@ -129,4 +129,5 @@
 
     <!--财务小模块-->
     <url path="/web/finance" view="web/finance/index.xml"/>
+    <url path="/web/finance/add_receipt" view="web/finance/addReceipt.xml"/>
 </urls>

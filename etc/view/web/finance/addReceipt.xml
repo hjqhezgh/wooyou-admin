@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewport window="true">
+    <blankpanel>dsa
+        <content>
+            <![CDATA[
+           <div class="block gridpanel" id="gridpanel5425" style="width: 100%;">
+             <h4 class="title"><i class="icon-table"></i>报销</h4>
+             <form class="form-horizontal">
+               <div class="control-group">
+                 <label class="control-label">报销中心</label>
+                 <div class="controls">
+                   <select class="form-control">
+             	<option value="1">阿罗海</option>
+             	<option value="2">湖里金宝贝</option>
+             	<option value="3">福州台江万达</option>
+             	<option value="4">总部</option>
+                   </select>
+                 </div>
+               </div>
+
+               <div class="control-group">
+                 <label class="control-label">报销部门</label>
+                 <div class="controls">
+                   <select class="form-control">
+             	<option value="hr">人力部门</option>
+             	<option value="it">IT部门</option>
+             	<option value="market">市场部</option>
+                   </select>
+                 </div>
+               </div>
+
+               <div class="control-group">
+                 <label class="control-label">报销类型</label>
+                 <div class="controls">
+                   <select class="form-control">
+             	<option value="daily">日常类</option>
+             	<option value="build">建设类</option>
+                   </select>
+                 </div>
+               </div>
+
+	       <div class='control-group'>
+                 <label class="control-label">报销细项</label>
+                 <div class="controls">
+	  	   <table class="table table-hover">
+                     <thead>
+                       <tr>
+                         <th class="span2">用途</th>
+                         <th class="span2">单据</th>
+                         <th class="span2">金额</th>
+                         <th class="span2">费用期间</th>
+                         <th>备注</th>
+                         <th class='span2'>操作</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td>差旅费</td>
+                         <td>2</td>
+                         <td>100</td>
+                         <td>20140303-20140305</td>
+                         <td>吃吃喝喝</td>
+                         <td>修改 删除</td>
+                       </tr>
+                       <tr>
+                         <td>电话</td>
+                         <td>4</td>
+                         <td>100</td>
+                         <td>20140303-20140309</td>
+                         <td>与客户通话</td>
+                         <td>修改 删除</td>
+                       </tr>
+                       <tr>
+                         <td><input type="text" placeholder="用途"></td>
+                         <td><input type="text" placeholder="单据"></td>
+                         <td><input type="text" placeholder="金额"></td>
+                         <td><input type="text" placeholder="期间"></td>
+                         <td><input type="text" placeholder="备注"></td>
+                         <td><a class="btn btn-primary">保存</a></td>
+                       </tr>
+                     </tbody>
+                   </table>
+                 </div>
+	       </div>
+
+	       <div class='control-group'>
+                 <label class="control-label">发票凭据</label>
+                 <div class="controls">
+	  	   <table class="table table-hover">
+                     <thead>
+                       <tr>
+                         <th>文件名</th>
+                         <th>操作</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td>阿罗海4月第一周发票01</td>
+                         <td>预览 下载 删除</td>
+                       </tr>
+                       <tr>
+                       <tr>
+                         <td>阿罗海4月第一周发票02</td>
+                         <td>预览 下载 删除</td>
+                       </tr>
+		       <tr>
+                         <td colspan='2'><input type="file" class='input-file'></td>
+                       </tr>
+                     </tbody>
+                   </table>
+                 </div>
+	       </div>
+
+
+               <div class="control-group">
+                 <div class="control-group text-center navbar navbar-fixed-bottom form-buttons">
+                   <div class="controls">
+	             <a href="javascript:void(0);" data-action="save" class="btn btn-primary">保存</a>
+       		     <a href="javascript:void(0);" data-action="reset" class="btn">重置</a>
+                   </div>
+                 </div>
+               </div>
+             </form>
+           </div>
+           ]]>
+        </content>
+    </blankpanel>
+</viewport>

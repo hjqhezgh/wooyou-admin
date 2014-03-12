@@ -463,4 +463,17 @@ define(function (require, exports, module) {
             return (((sign) ? '' : '-') + num + '.' + cents);
         }
     }
+
+    $(document).on('click','a[data-action=openIframeWindow]',function(e){
+        e.preventDefault();
+
+        var url = $(this).attr('href');
+
+        $.openIframeWindow({
+            url : url,
+            parentComponent : "",
+            parentWindowName : window.name
+        },e);
+    });
+
 });
