@@ -5,7 +5,7 @@
             <![CDATA[
             <div style="margin: 4% 15%">
                 <div id="divSubmissionAction" class="block" style="display:none; margin-bottom: 3%;">
-                    <div style="display: inline;margin-right:5%;"><a id="btnReimbursed">我要报销</a></div><div style="display: inline;"><a id="btnPayment">我要付款</a></div>
+                    <div style="display: inline;margin-right:5%;"><a id="btnReimbursed" href="/web/finance/add_receipt" data-action='openIframeWindow'>我要报销</a></div><div style="display: inline;"><a id="btnPayment">我要付款</a></div>
                 </div>
 
                 <div id="divSearch" style="display: inline; margin-right: 5%;">
