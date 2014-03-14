@@ -18,7 +18,7 @@ import (
 	"github.com/hjqhezgh/lessgo"
 	"net/http"
 	"server"
-	"process"
+//	"process"
 	"strconv"
 	_ "tool"
 	"web"
@@ -216,7 +216,7 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/courseware/load.json":      web.CoursewareLoadAction,
 	"/web/courseware/uploadCallBack": web.CoursewareUploadCallBack,
 
-	"/getUserInfo.json"					:			finance.UserInfoAction,
+	"/getRoleCodes.json"				:			finance.RoleCodesAction,
 	"/getHandleApplyInfo.json"			:			finance.HandleApplyAction,
 	"/getReceiptDetails.json"			:			finance.ReceiptDetailsAction,
 	"/classifiedPendingReceiptList"		:			finance.ClassifiedPendingReceiptListAction,

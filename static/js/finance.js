@@ -41,33 +41,29 @@ define(function (require, exports, module) {
         '<td class="sub_total monetary">$${subTotal}</td>' +
         '</tr>';
 
-    var urlUserInfo = "/getUserInfo.json";
-    // 模拟用户测试
-    var userId = "1";//CD
-//    var userId = "2";// 管理层
-    $.get(urlUserInfo, {userId: userId}, function (data) {
+    $.get("/getRoleCodes.json", {}, function (data) {
         if (data.success) {
-            var userInfo = data.datas;
-            var role = userInfo.role;
-            render(role);
+            var roleCodes = data.datas;
+            render(roleCodes);
 //            bindEvent();
         } else {
             alert(data.msg);
         }
     }, 'json');
 
-    function render(role) {
-        if (role == "CD") {
+    function render(roleCodes) {
+        if (isExistInArray(roleCodes, 'cd')) {
             $divSubmissionAction.show();
             $divCenter.css('display', 'none');
-        } else {
+        }
+        if (isExistInArray(roleCodes, 'yyzj')) {
             $divSubmissionAction.hide();
             $divCenter.css('display', 'inline-block');
         }
         $divCenter.append('<select><option>A中心</option><option>B中心</option></select>');
 
         // 处理信息汇总
-        $.get("/getHandleApplyInfo.json", {userId: userId}, function (data) {
+        $.get("/getHandleApplyInfo.json", {}, function (data) {
             if (data.success) {
                 var handleApplyInfo = data.datas;
                 var pendingReceiptAmount = handleApplyInfo.pendingReceiptAmount;
@@ -82,7 +78,7 @@ define(function (require, exports, module) {
             }
         }, 'json');
         // 详细信息列表
-        $.get("/getReceiptDetails.json", {userId: userId}, function (data) {
+        $.get("/getReceiptDetails.json", {}, function (data) {
             if (data.success) {
                 var applyDetailsMap = getApplyDetailsMap(data.datas);
                 var $TRs = getApplyDetailsDisplayList(applyDetailsMap);
@@ -91,6 +87,18 @@ define(function (require, exports, module) {
                 alert('获取数据出错！');
             }
         }, 'json')
+    }
+
+    function isExistInArray(arrData, code) {
+        var isExist = false;
+        for (var i in arrData) {
+            if (code.toLowerCase() == arrData[i].toLowerCase()) {
+                isExist = true;
+                break;
+            }
+        }
+
+        return isExist;
     }
 
     function renderApplyDetailsList($TRs) {

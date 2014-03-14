@@ -2,28 +2,29 @@ package finance
 
 import (
 	"github.com/hjqhezgh/commonlib"
+	"github.com/hjqhezgh/lessgo"
 	"net/http"
 	"strconv"
-	"github.com/hjqhezgh/lessgo"
+	"tool"
+	"strings"
 )
 
-func UserInfoAction(w http.ResponseWriter, r *http.Request) {
+func RoleCodesAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface {})
-	userId := r.FormValue("userId")
 
-	userInfo := new(UserInfo)
-
-	if userId == "1" {
-		userInfo.Id = "1"
-		userInfo.Role = "CD"
-	} else {
-		userInfo.Id = "0"
-		userInfo.Role = "C"
+	roleCodes, err := tool.GetCurrentEmployeeRoles(r)
+	if err != nil {
+		lessgo.Log.Error(err)
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
 	}
 
 	m["success"] = true
 	m["code"] = "200"
-	m["datas"] = userInfo
+	m["datas"] = roleCodes
 	commonlib.OutputJson(w, m, "")
 
 	return
@@ -31,13 +32,20 @@ func UserInfoAction(w http.ResponseWriter, r *http.Request) {
 
 func HandleApplyAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface {})
-	userId := r.FormValue("userId")
 
-	role := GetUserRole(userId)
+	roleCodes, err := tool.GetCurrentEmployeeRoles(r)
+	if err != nil {
+		lessgo.Log.Error(err)
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
 
 	handleApply := new(HandleApply)
-	handleApply.PendingReceiptAmount = GetPendingReceiptAmount(role)
-	handleApply.CompletedReceiptAmount = GetCompletedReceiptAmount(role)
+	handleApply.PendingReceiptAmount = GetPendingReceiptAmount(roleCodes)
+	handleApply.CompletedReceiptAmount = GetCompletedReceiptAmount(roleCodes)
 
 	m["success"] = true
 	m["code"] = "200"
@@ -49,11 +57,18 @@ func HandleApplyAction(w http.ResponseWriter, r *http.Request) {
 
 func ReceiptDetailsAction(w http.ResponseWriter, r *http.Request) {
 	m := make(map[string]interface {})
-	userId := r.FormValue("userId")
 
-	role := GetUserRole(userId)
+	roleCodes, err := tool.GetCurrentEmployeeRoles(r)
+	if err != nil {
+		lessgo.Log.Error(err)
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
 
-	receiptList := GetReceiptList(role)
+	receiptList := GetReceiptList(roleCodes)
 
 	m["success"] = true
 	m["code"] = "200"
@@ -118,48 +133,47 @@ func GetUserRole(userId string) string {
 	return userRole
 }
 
-func GetPendingReceiptAmount(role string) string {
+func GetPendingReceiptAmount(roleCodes []string) string {
 	var pendingReceiptAmount string
-	if role == "CD" {
+	if isStringExistInStringArray(roleCodes, "cd") {
 		pendingReceiptAmount = "2"
-	} else {
+	} else if isStringExistInStringArray(roleCodes, "yyzj") {
 		pendingReceiptAmount = "10"
 	}
 
 	return pendingReceiptAmount
 }
 
-func GetCompletedReceiptAmount(role string) string {
+func GetCompletedReceiptAmount(roleCodes []string) string {
 	var completeReceiptAmount string
-	if role == "CD" {
+	if isStringExistInStringArray(roleCodes, "cd") {
 		completeReceiptAmount = "20"
-	} else {
+	} else if isStringExistInStringArray(roleCodes, "yyzj") {
 		completeReceiptAmount = "100"
 	}
 
 	return completeReceiptAmount
 }
 
-func GetPendingReceiptDetails(role string) {
-	if role == "CD" {
+func GetPendingReceiptDetails(roleCodes []string) {
+	if isStringExistInStringArray(roleCodes, "cd") {
 		//
-	} else {
-		//
-	}
-}
-
-func GetCompletedReceiptDetails(role string) {
-	if role == "CD" {
-		//
-	} else {
+	} else if isStringExistInStringArray(roleCodes, "yyzj") {
 		//
 	}
 }
 
-func GetReceiptList(role string) []*Receipt {
+func GetCompletedReceiptDetails(roleCodes []string) {
+	if isStringExistInStringArray(roleCodes, "cd") {
+		//
+	} else if isStringExistInStringArray(roleCodes, "yyzj") {
+		//
+	}
+}
+
+func GetReceiptList(roleCodes []string) []*Receipt {
 	var receiptList []*Receipt
-	lessgo.Log.Debug(role)
-	if role == "CD" {
+	if isStringExistInStringArray(roleCodes, "cd") {
 		code := 100100
 		curCode := code
 		curAmount := 500
@@ -217,9 +231,21 @@ func GetReceiptList(role string) []*Receipt {
 
 			receiptList = append(receiptList, receipt)
 		}
-	} else {
+	} else if isStringExistInStringArray(roleCodes, "yyzj") {
 		//
 	}
 
 	return receiptList
+}
+
+func isStringExistInStringArray (strArray []string, str string) bool {
+	isExist := false
+	for _, v := range strArray {
+		if strings.ToLower(str) == strings.ToLower(v) {
+			isExist = true
+			break
+		}
+	}
+
+	return isExist
 }
