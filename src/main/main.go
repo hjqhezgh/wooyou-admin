@@ -64,10 +64,11 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/login": server.LoginAction,
 
 	//根据角色ID获取员工列表
-	"/employeeListByRoleId.json": server.EmployeeListByRoleIdAction,
-	"/employeeByCenterId.json":   server.EmployeeListByCenterIdAction,
-	"/courseInCenter.json":       server.CourseInCenterAction,
-	"/employeeInCenter.json":     server.EmployeeListInCenterAction,
+	"/employeeListByRoleId.json" : server.EmployeeListByRoleIdAction,
+	"/employeeByCenterId.json"   : server.EmployeeListByCenterIdAction,
+	"/courseInCenter.json"       : server.CourseInCenterAction,
+	"/employeeInCenter.json"     : server.EmployeeListInCenterAction,
+	"/getCurrentEmployee.json"   : server.GetCurrentEmployeeAction,
 
 	//音频相关服务
 	"/consultant_phone_list.json":        server.ConsultantPhoneListAction,
@@ -216,9 +217,9 @@ var handlers = map[string]func(http.ResponseWriter, *http.Request){
 	"/web/courseware/load.json":      web.CoursewareLoadAction,
 	"/web/courseware/uploadCallBack": web.CoursewareUploadCallBack,
 
-	"/getRoleCodes.json"				:			finance.RoleCodesAction,
-	"/getHandleApplyInfo.json"			:			finance.HandleApplyAction,
-	"/getReceiptDetails.json"			:			finance.ReceiptDetailsAction,
-	"/classifiedPendingReceiptList"		:			finance.ClassifiedPendingReceiptListAction,
-	"/classifiedCompletedReceiptList"	:			finance.ClassifiedCompletedReceiptListAction,
+	"/getRoleCodes.json"		  : finance.RoleCodesAction,
+	"/getHandleApplyInfo.json"	  : finance.HandleApplyAction,
+	"/getReceiptDetails.json"	  : finance.ReceiptDetailsAction,
+	"/classifiedPendingReceiptList"	  : finance.ClassifiedPendingReceiptListAction,
+	"/classifiedCompletedReceiptList" : finance.ClassifiedCompletedReceiptListAction,
 }

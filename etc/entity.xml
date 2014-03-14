@@ -215,6 +215,19 @@
         <field name="phone_in_center"/>
     </entity>
 
+    <!--部门-->
+    <entity id="department">
+        <pk>id</pk>
+        <field name="name"/>
+    </entity>
+
+    <!--财务科目-->
+    <entity id="accounting_subject">
+        <pk>id</pk>
+        <field name="code"/>
+        <field name="name"/>
+    </entity>
+
     <entity id="gallery">
         <pk>id</pk>
         <field name="title"/>

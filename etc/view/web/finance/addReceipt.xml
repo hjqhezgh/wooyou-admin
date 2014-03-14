@@ -9,32 +9,23 @@
                <div class="control-group">
                  <label class="control-label">报销中心</label>
                  <div class="controls">
-                   <select class="form-control">
-                     <option value="1">阿罗海</option>
-                     <option value="2">湖里金宝贝</option>
-                     <option value="3">福州台江万达</option>
-                     <option value="4">总部</option>
-                   </select>
+                   <select class="form-control" name='center_id'></select>
                  </div>
                </div>
 
                <div class="control-group">
                  <label class="control-label">报销部门</label>
                  <div class="controls">
-                   <select class="form-control">
-             	<option value="hr">人力部门</option>
-             	<option value="it">IT部门</option>
-             	<option value="market">市场部</option>
-                   </select>
+                   <select class="form-control" name='department_id'></select>
                  </div>
                </div>
 
                <div class="control-group">
                  <label class="control-label">报销类型</label>
                  <div class="controls">
-                   <select class="form-control">
-             	<option value="daily">日常类</option>
-             	<option value="build">建设类</option>
+                   <select class="form-control" name='use_type'>
+                     <option value="daily">日常类</option>
+             	     <option value="build">建设类</option>
                    </select>
                  </div>
                </div>
@@ -56,7 +47,7 @@
                      <tbody>
                        <tr id='itemTemplate' hidden='hidden'>
                          <td>
-                          <select name="use_type[]" class="form-control span1" disabled="disabled">
+                          <select name="accounting_subject_code[]" class="form-control span1" disabled="disabled">
                              <option value="chailv">差旅</option>
                              <option value="shuidian">水电</option>
                              <option value="dianhua">电话</option>
@@ -73,18 +64,12 @@
 			   </div>	
  			 </td>
                          <td><div class="row-fluid"><textarea name="remark[]" rows="1" placeholder="备注" class="span12" disabled="disabled"></textarea></div></td>
-                         <td><a class='editItem'>修改</a> <a class='saveItem' hidden='true'>保存</a> <a class='deleteItem'>删除</a></td>
+                         <td><a class='editItem' style='cursor:pointer'>修改</a> <a class='saveItem' style='cursor:pointer' hidden='true'>保存</a> <a class='deleteItem' style='cursor:pointer'>删除</a></td>
                        </tr>
 
                        <tr id='newItem'>
                          <td>
-                           <select name="data1" class="form-control span1">
-                             <option value="chailv">差旅</option>
-                             <option value="shuidian">水电</option>
-                             <option value="dianhua">电话</option>
-                             <option value="wangluo">网络</option>
-                             <option value="gongzi">工资</option>
-                           </select>
+                           <select name="data1" class="form-control span1" id='accounting_subject'></select>
              	 	 </td>
                          <td><div class='row-fluid'><input name="data2" type="text" placeholder="单据" class="span12"></div></td>
                          <td><div class='row-fluid'><input name="data3" type="text" placeholder="金额" class="span12"></div></td>
@@ -113,16 +98,7 @@
                        </tr>
                      </thead>
                      <tbody>
-                       <tr>
-                         <td>阿罗海4月第一周发票01</td>
-                         <td>预览 下载 删除</td>
-                       </tr>
-                       <tr>
-                       <tr>
-                         <td>阿罗海4月第一周发票02</td>
-                         <td>预览 下载 删除</td>
-                       </tr>
-		       <tr>
+               	       <tr>
                          <td colspan='2'><input type="file" class='input-file'></td>
                        </tr>
                      </tbody>
@@ -143,7 +119,7 @@
            </div>
 
     <script type="text/javascript">
-            seajs.use(['/js/receiptDetails.js']);
+            seajs.use(['/js/add_receipt.js']);
     </script>
 
            ]]>

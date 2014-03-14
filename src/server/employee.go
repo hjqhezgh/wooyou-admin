@@ -76,6 +76,27 @@ type Employee struct {
 	CenterId     string `json:"centerId"`
 }
 
+// 获取当前用户信息
+func GetCurrentEmployeeAction(w http.ResponseWriter, r *http.Request) {
+	m := make(map[string]interface{})
+
+	user_id, err := strconv.Atoi(lessgo.GetCurrentEmployee(r).UserId)
+	employee, err := FindEmployeeById(user_id)
+
+	if err != nil {
+		m["success"] = false
+		m["code"] = 100
+		m["msg"] = "出现错误，请联系IT部门，错误信息:" + err.Error()
+		commonlib.OutputJson(w, m, " ")
+		return
+	}
+
+	m["success"] = true
+	m["code"] = 200
+	m["datas"] = employee
+	commonlib.OutputJson(w, m, " ")
+}
+
 //根据id获取员工信息
 func FindEmployeeById(id int) (Employee, error) {
 
