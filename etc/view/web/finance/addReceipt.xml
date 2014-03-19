@@ -46,39 +46,29 @@
                      </thead>
                      <tbody>
                        <tr id='itemTemplate' hidden='hidden'>
-                         <td>
-                          <select name="accounting_subject_code[]" class="form-control span1" disabled="disabled">
-                             <option value="chailv">差旅</option>
-                             <option value="shuidian">水电</option>
-                             <option value="dianhua">电话</option>
-                             <option value="wangluo">网络</option>
-                             <option value="gongzi">工资</option>
-                           </select>
-			 </td>
+                         <td><div class='row-fluid'><input type="text" disabled="disabled" value="" name="accounting_subject_code[]"/></div></td>
                          <td><div class='row-fluid'><input name="certificate_quantity[]" type="text" placeholder="单据" class="span12" disabled="disabled"></div></td>
                          <td><div class='row-fluid'><input name="amount[]" type="text" placeholder="金额" class="span12" disabled="disabled"></div></td>
                          <td>
-			   <div class='form-inline row-fluid'>
+						   <div class='form-inline row-fluid'>
                              <input name="accounting_periods_start[]" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="ge" placeholder='开始日期' class='span6 date' disabled="disabled" />
                              <input name="accounting_periods_end[]" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="le" placeholder='结束日期' class='span6 date' disabled="disabled"/>
-			   </div>	
- 			 </td>
+						   </div>	
+			 			 </td>
                          <td><div class="row-fluid"><textarea name="remark[]" rows="1" placeholder="备注" class="span12" disabled="disabled"></textarea></div></td>
                          <td><a class='editItem' style='cursor:pointer'>修改</a> <a class='saveItem' style='cursor:pointer' hidden='true'>保存</a> <a class='deleteItem' style='cursor:pointer'>删除</a></td>
                        </tr>
 
                        <tr id='newItem'>
-                         <td>
-                           <select name="data1" class="form-control span1" id='accounting_subject'></select>
-             	 	 </td>
+						 <td><div class='row-fluid'><input class="ztreeInput" type="text" readonly value="" name="" class="span11"/></div></td>
                          <td><div class='row-fluid'><input name="data2" type="text" placeholder="单据" class="span12"></div></td>
                          <td><div class='row-fluid'><input name="data3" type="text" placeholder="金额" class="span12"></div></td>
                          <td>
-			   <div class='form-inline row-fluid'>
+						   <div class='form-inline row-fluid'>
                              <input name="data4" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="ge" placeholder='开始日期' class='span6 date'/>
                              <input name="data5" type="text" data-field="" data-desc="日期" style="z-index:10;" data-searchtype="le" placeholder='结束日期' class='span6 date'/>
-			   </div>	
- 			 </td>
+			   			   </div>	
+			 			 </td>
                          <td><div class="row-fluid"><textarea name="data6" rows="1" placeholder="备注" class="span12"></textarea></div></td>
                          <td><div class="row-fluid"><a class="btn btn-primary" class='span12' id='addItem'>保存</a></div></td>
                        </tr>
@@ -88,22 +78,22 @@
 	       </div>
 
 	       <div class='control-group'>
-                 <label class="control-label">发票凭据</label>
-                 <div class="controls">
-	  	   <table class="table table-hover">
-                     <thead>
-                       <tr>
-                         <th>文件名</th>
-                         <th>操作</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-               	       <tr>
-                         <td colspan='2'><input type="file" class='input-file'></td>
-                       </tr>
-                     </tbody>
-                   </table>
-                 </div>
+             <label class="control-label">发票凭据</label>
+             <div class="controls">
+	  	       <table class="table table-hover">
+                 <thead>
+                   <tr>
+                     <th>文件名</th>
+                     <th>操作</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td colspan='2'><input type="file" class='input-file'></td>
+                   </tr>
+                 </tbody>
+               </table>
+             </div>
 	       </div>
 
 
@@ -118,10 +108,8 @@
              </form>
            </div>
 
-    <script type="text/javascript">
-            seajs.use(['/js/add_receipt.js']);
-    </script>
-
+			<div id="menuContent" class="menuContent" style="display:none; position: absolute;background:#eee"><ul id="treeDemo" class="ztree" style="margin-top:0; width:160px;"></ul></div>
+		    <script type="text/javascript"> seajs.use(['/js/add_receipt.js']); </script>
            ]]>
         </content>
     </blankpanel>
