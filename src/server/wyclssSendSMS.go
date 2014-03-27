@@ -265,7 +265,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				smsStatus = "3"
 			}
 
-			updateClassSmsStatus := "update schedule_detail_child set sms_status=? where wyclass_id=? and child_id=? and schedule_detail_id=? "
+			updateClassSmsStatus := "update schedule_detail_child set sms_status=? where child_id=? and schedule_detail_id=? "
 			lessgo.Log.Debug(updateClassSmsStatus)
 
 			stmt, err := tx.Prepare(updateClassSmsStatus)
@@ -280,7 +280,7 @@ func WyClassSendSMSSaveAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = stmt.Exec(smsStatus, classId, consumerIdList[index], scheduleId)
+			_, err = stmt.Exec(smsStatus, consumerIdList[index], scheduleId)
 			if err != nil {
 				tx.Rollback()
 				lessgo.Log.Warn(err.Error())
