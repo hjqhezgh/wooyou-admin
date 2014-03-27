@@ -18,6 +18,7 @@ import (
 	"github.com/hjqhezgh/commonlib"
 	"github.com/hjqhezgh/lessgo"
 	"time"
+	"fmt"
 )
 
 const (
@@ -105,6 +106,41 @@ func insertSignIn(tx *sql.Tx, scheduleId, childId, signType, contractId, cardId,
 	} else {
 		_, err = stmt.Exec(childId, time.Now().Format("20060102150405"), scheduleId, signType, contractId, cardId, employeeId, isFree)
 	}
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func updateSignIn(tx *sql.Tx, parentDataMap map[string]interface{}, id string) error {
+	sql := "update sign_in set %v where sid=?"
+	params := []interface{}{}
+
+	setSql := ""
+
+	for key, value := range parentDataMap {
+		setSql += key + "=?,"
+		params = append(params, value)
+	}
+
+	params = append(params, id)
+
+	setSql = commonlib.Substr(setSql, 0, len(setSql)-1)
+
+	sql = fmt.Sprintf(sql, setSql)
+	lessgo.Log.Debug(sql)
+
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		lessgo.Log.Error(err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(params...)
 
 	if err != nil {
 		lessgo.Log.Error(err.Error())

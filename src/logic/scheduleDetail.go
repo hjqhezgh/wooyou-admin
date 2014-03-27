@@ -556,6 +556,7 @@ func ClassScheduleDetailSignIn(childIds, scheduleId, classId, employeeId string)
 	}
 
 	for _, childId := range idList {
+		//检查改学生在本节课是否已经有签到记录
 		signInExistFlag, err := checkSignInExist(childId, scheduleId)
 
 		if err != nil {
@@ -564,6 +565,7 @@ func ClassScheduleDetailSignIn(childIds, scheduleId, classId, employeeId string)
 		}
 
 		if signInExistFlag {
+			//todu更新已有的签到记录为1
 			continue
 		}
 
